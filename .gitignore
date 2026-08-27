@@ -3,7 +3,6 @@
 */.DS_Store
 **/.obsidian/workspace.json
 **/.obsidian/workspace-mobile.json
-ruflo/
 
 # Ruflo local secrets and runtime data
 .env.local
@@ -11,7 +10,3 @@ ruflo/
 .claude-flow/data/
 .claude-flow/logs/
 .claude-flow/sessions/
-.claude-flow/
-.swarm/
-ruvector.db
-.agents/skills/ruflo/*.log
