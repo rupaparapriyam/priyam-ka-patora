@@ -1,7 +1,13 @@
 # 🏢 Priyam Ka Patora — Command Center
 
 > **Founder & CEO**: Priyam
-> **Last Updated**: 2026-08-28
+> **Last Updated**: 2026-08-28 (re-verification + roadmap pass)
+
+---
+
+## 🗺️ [[Roadmap|Roadmap & Prioritization]]
+
+**Where to start right now**: [[Startup Ideas/02 - Pathology Lab Ops Assistant/Pathology Lab Ops Assistant|Pathology Lab Ops Assistant]] — real prototype + real paying customer + unique access edge. [[Startup Ideas/03 - Ecommerce Hub/Ecommerce Hub|Ecommerce Hub]] runs as a parallel validation track. Full reasoning and ranking of all ideas in [[Roadmap]].
 
 ---
 

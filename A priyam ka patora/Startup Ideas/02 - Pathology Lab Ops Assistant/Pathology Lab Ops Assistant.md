@@ -402,3 +402,21 @@ A working v0 exists at `~/developer/pathlab-ops` (Next.js + Prisma): analyzer CS
 LabsmartLIS (pathology lab software price in India, 2026); Codingclave (10 Indian LIMS reviewed, 2026); CareEdge Ratings (Indian Diagnostics Industry opinion piece, 18 Nov 2025 — 1.3 lakh labs, 75-80% unorganised, revenue/test ₹233→₹187, ~12% growth, USD 15-16bn by FY30); Precedence Research (India laboratory informatics, USD 160M 2025 → USD 241M 2035, 4.2% CAGR); ConsentOS (DPDP enforcement timeline); Ichelon Consulting (ABDM 2026 rollout); Clinical Establishments Act portal; NABL India.
 
 **Confidence:** pricing band, market size, growth and regulatory dates are sourced and dated. "Most labs use the same software" rests on **one** first-hand account and needs five more datapoints — that is task 4 above. Vendor feature claims are marketing copy unless demo-verified; only CrelioHealth has substantial third-party review coverage. Market-size figures carry the usual commercial-research methodology caveats; two independent methods agreeing raises confidence without making either exact.
+
+---
+
+## Claude — Pass 6 refresh (2026-08-28)
+
+Quick sanity-check, not a full redo. **Prior verdict (🟡 Build, not a venture bet) still holds — no material change.**
+
+**Market size**: no India-specific source directly confirms or refutes the ₹150–300 cr/yr, ~4% growth estimate from Pass 5. Broader "Laboratory Informatics" market reports (Mobility Foresights, Precedence Research, Grand View, MarketsandMarkets) size across pharma/biotech/hospital/environmental labs combined, not just independent pathology labs, so they aren't directly comparable — Precedence Research pegs the *broader* India lab-informatics market at ~USD 241M by 2035 with industry-wide CAGRs commonly cited at 7–9%, higher than the 4% assumed here. This doesn't contradict the narrower pathology-specific estimate but flags it as conservative/niche-specific rather than confirmed. **Unverified either way — still an open item.**
+
+**Competitors confirmed (verified via vendor sites this pass)**:
+- **Flabs** (flabslis.com) — cloud pathology LIS, "Try for ₹1" trial, SaaS-first, direct small-lab competitor.
+- **Labsmart LIS** (labsmartlis.com) — entry pricing ~₹417/month, also publishes its own "one-time vs subscription" pricing guide and runs comparison pages vs competitors.
+- **Attune** (attunelive.com) — LIMS aimed at pathology labs, more enterprise/hospital-oriented.
+- Numerous small IndiaMART vendors sell one-time desktop pathology software from ~₹5,000/unit — confirms the one-time-purchase norm (matching the family lab's ₹40k one-time + AMC) is the market standard here, not an outlier.
+
+**Read**: several small, regionally-scrappy vendors already compete on price/one-time-purchase model in this exact niche. Differentiation has to come from the design-partner relationship and workflow depth (the personal-access edge), not category novelty — consistent with, not contradicting, the "small real business, not a venture-scale bet" framing.
+
+Sources: flabslis.com, labsmartlis.com, attunelive.com, IndiaMART listings, Precedence Research India Laboratory Informatics Market.

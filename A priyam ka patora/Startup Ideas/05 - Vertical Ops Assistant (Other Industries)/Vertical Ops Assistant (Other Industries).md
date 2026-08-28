@@ -61,3 +61,22 @@ Logistics: Fretron, Shipmnts, Broto, Live IMPEX/Softlink Global product sites; T
 Finance ops: Clear.in, Finifi, HighRadius, CashFlo press materials; Vyapar TaxOne and Flick AI product pages; Zoho Books G2 reviews and Vyapar Software Advice reviews; Tally Solutions e-invoicing threshold history; PIB Udyam registration figures (Feb 2026); CAclubIndia GST 8-year statistics (June 2025); Pazy.io invoice automation guide (flagged as largely uncited vendor claims).
 
 **Confidence note:** every "X hours saved" or "Y% error rate" figure across all three industries traces back to a vendor's own marketing content, not independent audited data — consistent with what the pathology-lab research also found. The one class of evidence that's genuinely load-bearing across all three is *acquisition and funding activity* (Suvit→Vyapar, CashFlo's ₹70cr raise, Freightmate.ai's $5M, Broto's live product) — that's real market signal, distinct from the unverified time-savings claims layered on top of it.
+
+---
+
+## Claude — Pass 2 refresh (2026-08-28)
+
+Re-verified the four named competitors are still real, active, and funded — and the picture is now stronger against this idea, not weaker:
+
+- **Suvit** — real, ~$6.2M revenue (2025) — and **acquired by Vyapar in 2026**, rebranded "Vyapar TaxOne," specifically to consolidate AI-led accounting automation for MSMEs. This is new information since Pass 1: the space didn't just stay crowded, it **consolidated further** — a new solo entrant would now be competing against a combined, funded incumbent instead of two separate ones.
+- **Vyapar** — active, larger post-acquisition.
+- **Broto** (brotoai.com) — confirmed live, "all-in-one automation for Indian customs brokers" — matches the logistics/customs thesis exactly.
+- **CashFlo** — active and funded: Series A ($3.3M) plus a later ₹70 crore round from General Catalyst and Elevation Capital, in SME finance-ops/working-capital exactly as described.
+
+**Verdict unchanged, arguably reinforced**: 🔴 Researched, crowded — now with active M&A consolidation as an additional reason to stay away from these three specific candidates.
+
+**Speculative alternate verticals** (brainstormed, NOT researched or verified — flagged only as possible future leads):
+1. Diagnostic/imaging centers adjacent to pathology (radiology, dialysis chains) — same "small clinical-ops + compliance + billing" pattern as the pathology lab idea, plausibly under-served, but no personal-access edge has been identified yet.
+2. Small manufacturing/job-work units (GST + purchase-order + machine-hour tracking) — fragmented, guessed to have low SaaS penetration, but this is a pure guess with zero evidence checked.
+
+Sources: Inc42 "Vyapar Acquires Suvit", Latka (Suvit revenue estimate), brotoai.com, CashFlo funding announcements (cashflo.io/media).

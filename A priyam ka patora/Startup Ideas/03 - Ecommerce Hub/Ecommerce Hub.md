@@ -95,3 +95,17 @@ A defensible entry price for an India-first unified tool, benchmarked against Tr
 Triple Whale (G2 pricing/reviews page, own knowledge-base integration docs, Crunchbase Series B, Getlatka revenue estimate); Polar Analytics (own pricing page, G2 reviews, 1800dtc.com overview); Daasity, Glew, Rockerbox, Lifesight (G2 review pages); Northbeam (Crunchbase, BusinessWire Series A announcement); Putler (own pricing page, own Razorpay-analytics-tools page); WhatsApp BSP comparisons — WATI vs AiSensy vs Interakt (CampaignHQ, Ominiflow); Gupshup funding (TechCrunch 2021 raise, Zomefy 2025 valuation update); BiteSpeed (Inc42 Sequoia Surge funding, AsiaTechDaily seed round, Devdiscourse Razorpay partnership, ValueForStartups ARR estimate — flagged unverified); Shiprocket (own carrier-integrations pages); Razorpay (own RTO Analytics Dashboard blog post); Google Ads API access levels (Google's own developer docs); Meta Marketing API access tier changes (Meta's own developer blog); DPDP Rules 2025 (PIB government notification PDF, EY India, Seclore, Wikipedia summary).
 
 **Confidence note**: G2 review counts/ratings, official pricing pages, Meta/Google's own developer documentation, the government PDF, and named press coverage (TechCrunch, BusinessWire, Crunchbase) are highest-confidence. Anything sourced only from SEO comparison/listicle blogs is lower-confidence secondary commentary — several such sites have referral/affiliate incentives to shade competitor pricing unfavorably, flagged inline wherever used.
+
+---
+
+## Claude — Pass 2 refresh (2026-08-28)
+
+Targeted follow-up specifically trying to close the weakest-evidence gap flagged in Pass 1: real, sourced founder complaints about fragmented ecommerce analytics or missing Razorpay integration. Ran five more targeted searches (Reddit/r-India, X/Twitter + specific tool names, Indie Hackers, colloquial "too many dashboards"/"excel sheet" phrasing, "too expensive" + Shopify India) with more India-specific and colloquial terms than the first pass.
+
+**Result: still no direct, sourced founder complaints found.** Two independent search passes (desk research + this targeted one) both came up empty — only generic listicles, vendor alternatives pages, and unrelated threads surfaced.
+
+**This raises rather than lowers the priority of direct founder validation.** Absence of public complaints could mean the pain is genuinely low, or that frustrated founders vent in private WhatsApp groups/Slack communities that aren't indexed by search — this method can't distinguish between those two explanations. That distinction can only be resolved by actually talking to 10-20 Indian D2C founders directly, which remains the single most important next step before writing any code.
+
+**Verdict unchanged**: 🟡 Real gap, not blue ocean — product-side evidence (no Razorpay/Indian-logistics support in Western tools) is verified and solid; demand-side evidence is still unproven.
+
+Confidence note: the searches returning nothing is itself verified (the searches were run). The interpretation of *why* (low pain vs. private venting) is inference, not evidence either way.
