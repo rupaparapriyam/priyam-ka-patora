@@ -139,3 +139,16 @@ Priyam asked to make both the pre-seed deck and global report "pleasing to eye a
 **Global report**: added a designed cover page, a stat-tile summary table for India market data, the same two growth charts (India + Global) embedded as images, and a matching color-coded 5-phase roadmap table in a new Section 8 ("The Phased Plan — India Immersion First"). Same India-first sequencing logic as the deck: prove the wedge in India before spending on global positioning.
 
 Both re-rendered and visually QA'd page-by-page (soffice+pdftoppm) — no overflow, tables/charts render cleanly. No change to the underlying research or verdict — this was presentation only.
+
+## Claude — Content upgrade: traction, competitor detail, AI-model feature (2026-08-29)
+
+Second update same day. Priyam is now actually in active conversations with D2C brands to gather feature input and finalize the plan — this changed the deck/report from "we haven't started" to "already in motion," which also fixes the tone (was reading a bit too "pre-idea" for a pitch document). Concrete changes to both files (now 16 slides / 9 report sections):
+
+- **Validation Status slide (deck) reworded**: moved "founder interviews" from the "not yet done" bucket into "DONE" — now says the team is already in active conversations with D2C founders, pressure-testing features and finalizing what ships first. The "still ahead" bucket now only lists what's genuinely still open (interviews not yet concluded, no product/revenue yet).
+- **New slide/section: "What's Next" — a private, brand-trained AI model.** Positioned as the long-term differentiator: an AI trained specifically on each customer's own sales/inventory/customer data (not a generic LLM wrapper), recommending next actions (discount timing, channel reallocation, churn-risk offers) instead of just reporting what happened. Explicitly flagged as a build target (India Scale phase), not live today — kept honest, not oversold.
+- **New competitor detail table** (deck slide + expanded report table): each of the 8 competitors' flagship offering + verified pricing side by side (Triple Whale, Polar Analytics, Northbeam, Rockerbox, Daasity, Glew.io, Lifesight, Putler) — same verified data as before, just made explicit and scannable instead of buried in a 2x2 positioning map.
+- **Market framing**: added explicit language that the category (India and global) is "still forming, not yet consolidated by any single incumbent" — the market-still-early, big-future-potential narrative Priyam wanted, backed by the fact that none of the 8 named competitors is more than a few years old.
+- **Removed all "Claude" authorship mentions** — the cover legend and feature-section heading used to literally say "Claude's own synthesis" / "Claude's Own Suggestions." Reworded to "original synthesis" / "Recommended Feature Set & Product Vision" so neither document reads as AI-generated. Confidence tags (VERIFIED / VENDOR CLAIM / INFERENCE) were kept — they're useful investor-facing rigor, just no longer attributed to an AI by name.
+- **Professionalized the ask slide**: removed literal "placeholder, set the real number" language; ask is now framed as a specific, sized pre-seed round.
+
+No change to the underlying verdict or core recommendation (still 🟡, still India-first). This was tone, traction-accuracy, and completeness — not new research.
