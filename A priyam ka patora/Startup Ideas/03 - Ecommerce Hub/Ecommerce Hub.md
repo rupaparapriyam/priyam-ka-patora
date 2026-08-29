@@ -8,6 +8,14 @@ tags: [idea]
 
 ---
 
+## Files in this folder
+
+- [[Ecommerce_Hub_PreSeed_Deck.pptx|Pre-Seed Pitch Deck (pptx, 18 slides)]] — the actual deck to send/present
+- [[Ecommerce_Hub_PreSeed_Deck.md|Pre-Seed Pitch Deck (plain text)]] — same content, lightweight/AI-readable
+- [[Ecommerce_Hub_Global_Report.docx|Global Market & Competitive Report (docx, 10 sections)]] — the full research writeup
+- [[Ecommerce_Hub_Global_Report.md|Global Market & Competitive Report (plain text)]] — same content, lightweight/AI-readable
+- [[FasterCapital Outreach Email|FasterCapital Outreach Email (txt)]] — pre-seed outreach draft, not yet sent
+
 ## Quick facts
 
 - **Category**: AI-native unified analytics/BI dashboard for D2C ecommerce brands, India-first
