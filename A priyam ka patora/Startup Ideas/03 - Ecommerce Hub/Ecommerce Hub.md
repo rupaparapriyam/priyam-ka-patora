@@ -179,3 +179,16 @@ Fourth update same day. Two changes Priyam asked for:
 2. **Added the consolidation pitch** — new slide/section: "Ten subscriptions become one dashboard." Lists the 8 tools a D2C brand actually juggles today (analytics dashboard, WhatsApp automation, email/SMS automation, payment gateway dashboard, logistics dashboard, warehouse inventory/monitoring, marketplace panels, ads reporting) against "one login, one bill, one dashboard." Also added the clarifying distinction Priyam gave: this is NOT a plan to become a payments or logistics company — the product connects to existing payment gateways/logistics providers/marketplaces as-is ("out-house"), while WhatsApp automation, email/SMS automation, and warehouse monitoring are built in-house, natively inside the dashboard. This reframes the whole pitch around "simplify what you have to do to run an ecommerce storefront" rather than just "analytics in one place."
 
 Deck is now 18 slides, report is 8 pages / 10 sections (new 5.1 subsection). No change to core verdict — this was pricing accuracy + a sharper value-prop framing.
+
+## Claude — Added text/markdown versions for cheap AI-readable storage (2026-08-29)
+
+Fifth update same day. Priyam asked for the vault copies to be in text/small-storage format that's easy for future AI sessions to read, instead of only the binary pptx/docx.
+
+Added two new files alongside the existing binaries (kept the pptx/docx too — those are what you'd actually use to pitch investors, these are for fast/cheap reading):
+
+- **Ecommerce_Hub_PreSeed_Deck.md** (12KB) — all 18 slides transcribed as numbered sections with their substantive text, bullets, and tables. No layout/icon/visual detail, just the content.
+- **Ecommerce_Hub_Global_Report.md** (15KB) — all 10 report sections transcribed the same way, with proper markdown tables for the competitor/connector/risk/roadmap tables and confidence tags kept as `**[TAG]**` markers.
+
+Tried the obvious automated route first (markitdown, pandoc) but both produced genuinely broken output in this environment — markitdown is missing a docx dependency, and pandoc's docx conversion escaped dollar signs, dumped multi-paragraph cells as raw HTML tables, and left dangling image references to a media folder that was never created. Hand-transcribed both files directly instead, since I'd already written build.js/report.js and visually reviewed every page this session — that gave a much cleaner result: ~15KB and ~12KB vs. 94KB/606KB for the binaries, roughly 6x/40x smaller, and plain text any future AI session can read without parsing office file formats.
+
+No change to content/verdict — this was a storage-format change only.

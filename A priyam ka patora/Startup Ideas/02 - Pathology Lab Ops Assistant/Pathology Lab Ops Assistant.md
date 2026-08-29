@@ -4,7 +4,17 @@ tags: [idea]
 
 # Pathology Lab Ops Assistant
 
-**Current verdict**: 🟡 Build, but not as a venture-scale startup (updated 2026-08-28, pass 5 — see the Claude section at the end of this file). A first-hand datapoint from the family lab overturns the pricing assumption in passes 1-4: labs in this segment buy software on a **one-time perpetual licence of ~₹40,000 (range ₹14,000-50,000) plus 15-20% AMC**, not a monthly subscription. Corroborated by two independent pricing sources; Birlamedisoft PathoGold sells at ₹5,900-40,000 lifetime + AMC. Consequence: India's entire clinical-lab software market is roughly **₹150-300 crore/year across 30+ vendors, growing ~4%/yr** (triangulated from 1.3 lakh labs × realistic ARPU, and from the USD 160M India laboratory-informatics market). Product opportunity and family-access edge are real; the market ceiling is not. Best wedges remain statistical QC, delta checks, critical-value logging, TAT monitoring and NABL/DPDP compliance — plus, newly identified as highest-leverage, a **one-click migration importer from the incumbent desktop software**, because switching cost (not features) is the real moat. Three dated clocks create urgency: DPDP full enforcement May 2027, ABDM/ABHA now required for insurance empanelment, rolling NABL reassessment cycles. Next step unchanged and now overdue: talk to six labs in the next two weeks, not more desk research.
+**Current verdict**: 🟡 BUILD — but not as a venture-scale startup. (2026-08-28, pass 5. Detail in the Claude section at the bottom of this file.)
+
+- **Price reality**: labs pay ₹40,000 ONCE + 15-20% AMC. Not monthly. Range ₹14k-50k. Verified against 2 independent sources.
+- **Market ceiling**: ₹150-300 cr/yr for all of India, 30+ vendors, growing ~4%. Triangulated 2 ways. This number does not move with good execution.
+- **Edge**: family lab access. Kills product risk, not market risk.
+- **Build first**: migration importer from incumbent software (switching cost is the real moat) → statistical QC → delta checks → critical-value log with acknowledgement → TAT monitoring.
+- **Don't build**: AI report drafting, patient app, anything diagnostic, per-brand hardware drivers.
+- **Pricing**: ₹50-60k one-time + 18% AMC. Bigger option: sell the NABL/DPDP compliance outcome, software as delivery.
+- **Clocks**: DPDP enforcement May 2027 · ABDM required for insurance empanelment now · NABL reassessment cycles rolling.
+- **Next 14 days**: interview 6 labs. Not more desk research, not more code.
+- **Kill**: no 3 paying labs outside the family by day 90 → stop. SURGE being paused makes this rule more important, not less.
 
 ---
 
