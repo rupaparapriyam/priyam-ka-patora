@@ -109,3 +109,23 @@ Targeted follow-up specifically trying to close the weakest-evidence gap flagged
 **Verdict unchanged**: 🟡 Real gap, not blue ocean — product-side evidence (no Razorpay/Indian-logistics support in Western tools) is verified and solid; demand-side evidence is still unproven.
 
 Confidence note: the searches returning nothing is itself verified (the searches were run). The interpretation of *why* (low pain vs. private venting) is inference, not evidence either way.
+
+---
+
+## Claude — Global scope research + feature brainstorm (2026-08-29)
+
+Priyam asked to research this idea globally (not India-only), add recommended features, and produce a detailed report. Full report saved alongside this file as `Ecommerce_Hub_Global_Report.docx`; pre-seed deck as `Ecommerce_Hub_PreSeed_Deck.pptx`. Key takeaways:
+
+**Honest headline finding**: going global trades away the one verified, defensible advantage this idea has. The India-native gap (no Razorpay/Indian-logistics support in Triple Whale, Polar, Northbeam, Rockerbox, Daasity, Glew — confirmed directly) is real and checkable. "Global" has no equivalent confirmed gap — Triple Whale's own help center already states it supports multi-currency, i.e. already actively markets itself internationally.
+
+**Market size (verified)**: Grand View Research pegs global B2C ecommerce at $7.2T (2025) → $8.5T (2026) → $33.5T by 2033, 21.7% CAGR — this is broader B2C, not a D2C-only or software-spend figure, same caveat as the India numbers.
+
+**Regional check**: Plugo (Singapore, $9M Series A, Altos Ventures) is the only verified non-US/India competitor found — an ecommerce enabler, not a pure analytics tool. No dedicated D2C analytics competitor was found in Latin America, Europe, or the Middle East — explicitly flagged as an evidence gap, not proof those markets are open.
+
+**Untested hypothesis worth validating directly**: the same "big global tools skip the local payment/logistics ecosystem" pattern that's confirmed for India may also exist for Mercado Pago (LatAm), GrabPay/J&T Express (SEA), Klarna/iDEAL (parts of Europe) — none of this was confirmed in this pass (couldn't verify what Polar/Putler/Supermetrics do or don't support there). If true, the real strategy is "win one underserved payment-ecosystem market, then repeat," not "launch everywhere."
+
+**Recommendation given to Priyam**: keep the India-first validation plan (the 10-20 founder interviews) unchanged, but build the product so currency/locale/payment-provider handling isn't hard-coded to India-only from day one — keeps the option to repeat the playbook elsewhere later without a rebuild.
+
+**Feature brainstorm** (Claude's own suggestions, not user-validated — full list with rationale in the docx report): natural-language copilot to query data conversationally, proactive anomaly alerts (WhatsApp/Slack/email), revenue/inventory/CAC forecasting, anonymized industry benchmarking, creative-fatigue detection, RFM/cohort segmentation, influencer/affiliate ROI tracking, social-commerce (TikTok/Instagram/Facebook Shop) unification, root-cause RTO/chargeback analysis, customer 360 view, auto-generated board reports, multi-brand rollup + white-label reporting for agencies, and data-warehouse/API export. Flagged natural-language copilot as the single highest-leverage feature to prototype first.
+
+Verdict unchanged at 🟡 — this update doesn't change the core recommendation, it adds context for if/when Priyam decides to expand beyond India.
