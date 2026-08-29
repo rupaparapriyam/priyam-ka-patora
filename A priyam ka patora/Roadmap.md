@@ -55,3 +55,13 @@ The product-side research is solid and done: there's a verified, real gap (no ma
 3. **Decision point after both**: if Pathology Lab interviews confirm other labs will pay too, that's your primary build focus — it's the most de-risked idea on the list. If Ecommerce Hub founder conversations turn up real, specific, costly pain, that becomes a second serious track (larger market, but more competition and a harder validation bar than pathology).
 4. **Don't spend more time on**: Vertical Ops Assistant's three researched candidates, or the generic AI Chatbot Assistant — both are settled, re-verified dead ends for now.
 5. **Whenever you have 10 minutes**: write out what AI for Defence actually is (who pays, what it does, why now) so it can either get properly researched or be formally dropped instead of sitting as a permanent placeholder.
+
+---
+
+## Update — 2026-08-29: evolved AI Chatbot Assistant idea re-researched
+
+Priyam described an evolved version of idea 01 (AI Chatbot Assistant): a simpler agent builder bundled with employee monitoring, insider-leak/DLP detection, and a private company-hosted AI, possibly packaged as an "OS." Researched properly — see [[Startup Ideas/01 - AI Chatbot Assistant/AI Chatbot Assistant|AI Chatbot Assistant]] Pass 3 for full detail.
+
+**Verdict: 🔴 High risk, not recommended ahead of the current top two.** It bundles three separate markets: a crowded-but-narrow-wedge-viable agent-builder space (n8n, Gumloop, Dify, Chatbase already funded/profitable there), a genuinely hard enterprise DLP market requiring SOC2/ISO27001 and long sales cycles, and a capital-intensive private-AI-infra play ($150k-500k in GPU hardware for a mid-size company). Only the agent-builder UI layer is realistically buildable via vibe coding — the security/compliance/infra layers are not.
+
+**Ranking is unchanged at the top**: Pathology Lab Ops Assistant is still #1, Ecommerce Hub still #2. This evolved idea ranks below both — it doesn't have Pathology Lab's working prototype + paying customer, and unlike Ecommerce Hub, it requires enterprise trust/security certification just to start selling, which a solo founder can't get to quickly. If pursued at all, the only defensible starting point within it is a narrow-niche personal/consumer agent tool (not the "OS" version), and even that lands in already-crowded territory.
