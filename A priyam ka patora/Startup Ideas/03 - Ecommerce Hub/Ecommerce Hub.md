@@ -129,3 +129,13 @@ Priyam asked to research this idea globally (not India-only), add recommended fe
 **Feature brainstorm** (Claude's own suggestions, not user-validated — full list with rationale in the docx report): natural-language copilot to query data conversationally, proactive anomaly alerts (WhatsApp/Slack/email), revenue/inventory/CAC forecasting, anonymized industry benchmarking, creative-fatigue detection, RFM/cohort segmentation, influencer/affiliate ROI tracking, social-commerce (TikTok/Instagram/Facebook Shop) unification, root-cause RTO/chargeback analysis, customer 360 view, auto-generated board reports, multi-brand rollup + white-label reporting for agencies, and data-warehouse/API export. Flagged natural-language copilot as the single highest-leverage feature to prototype first.
 
 Verdict unchanged at 🟡 — this update doesn't change the core recommendation, it adds context for if/when Priyam decides to expand beyond India.
+
+## Claude — Visual polish pass on deck + report (2026-08-29)
+
+Priyam asked to make both the pre-seed deck and global report "pleasing to eye and information/data easy to read at a glance," and to add a proper phased plan leading with India immersion before global expansion. Both files updated in place (same filenames, both re-committed to this vault):
+
+**Pitch deck**: Market slide rewritten with 3 stat tiles + a native area chart of India's modeled growth (2026→2031), plus a new "Expansion Roadmap" slide — 5 color-coded phases (01 Validate → 02 India MVP → 03 India Scale → 04 1st Adjacent Market → 05 Multi-Market), with phases 01-02 marked "THIS RAISE" in coral to make clear the raise funds India-only validation, not global expansion.
+
+**Global report**: added a designed cover page, a stat-tile summary table for India market data, the same two growth charts (India + Global) embedded as images, and a matching color-coded 5-phase roadmap table in a new Section 8 ("The Phased Plan — India Immersion First"). Same India-first sequencing logic as the deck: prove the wedge in India before spending on global positioning.
+
+Both re-rendered and visually QA'd page-by-page (soffice+pdftoppm) — no overflow, tables/charts render cleanly. No change to the underlying research or verdict — this was presentation only.
