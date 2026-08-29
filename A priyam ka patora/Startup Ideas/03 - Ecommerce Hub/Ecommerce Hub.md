@@ -4,7 +4,9 @@ tags: [idea]
 
 # Ecommerce Hub
 
-**Current verdict**: 🟡 Real gap, but not a blue ocean — narrow to India-first wedge, not a full clone. The pain (juggling GA4, ad platforms, WhatsApp, Razorpay, logistics, and abandoned-cart data across separate dashboards) is genuine and well-monetized elsewhere — Triple Whale, Polar Analytics, Northbeam, Rockerbox, Daasity, Glew, and India-founded Lifesight all exist because this is a real, paying problem. But "AI explains your data in plain language" is **already a shipped, reviewer-corroborated feature** at Polar Analytics and Lifesight — that alone isn't a differentiator anymore in 2026, it's table stakes for a new entrant. The genuinely-verified gap is **India-specific data sources**: none of the established Western tools natively support Razorpay or Indian logistics carriers (confirmed by checking Triple Whale's own integration docs directly). The closest real competitor is **BiteSpeed** — a Sequoia Surge-backed, India-based startup already combining WhatsApp + Shopify + Razorpay — though it's positioned as a CRM/messaging tool, not an analytics-and-insight dashboard, so there may still be room. Weakest part of this research: I could not find direct, sourced Reddit/founder-forum complaints about these tools being too expensive or fragmented — that's a real evidence gap, not a green light. Next step is talking to 10-20 other D2C founders directly, not more desk research.
+**Current verdict**: 🟡 Real gap, not a blue ocean — narrow to India-first wedge, not a full clone. Same core thesis as the original research (below), now folded into a live pitch: **the pain is genuine** (juggling GA4, ads, WhatsApp, payments, logistics, marketplaces separately across 8+ tools), **"AI explains your data" alone isn't a differentiator** (Polar Analytics, Lifesight already ship it), and **the real verified gap is India-native data** — no major global tool (Triple Whale, Polar, Northbeam, Rockerbox, Daasity, Glew) natively supports Razorpay/Cashfree/PayU or Indian logistics carriers. Closest competitor: **BiteSpeed** (WhatsApp+Shopify+Razorpay, positioned as CRM not analytics).
+
+**Status as of 2026-08-29 (end of day)**: no longer just desk research — Priyam is now in active conversations with D2C brand founders (pressure-testing the feature set) and has reached out to investors (FasterCapital, via a LinkedIn connection with Eric Bush). A full 18-slide pre-seed deck and 10-section global research report exist (see **Files in this folder** below), positioned as "one dashboard instead of 10 tools," explicitly NOT a payments/logistics company (those stay third-party/"out-house"; WhatsApp/email-SMS automation/warehouse monitoring are in-house). Product/company name is **still undecided** — "Ecommerce Hub" is a working title only; candidate names discussed but not chosen: Setu, Sutradhar, Dukaan OS, Vyapar IQ, Threadline, Compass Commerce. Own pricing not set yet — deliberately, pending founder conversations. **Next concrete step**: finish the founder validation conversations already underway (kill criteria still apply — no real evidence yet of founders calling this pain point out unprompted, that gap hasn't closed), and decide on the product name.
 
 ---
 
@@ -18,15 +20,18 @@ tags: [idea]
 
 ## Quick facts
 
-- **Category**: AI-native unified analytics/BI dashboard for D2C ecommerce brands, India-first
-- **Direct global competitors**: Triple Whale, Polar Analytics, Northbeam, Rockerbox, Daasity, Glew.io, Lifetimely, Putler (verified via G2/vendor pricing pages)
-- **Closest India competitor**: BiteSpeed (Sequoia Surge-backed, WhatsApp+Shopify+Razorpay, ~$10M ARR per unverified third-party estimate)
-- **India-founded overlap**: Lifesight (AI-driven attribution/MMM, one G2 reviewer claims "no competition in the Indian market" — unverified opinion, worth checking directly)
-- **Pricing benchmarks (verified)**: Triple Whale $124–$375+/mo; Putler $20–$750/mo (revenue-tiered, has native Razorpay integration)
-- **Real technical gaps confirmed**: no Razorpay/Indian-logistics support in Triple Whale, Polar, Northbeam, Rockerbox, Daasity, Glew
-- **API access barriers**: manageable, not blocking — Meta needs 500+ API calls/15 days (recently lowered, not raised), Google Ads Basic Access gives 15,000 ops/day and ~5 business day approval
-- **Regulatory**: DPDP Act 2025 applies (processing D2C brands' customers' PII) — 18-month phased compliance window, not an immediate blocker at MVP stage
-- **Strategic risk**: Razorpay is already building its own analytics (RTO Analytics Dashboard) — could commoditize the payments-data layer
+- **Name**: not decided — "Ecommerce Hub" is a working title used across all files so far. Candidates discussed: Setu, Sutradhar, Dukaan OS, Vyapar IQ, Threadline, Compass Commerce.
+- **Category**: AI-native, consolidated dashboard for D2C ecommerce brands — analytics + WhatsApp/email/SMS automation + warehouse monitoring built in-house; payments/logistics/marketplaces stay third-party ("out-house"), just connected. India-first.
+- **Ask**: $40K–$60K pre-seed, sized to fund 90 days of founder validation (already underway) + MVP build (GA4 + one payment gateway + one logistics carrier).
+- **Own pricing**: not set yet, deliberately — to be set with design partners. Competitor pricing used only as a reference benchmark.
+- **Direct global competitors**: Triple Whale, Polar Analytics, Northbeam, Rockerbox, Daasity, Glew.io, Lifesight, Putler (verified via G2/vendor pricing pages) — none more than a few years old, none has consolidated the category yet.
+- **Closest India competitor**: BiteSpeed (Sequoia Surge-backed, WhatsApp+Shopify+Razorpay, ~$10M ARR per unverified third-party estimate), positioned as CRM not analytics.
+- **Real technical gap confirmed**: no Razorpay/Cashfree/PayU/Indian-logistics support in any major global tool.
+- **Full connector map** (not just Razorpay): Payments (Razorpay, Cashfree, PayU, PhonePe PG), Logistics (Shiprocket, Delhivery, XpressBees, Ecom Express, Shadowfax), WhatsApp/BSPs (AiSensy, Wati, Interakt, Gupshup), Storefront/OMS (Shopify, WooCommerce, Unicommerce), Marketplaces (Amazon, Flipkart, Myntra, Nykaa, Meesho) — MVP scope is still just GA4 + 1 payment gateway + 1 logistics carrier; the rest is the expansion map.
+- **Regulatory**: DPDP Act 2025 applies — 18-month phased compliance window, not an immediate blocker at MVP stage.
+- **Strategic risk**: Razorpay is already building its own analytics (RTO Analytics Dashboard) — could commoditize the payments-data layer.
+- **Outreach in progress**: FasterCapital (via LinkedIn connection with Eric Bush) — draft in [[FasterCapital Outreach Email]], not yet sent.
+- **Evidence gap that hasn't closed**: still no direct sourced evidence of founders complaining about this pain unprompted — the in-progress founder conversations are meant to close this, not desk research.
 
 ---
 
