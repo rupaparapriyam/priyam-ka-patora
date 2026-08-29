@@ -1,0 +1,21 @@
+Subject: Ecommerce Hub — Pre-Seed Pitch (following up from LinkedIn via Eric Bush)
+
+Hi FasterCapital team,
+
+Eric Bush shared this email with me after I reached out on LinkedIn — following up here with more detail on what I'm building.
+
+I'm Priyam, founder of Ecommerce Hub — an AI-native analytics dashboard for India's D2C brands. I'm reaching out about our pre-seed round.
+
+The problem: Running a D2C brand in India means living across six-plus disconnected tools — GA4, Meta/Google Ads, WhatsApp (AiSensy/Wati/Interakt), payment gateways (Razorpay/Cashfree/PayU), logistics carriers (Shiprocket/Delhivery/XpressBees), and spreadsheets stitching it all together manually. I lived this firsthand running SURGE, a D2C hair-styling brand.
+
+The solution: One dashboard that pulls in every channel — including India's payment gateways and logistics carriers, which no major global analytics tool supports natively — and explains what changed and why in plain language, not just charts.
+
+Why now: India's D2C market is $108.76B in 2026, growing at 24.3% CAGR to $322.1B by 2031 (Mordor Intelligence). The category is still forming — none of the eight competitors we've benchmarked (Triple Whale, Polar Analytics, Northbeam, Rockerbox, Daasity, Glew.io, Lifesight, Putler) is more than a few years old, and none has consolidated it yet, in India or globally.
+
+Where we stand: Already in active conversations with D2C brand founders, pressure-testing the feature set and finalizing what ships first. This raise — $40K–$60K — funds the next 90 days: completing that founder validation loop and shipping an MVP with three core integrations (GA4 + one payment gateway + one logistics carrier).
+
+I've attached a detailed deck and market/competitive research report. Happy to walk through either on a call — let me know what works.
+
+Best,
+Priyam
+rupaparapriyam@gmail.com

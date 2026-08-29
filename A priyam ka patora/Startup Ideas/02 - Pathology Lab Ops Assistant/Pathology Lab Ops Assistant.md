@@ -430,3 +430,74 @@ Quick sanity-check, not a full redo. **Prior verdict (🟡 Build, not a venture 
 **Read**: several small, regionally-scrappy vendors already compete on price/one-time-purchase model in this exact niche. Differentiation has to come from the design-partner relationship and workflow depth (the personal-access edge), not category novelty — consistent with, not contradicting, the "small real business, not a venture-scale bet" framing.
 
 Sources: flabslis.com, labsmartlis.com, attunelive.com, IndiaMART listings, Precedence Research India Laboratory Informatics Market.
+
+---
+
+## Claude (2026-08-28) — the plan: 6 months, ~240 hours, from one lab to a national channel
+
+_Constraints Priyam set: in Delhi, **under 10 hrs/week**, family lab is in Rajkot. Ambition: sell **online and in the field, all over India**. Success in 6 months = **enough revenue to fund the next venture**._
+
+### The arithmetic that shapes everything
+
+10 hrs/week ≈ 40 hrs/month ≈ **240 hours in six months**. A full LIS is 1,500+ hours. Thirty vendors already sell this door-to-door. So the binding constraint is **not code and not competition — it is Priyam's hours**. Every decision below is "what buys the most per hour."
+
+Consequence: national is the *destination*, not the *starting position*. You cannot run a national field sales motion at 10 hrs/week from Delhi. You can build one asset, prove it in one city, and then bolt a national channel onto a thing that already works.
+
+### The four phases
+
+**Phase 0 — Weeks 1-2 (~20 hrs). Validate without writing code.**
+- Father/mother send by WhatsApp: one machine export file from biochem + one from haematology, photos of a current printed report (front and back), the lab's test menu with prices. No travel needed.
+- Six lab calls by phone from Delhi, on father's introductions. Five questions: what software, what they paid, do they pay AMC, one thing they'd change, and the pricing question (₹50k once vs ₹2k/month).
+- Time three real tasks at the family lab (father can time them): registration→report for one CBC, monthly referral-commission calculation, last NABL document compilation.
+- **Output**: a one-page findings note in this file. **Gate: day 30 kill criterion.**
+
+**Phase 1 — Weeks 3-8 (~60 hrs). Make it real for exactly one lab.**
+- Vaibhav Laboratory runs it *in parallel* with the existing software — shadow mode, never a cutover. Nothing patient-facing depends on it until it's earned that.
+- Only what makes the demo win: their exact report layout, their test menu, their reference ranges, their machine's codes working end-to-end, WhatsApp delivery, and a **migration importer for their existing history**.
+- **Output**: a working lab and a case study with real numbers. This is the entire sales asset.
+
+**Phase 2 — Weeks 9-16 (~80 hrs). Three paying labs in Rajkot.**
+- Motion: father's referral → WhatsApp demo video → in-person install on a Rajkot trip (batch these; go once, install three).
+- Price ₹50-60k one-time + 18% AMC unless Phase 0 says otherwise.
+- **Gate: day 90 kill criterion — 3 paying labs outside the family, or the distribution thesis is wrong.**
+
+**Phase 3 — Weeks 17-26 (~80 hrs). Bolt on the national channel and test it cheaply.**
+- Landing page, demo video in Gujarati/Hindi/English, WhatsApp enquiry funnel, remote install over AnyDesk.
+- **The experiment that matters**: can a lab in a state you have never visited buy without meeting you? One sale answers it. That is the national question, and it costs a fortnight, not a year.
+- If yes → national is real, scale the channel. If no → Gujarat depth plus the reseller model below.
+
+### How "national + online" actually works in this segment
+
+Software can sell online in a way SURGE's physical product could not. But a ₹50,000 one-time purchase, made by a 55-year-old lab owner who has never bought software online, will not self-serve. Realistic model:
+
+**Online = lead generation. A person = the close.** Landing page and demo video bring enquiries; a WhatsApp demo and a remote install convert them. Then, the real national unlock:
+
+**Resellers.** One person per city who installs and supports for a cut of licence + AMC. This is exactly how the incumbents cover India — PathoGold is not flying engineers to Rajkot. It costs Priyam almost no hours per city, which is the only property that matters under this time budget. Phase 4, not now, but design the product so it is possible: clean installer, remote support, no hand-holding required.
+
+### Scope: what goes in v1, and what is explicitly cut
+
+**In**: registration → sample/barcode → result entry (manual + CSV import) → calculations → flags → report print + WhatsApp → basic billing with GST → **migration importer** → statistical QC (the NABL wedge) → audit log.
+
+**Cut from v1** (write it down so it stops being tempting): multi-branch, inventory/reagents, TPA/insurance, home collection, patient app, corporate/camp module, anything AI.
+
+Note: **billing is not optional.** A lab cannot replace its current software without it. It is boring and it is load-bearing.
+
+### Revenue, honestly
+
+3 labs × ₹55,000 = **₹1.65 lakh**, plus ~₹10k/lab/year AMC. Realistic six-month range if Phase 2 lands: **₹1.5-3 lakh.** That funds a next venture modestly. It is not a salary, and it arrives in month 4-6, not month 2.
+
+**If cash is genuinely the goal, name the tension:** the near-term income plan already in the vault — automation systems and websites for Indian SMEs — pays in *weeks*, not months. Pathology software is an asset build with a 4-6 month payback. The honest sequencing is to run pathlab as the asset and take one or two paid automation projects for cash alongside it. Do not pretend the lab software is the fast money.
+
+### Risks that are not competition
+
+1. **Time.** 10 hrs/week is the single biggest risk. Protect Phase 0 and Phase 1 above all — they are the only phases where hours compound.
+2. **Support burden — think about this before selling.** Once a lab runs on your software, a bug means patients waiting for reports. Three paying labs is a real on-call commitment while at university in another city. Decide in advance what you promise, and price it in.
+3. **Patient safety and liability.** A wrong value on a signed report is not a software bug, it is a clinical incident. Keep the pathologist verification step mandatory, keep raw machine values immutable, keep the audit log, and never let the software issue a report nobody verified.
+4. **Single-customer distortion.** Building only for the family lab produces software that fits one lab. Phase 0's six interviews exist to stop that.
+
+### Immediate next actions
+
+1. Ask parents for the machine export files, report photos and test menu — today, by WhatsApp.
+2. Ask father for six lab owner phone numbers and an introduction.
+3. Book the six calls for the next ten days.
+4. Do not open the code until items 1-3 are done.

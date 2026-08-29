@@ -192,3 +192,9 @@ Added two new files alongside the existing binaries (kept the pptx/docx too — 
 Tried the obvious automated route first (markitdown, pandoc) but both produced genuinely broken output in this environment — markitdown is missing a docx dependency, and pandoc's docx conversion escaped dollar signs, dumped multi-paragraph cells as raw HTML tables, and left dangling image references to a media folder that was never created. Hand-transcribed both files directly instead, since I'd already written build.js/report.js and visually reviewed every page this session — that gave a much cleaner result: ~15KB and ~12KB vs. 94KB/606KB for the binaries, roughly 6x/40x smaller, and plain text any future AI session can read without parsing office file formats.
 
 No change to content/verdict — this was a storage-format change only.
+
+## Claude — FasterCapital outreach email drafted (2026-08-29)
+
+Sixth update same day. Priyam connected with Eric Bush (FasterCapital) on LinkedIn and got a contact email — drafted a pre-seed outreach email addressed to the FasterCapital team, referencing that connection. Saved as [[FasterCapital Outreach Email]] (plain .txt, subject + body) in this folder. Not sent by me — Priyam is sending it himself so he can attach the actual pptx/docx directly in Gmail.
+
+Note: product/company naming is still undecided — "Ecommerce Hub" is a working title used throughout the deck/report/vault so far. Discussed candidate names (Setu, Sutradhar, Dukaan OS, Vyapar IQ, Threadline, Compass Commerce) in chat; nothing finalized yet. Rename everything once Priyam picks one.
