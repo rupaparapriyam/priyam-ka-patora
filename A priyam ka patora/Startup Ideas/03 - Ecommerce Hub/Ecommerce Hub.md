@@ -169,3 +169,13 @@ Researched the current (2025-2026) Indian D2C tech stack across six categories a
 Every prior mention of "Razorpay" or "Shiprocket/Delhivery" as if they were the only options was reworded throughout both documents (Problem slide, Solution slide, Product slide, GTM slide, Ask slide, Executive Summary, Section 2). Kept it honest: MVP scope (what this raise actually funds) is still explicitly scoped to GA4 + one payment gateway + one logistics carrier — the broader map is the category the product expands into as it scales, not day-one build scope. Deck is now 17 slides, report is now 8 pages / 10 sections.
 
 No change to the core research verdict — this was breadth/accuracy of the product's technical scope, not new market research.
+
+## Claude — Removed pricing, added consolidation pitch (2026-08-29)
+
+Fourth update same day. Two changes Priyam asked for:
+
+1. **Removed our own pricing** from both documents (Business Model slide's $50/$150/$300 tiers, the Market slide's "$50-$300/month" line, report Section 7). Reworded as "pricing set with design partners, not guessed up front" — kept competitor pricing (Triple Whale, Putler) as reference-only benchmarking since that's informational, not a commitment. This matches the reality: no price has actually been validated yet.
+
+2. **Added the consolidation pitch** — new slide/section: "Ten subscriptions become one dashboard." Lists the 8 tools a D2C brand actually juggles today (analytics dashboard, WhatsApp automation, email/SMS automation, payment gateway dashboard, logistics dashboard, warehouse inventory/monitoring, marketplace panels, ads reporting) against "one login, one bill, one dashboard." Also added the clarifying distinction Priyam gave: this is NOT a plan to become a payments or logistics company — the product connects to existing payment gateways/logistics providers/marketplaces as-is ("out-house"), while WhatsApp automation, email/SMS automation, and warehouse monitoring are built in-house, natively inside the dashboard. This reframes the whole pitch around "simplify what you have to do to run an ecommerce storefront" rather than just "analytics in one place."
+
+Deck is now 18 slides, report is 8 pages / 10 sections (new 5.1 subsection). No change to core verdict — this was pricing accuracy + a sharper value-prop framing.
