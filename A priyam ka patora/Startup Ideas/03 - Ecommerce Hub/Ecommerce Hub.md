@@ -152,3 +152,20 @@ Second update same day. Priyam is now actually in active conversations with D2C 
 - **Professionalized the ask slide**: removed literal "placeholder, set the real number" language; ask is now framed as a specific, sized pre-seed round.
 
 No change to the underlying verdict or core recommendation (still 🟡, still India-first). This was tone, traction-accuracy, and completeness — not new research.
+
+## Claude — Broadened connector/integration list beyond Razorpay (2026-08-29)
+
+Third update same day. Priyam pointed out the materials only named Razorpay for payments and Shiprocket/Delhivery for logistics, when in reality a serious Indian D2C integration layer needs to cover many more named players — asked me to research and add "all the connectors I would have missed."
+
+Researched the current (2025-2026) Indian D2C tech stack across six categories and added a new slide (deck) + new Section 5 (report) listing the real 3-5 players per category, not just one name each:
+
+- **Payments**: Razorpay, Cashfree, PayU, PhonePe PG
+- **Logistics & shipping**: Shiprocket, Delhivery, XpressBees, Ecom Express, Shadowfax
+- **WhatsApp / BSPs**: AiSensy, Wati, Interakt, Gupshup
+- **Storefront & OMS**: Shopify, WooCommerce, Unicommerce
+- **Marketplaces**: Amazon, Flipkart, Myntra, Nykaa, Meesho
+- **Ads & analytics**: Meta Ads, Google Ads, GA4 (already covered elsewhere, listed for completeness)
+
+Every prior mention of "Razorpay" or "Shiprocket/Delhivery" as if they were the only options was reworded throughout both documents (Problem slide, Solution slide, Product slide, GTM slide, Ask slide, Executive Summary, Section 2). Kept it honest: MVP scope (what this raise actually funds) is still explicitly scoped to GA4 + one payment gateway + one logistics carrier — the broader map is the category the product expands into as it scales, not day-one build scope. Deck is now 17 slides, report is now 8 pages / 10 sections.
+
+No change to the core research verdict — this was breadth/accuracy of the product's technical scope, not new market research.
