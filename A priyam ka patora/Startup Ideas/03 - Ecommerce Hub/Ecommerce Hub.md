@@ -6,12 +6,13 @@ tags: [idea]
 
 **Current verdict**: 🟡 Real gap, not a blue ocean — narrow to India-first wedge, not a full clone. Same core thesis as the original research (below), now folded into a live pitch: **the pain is genuine** (juggling GA4, ads, WhatsApp, payments, logistics, marketplaces separately across 8+ tools), **"AI explains your data" alone isn't a differentiator** (Polar Analytics, Lifesight already ship it), and **the real verified gap is India-native data** — no major global tool (Triple Whale, Polar, Northbeam, Rockerbox, Daasity, Glew) natively supports Razorpay/Cashfree/PayU or Indian logistics carriers. Closest competitor: **BiteSpeed** (WhatsApp+Shopify+Razorpay, positioned as CRM not analytics).
 
-**Status as of 2026-08-29 (end of day)**: no longer just desk research — Priyam is now in active conversations with D2C brand founders (pressure-testing the feature set) and has reached out to investors (FasterCapital, via a LinkedIn connection with Eric Bush). A full 18-slide pre-seed deck and 10-section global research report exist (see **Files in this folder** below), positioned as "one dashboard instead of 10 tools," explicitly NOT a payments/logistics company (those stay third-party/"out-house"; WhatsApp/email-SMS automation/warehouse monitoring are in-house). Product/company name is **still undecided** — "Ecommerce Hub" is a working title only; candidate names discussed but not chosen: Setu, Sutradhar, Dukaan OS, Vyapar IQ, Threadline, Compass Commerce. Own pricing not set yet — deliberately, pending founder conversations. **Next concrete step**: finish the founder validation conversations already underway (kill criteria still apply — no real evidence yet of founders calling this pain point out unprompted, that gap hasn't closed), and decide on the product name.
+**Status as of 2026-08-29 (end of day)**: no longer just desk research — Priyam is now in active conversations with D2C brand founders (pressure-testing the feature set) and has reached out to investors (FasterCapital, via a LinkedIn connection with Eric Bush). A full 18-slide pre-seed deck and 10-section global research report exist (see **Files in this folder** below), positioned as "one dashboard instead of 10 tools," explicitly NOT a payments/logistics company (those stay third-party/"out-house"; WhatsApp/email-SMS automation/warehouse monitoring are in-house). Product/company name is **still undecided** — "Ecommerce Hub" is a working title only; candidate names discussed but not chosen (three since ruled out — see below): Setu, Sutradhar, Dukaan OS, Vyapar IQ, Threadline, Compass Commerce. Own pricing not set yet — deliberately, pending founder conversations. **Next concrete step (planned 2026-08-30, see the execution-plan section at the end of this file)**: run 15 scored founder interviews over two weeks — target segment (₹10L–₹2Cr/month GMV, Shopify/Woo, running paid ads), sourcing channels, an eight-question Mom-Test script and explicit Green/Amber/Red kill criteria are all now written down. The decisive test is behavioural: how many founders have already built their own sheet/script to stitch this data together. No code until the result is Green or Amber; MVP is specced on paper only. Naming is timeboxed to 90 minutes after call #5 — **Setu, Dukaan OS and Vyapar IQ are now ruled out** (all three collide with real, established Indian companies).
 
 ---
 
 ## Files in this folder
 
+- **Code**: `~/developer/abc` (Next.js + Prisma scaffold, folder still named `abc` — a Claude Desktop Project placeholder, rename when convenient) — see its README for details.
 - [[Ecommerce_Hub_PreSeed_Deck.pptx|Pre-Seed Pitch Deck (pptx, 18 slides)]] — the actual deck to send/present
 - [[Ecommerce_Hub_PreSeed_Deck.md|Pre-Seed Pitch Deck (plain text)]] — same content, lightweight/AI-readable
 - [[Ecommerce_Hub_Global_Report.docx|Global Market & Competitive Report (docx, 10 sections)]] — the full research writeup
@@ -20,7 +21,7 @@ tags: [idea]
 
 ## Quick facts
 
-- **Name**: not decided — "Ecommerce Hub" is a working title used across all files so far. Candidates discussed: Setu, Sutradhar, Dukaan OS, Vyapar IQ, Threadline, Compass Commerce.
+- **Name**: not decided — "Ecommerce Hub" is a working title used across all files so far. Of the six candidates discussed, three are **ruled out as of 2026-08-30**: Setu (existing Indian fintech API co, acquired by Pine Labs 2022), Dukaan OS (existing Indian ecommerce enabler), Vyapar IQ (established Indian SMB billing software). Surviving but weak: Sutradhar, Threadline, Compass Commerce — none has a clean .com; recommendation is to generate fresh candidates instead.
 - **Category**: AI-native, consolidated dashboard for D2C ecommerce brands — analytics + WhatsApp/email/SMS automation + warehouse monitoring built in-house; payments/logistics/marketplaces stay third-party ("out-house"), just connected. India-first.
 - **Ask**: $40K–$60K pre-seed, sized to fund 90 days of founder validation (already underway) + MVP build (GA4 + one payment gateway + one logistics carrier).
 - **Own pricing**: not set yet, deliberately — to be set with design partners. Competitor pricing used only as a reference benchmark.
@@ -31,7 +32,7 @@ tags: [idea]
 - **Regulatory**: DPDP Act 2025 applies — 18-month phased compliance window, not an immediate blocker at MVP stage.
 - **Strategic risk**: Razorpay is already building its own analytics (RTO Analytics Dashboard) — could commoditize the payments-data layer.
 - **Outreach in progress**: FasterCapital (via LinkedIn connection with Eric Bush) — draft in [[FasterCapital Outreach Email]], not yet sent.
-- **Evidence gap that hasn't closed**: still no direct sourced evidence of founders complaining about this pain unprompted — the in-progress founder conversations are meant to close this, not desk research.
+- **Evidence gap that hasn't closed**: still no direct sourced evidence of founders complaining about this pain unprompted — the in-progress founder conversations are meant to close this, not desk research. As of 2026-08-30 those conversations have a written plan, target segment, script and pre-agreed kill criteria (end of this file); results not yet in.
 
 ---
 
@@ -211,3 +212,119 @@ No change to content/verdict — this was a storage-format change only.
 Sixth update same day. Priyam connected with Eric Bush (FasterCapital) on LinkedIn and got a contact email — drafted a pre-seed outreach email addressed to the FasterCapital team, referencing that connection. Saved as [[FasterCapital Outreach Email]] (plain .txt, subject + body) in this folder. Not sent by me — Priyam is sending it himself so he can attach the actual pptx/docx directly in Gmail.
 
 Note: product/company naming is still undecided — "Ecommerce Hub" is a working title used throughout the deck/report/vault so far. Discussed candidate names (Setu, Sutradhar, Dukaan OS, Vyapar IQ, Threadline, Compass Commerce) in chat; nothing finalized yet. Rename everything once Priyam picks one.
+
+## Claude — Execution plan: validation, MVP-on-paper, naming (2026-08-30)
+
+Priyam asked to plan three tracks — founder validation, MVP build, and naming — with a stated budget of **a few hours a week** alongside the pathology-lab interviews. That budget is the binding constraint and it changes the plan's shape, so the honest version first.
+
+### The constraint, stated plainly
+
+A few hours a week is ~4-6 hrs, so ~10 hours over the next two weeks. That funds **one** track, not three. Running all three in parallel at this budget produces three half-finished tracks and no decision. So this plan spends every one of Priyam's hours on validation, and handles the other two tracks in ways that cost him almost nothing:
+
+- **Track A — Founder validation**: all ~10 hours go here. This is the only track that consumes real time.
+- **Track B — MVP**: written as a spec below, not built. Zero hours now. It exists so that if validation goes green, building starts the same day instead of after another week of thinking.
+- **Track C — Naming**: one 90-minute timebox, and only *after* the first five calls — because the calls give free naming signal. Three of the six candidates are ruled out below on hard grounds, at no cost.
+
+Also worth saying: the [[Roadmap]] still ranks Pathology Lab #1 because it has a working prototype and a real ₹40k+AMC commitment. Nothing in this plan changes that. Ecommerce Hub validation is cheap (conversations) and runs alongside — it does not justify taking hours away from the lab interviews.
+
+### Track A — Founder validation (the whole time budget)
+
+**Target: 15 conversations, 20 minutes each.** Not 20 — 15 is achievable at this budget and is enough to score the kill criteria.
+
+**Who counts as a valid interview.** Indian D2C brands doing roughly **₹10L–₹2Cr/month** in GMV, on Shopify or WooCommerce, spending on Meta/Google ads. Below that band founders genuinely are fine on Shopify's free dashboard, and above it they have an in-house analyst — both give misleading answers. Screen for the band before booking the call, not during it.
+
+**Where to find them, in yield order:**
+
+1. **Warm nodes from SURGE first.** Suppliers, contract manufacturers, packaging vendors, BSP/agency reps Priyam already dealt with each know 10-20 brands. This is the highest-conversion channel and costs nothing.
+2. **Performance-marketing agency owners and freelancers.** The single highest-yield node type: one agency owner services 15-30 D2C brands *and personally feels the reporting pain* (they build the client reports by hand every month). If the pain is real anywhere, it is most acute and most articulate here. Two agency conversations are worth five founder conversations for diagnostic purposes — but they are **not** substitutes for founder interviews when scoring willingness-to-pay, because agencies and brands buy differently.
+3. **[D2C Insider](https://www.d2cinsider.com/)** — a real, active curated community of Indian D2C founders, still running events in 2026 (Frontier AI Summit 2026) and an Elevate accelerator with cohort funding. Its [LinkedIn](https://in.linkedin.com/company/d2c-insider) and [Pulse blog](https://pulse.d2cinsider.com/) name founders publicly — a free source of a target list even without joining.
+4. **Vendor customer-story pages**: Shiprocket, Razorpay, Unicommerce and the BSPs (AiSensy, Wati, Interakt) all publish named case studies with founder names and brand names. Free, pre-qualified target list.
+5. **Instagram DMs to the brand account.** In this GMV band the founder often runs the account personally. Lower response rate than LinkedIn but non-zero and very cheap.
+
+**Outreach template** (no pitch, reciprocity hook, one send):
+
+> Hi <name> — I ran a D2C brand (SURGE, men's hair styling) and I'm researching how founders actually track performance across ads, payments and shipping. I'm not selling anything and I'm not building this for you. 20 minutes, and I'll send you the anonymised findings from all 15 conversations. Free Tue or Wed?
+
+The "I'll send you the findings" line is the strongest single lever here and costs one email at the end.
+
+**The interview script.** The Mom Test rule applies hard: **do not describe the product for the first 15 minutes.** Two search passes already failed to find public complaints (Pass 1 and Pass 2 above) — if the questions are leading, this round will fail the same way while feeling like success. Ask about last week, never about a hypothetical product.
+
+1. Walk me through the last time you checked how the business was doing. Which screens did you open, in what order? *(count them; write down the actual tool names)*
+2. How long did that take, how often do you do it, and who does it — you or someone else?
+3. What did you do with those numbers afterwards? *(spreadsheet? screenshot into a WhatsApp group? nothing?)*
+4. Last time a number looked wrong or surprising — what happened, and how long did it take to work out why?
+5. What do you pay today, in rupees, across analytics / WhatsApp / email / reporting tools? *(get figures, not ranges)*
+6. **Has anyone on your team ever built a sheet, script or Zap to stitch these together?** *(the single most diagnostic question — see kill criteria)*
+7. How do you track RTO and COD failure rate by channel or campaign today? *(the India-specific number no Western tool computes)*
+8. What have you tried for this and dropped? Why did you drop it?
+
+Only after all eight: describe the idea in one sentence, then ask **"what would have to be true for you to switch?"** and — for anyone who sounds keen — "would you pay ₹X to be a design partner for 90 days?" A yes with a number attached is data; "sounds interesting, keep me posted" is a no.
+
+**Write-up discipline**: one paragraph per call, **same day**, with verbatim quotes rather than summaries. Summaries written a week later reliably drift toward whatever the founder wants to believe.
+
+### Kill criteria — set now, before any data arrives
+
+Written in advance so they can't be renegotiated after the fact. Score at the end of the 15 calls.
+
+**🟢 Green — validated, start building:**
+- ≥8 of 15 open 4+ separate tools in a normal week, **and**
+- ≥5 of 15 have already built their own sheet/script/Zap workaround, **and**
+- ≥5 name a specific rupee or hours-lost cost, **and**
+- ≥3 verbally commit to a paid pilot with a number attached.
+
+**🟡 Amber — real pain, wrong shape:** the pain concentrates on one job (most likely: true per-order profit after RTO, or RTO attribution by campaign) rather than "too many dashboards." Then build **that one job** as a point solution and drop the hub framing. This is a good outcome, not a consolation prize — it is a much easier product to build and sell.
+
+**🔴 Red — shelve it:** fewer than 5 open 4+ tools weekly, **or** nobody has built their own workaround, **or** zero pilot commitments with numbers. Then put the hours into Pathology Lab and revisit only if new evidence appears.
+
+**Why the "built their own workaround" test carries the most weight**: it is behaviour, not opinion, and it is the exact evidence two desk-research passes could not find. Someone who has already spent their own Sunday building a Google Sheet to stitch Razorpay and Shiprocket numbers together has demonstrated the pain in a way no survey answer can fake. If none of 15 founders has ever bothered, that is the answer — the pain is real but not expensive enough to pay for.
+
+### Track B — MVP spec on paper (build nothing yet)
+
+Unblocked only by a Green or Amber result. Written now so no thinking time is lost later.
+
+**What v0 actually is.** Not "a dashboard with GA4 + one payment gateway + one logistics carrier" — that framing describes plumbing, and a dashboard of plumbing is something any agency can rebuild in Looker Studio in a week. v0 should answer **one question that currently has no good answer**, with a working hypothesis to be replaced by whatever the interviews actually say:
+
+> *Hypothesis (to be confirmed or overwritten by the interviews): "What is my true profit per order, by channel, after RTO, COD handling, shipping and ad spend?"*
+
+This is defensible specifically because it needs Indian payment + Indian logistics data together, which is the one gap the research above verifies no global tool covers. Every feature in the deck that isn't this — WhatsApp automation, email/SMS, warehouse monitoring, marketplace connectors, the private brand-trained AI model — is explicitly **out of v0**. They stay in the deck as the roadmap; none of them ships first.
+
+**Build order, driven by the slowest clock.** From the verified research in Pass 1: Meta's Marketing API needs manual app review for `ads_read`, often taking weeks; Google Ads Basic Access takes ~5 business days. So **day 1 of the build is filing both API access applications** — before any UI, any schema, any design work — so those weeks elapse in parallel with everything else. Razorpay/Cashfree and Shiprocket/Delhivery are merchant-API-key based and need no approval queue, so they can be built while waiting on Meta.
+
+**Minimum architecture.** A nightly scheduled pull per source → Postgres, one raw table per source (raw JSON payload plus the few typed columns actually used) → one derived `orders` table that joins order, payment, shipment and ad-cost → one page that answers the question above. No data warehouse, no dbt, no streaming, no real-time. Nobody in this segment watches D2C data intraday; nightly is genuinely enough, and choosing it saves weeks.
+
+**Data handling from day one** (per the DPDP findings above — the 18-month window is time to build habits, not time to ignore it): per-brand data isolation from the first commit; a plain-language consent notice at connect time; and **do not store customer phone numbers or emails in v0**. Order-level identifiers are enough to compute per-order profit, and staying out of PII entirely keeps the compliance posture trivial for as long as possible. The moment WhatsApp automation ships, that changes — which is another reason it isn't in v0.
+
+**Design-partner terms**: 3 brands, free for 90 days, in exchange for a weekly 30-minute call and permission to use anonymised data. Convert to paid at day 91. If none converts, they were never customers — that is a second, later kill gate, and it should be written into the arrangement out loud at the start so it isn't awkward later.
+
+### Track C — Naming (90-minute timebox, after call #5)
+
+Three of the six candidates are dead on arrival, checked this session:
+
+- **Setu** — ❌ fatal. [Setu is an existing Indian fintech API company](https://fintech.global/2022/06/27/pine-labs-acquires-fintech-api-startup-setu/), acquired by Pine Labs in 2022 for a reported [$70–75M](https://www.business-standard.com/article/companies/pine-labs-acquires-api-fintech-startup-setu-in-70-mn-75-mn-deal-122062300645_1.html). Same buyer persona, adjacent category, well known to exactly the investors being pitched.
+- **Dukaan OS** — ❌ fatal. [Dukaan is an established Indian ecommerce enabler](https://techcrunch.com/2022/06/15/indias-dukaan-expands-globally-to-take-on-shopify) selling to the same merchants. Direct category collision.
+- **Vyapar IQ** — ❌ fatal. Vyapar is established Indian SMB billing software — and per this vault's own [[Roadmap]], it acquired Suvit in 2026, so it is actively expanding in adjacent SME software.
+
+The survivors are weak rather than clean: **Sutradhar** (several existing Indian companies use it — consultancy, a storytelling app — none in this space, but `sutradhar.co` is taken), **Threadline** (existing US companies on Crunchbase/ZoomInfo; `threadline.tech` taken), **Compass Commerce** (generic, and Compass is a large US real-estate brand). None of the six has a clean `.com`.
+
+**Recommendation: treat all six as burned and generate fresh candidates**, screened against three constraints — (a) `.com` actually available, (b) no existing Indian SaaS/fintech/commerce company, (c) pronounceable and spellable by a Hindi/Gujarati-speaking founder hearing it once on a phone call. Add one free question to the end of every interview: *"if a tool did this, what would you expect it to be called?"* Fifteen founders' instincts are better naming input than a brainstorm.
+
+**Do not rename the deck, report or vault files until validation is Green.** Renaming an unvalidated product feels like progress and isn't — it is the most satisfying available form of procrastination on this idea right now, which is exactly why it should stay timeboxed and last.
+
+### One flag on the FasterCapital outreach (not in the requested scope, but worth 10 minutes)
+
+The [[FasterCapital Outreach Email]] draft is still unsent. Before sending it: FasterCapital's reputation online is **contested** — it has a Trustpilot presence and review-site coverage alongside a dedicated critic site and multiple "is it a scam" discussions. This session did not investigate deeply enough to call it either way, and it would be wrong to state a verdict here. But given the mode (equity/services-for-funding accelerators are a category where founders regularly lose time and equity), spend ten minutes reading founder accounts and understanding exactly what is being exchanged before sending anything. Pitching an unvalidated demand side to anyone is also premature — the interviews come first.
+
+### What to actually do, week by week
+
+**Week 1 (~5 hrs)**
+- 2h — build a target list of 40 brands/founders in the ₹10L–₹2Cr/month band, from warm SURGE contacts, agency owners, D2C Insider's public founder mentions and vendor case-study pages.
+- 2h — send all 40 outreach messages using the template above.
+- 1h — first 2-3 calls, same-day write-ups.
+
+**Week 2 (~5 hrs)**
+- 4h — 8-10 more calls.
+- 1h — same-day write-ups, plus the 90-minute naming timebox once five calls are done.
+
+**End of week 2** — score the 15 against the kill criteria and record the result as a new dated section here. Green → start the v0 build with the two API applications filed on day one. Amber → rewrite the deck around the single job that actually hurt. Red → shelve, and say so here plainly rather than letting the idea drift.
+
+**Verdict unchanged at 🟡** — this section adds no new market evidence. It converts the standing "talk to 10-20 founders" recommendation into a dated, scored, falsifiable plan, and rules out half the candidate names.
