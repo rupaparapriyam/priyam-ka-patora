@@ -15,7 +15,7 @@ tags: [idea]
 - **Clocks**: DPDP enforcement May 2027 · ABDM required for insurance empanelment now · NABL reassessment cycles rolling.
 - **Next 14 days**: interview 6 labs — script, sourcing plan, scoring sheet and green/red thresholds are in the Claude (2026-08-30) section below. Not more desk research, not more code.
 - **Architecture**: cloud web app + a small local Lab Bridge agent (analyzers and printers cannot be reached from a browser). Confirmed 2026-08-30, but **conditional on lab internet reliability** — an interview question, not a settled fact.
-- **v0 status**: working prototype at `~/developer/pathlab-ops` (Next.js + Prisma, 15 models, analyzer ingestion → calc → printable report). **Not yet committed to git** — untracked working-tree files only.
+- **v0 status**: working prototype at `pathlab-ops-app/` in the `priyam-ka-patora` repo (Next.js + Prisma, 15 models, analyzer ingestion → calc → printable report). Moved there from a standalone `~/developer/pathlab-ops` folder on 2026-08-30 and now tracked by the main repo; prior standalone history kept aside as `.git-standalone-history-backup`.
 - **Kill**: no 3 paying labs outside the family by day 90 → stop. SURGE being paused makes this rule more important, not less.
 
 ---
@@ -700,9 +700,9 @@ _Priyam said "let's start building." Reviewed the brief, this file in full, and 
 
 ### 0. Where the code actually stands (verified 2026-08-30)
 
-`~/developer/pathlab-ops` — Next.js 15 + React 19 + Prisma + Tailwind 4, SQLite for dev. Schema has 15 models (Patient, ReferringDoctor, Order, OrderPanel, Sample, Analyte, Panel, PanelItem, ReferenceRange, Analyzer, AnalyzerMapping, ImportBatch, Result, Report, AuditLog, User). Working: analyzer CSV + ASTM ingestion, analyte catalog, reference ranges, calculation engine, flagging, result-entry UI, printable report.
+`pathlab-ops-app/` (moved here from `~/developer/pathlab-ops` later the same day) — Next.js 15 + React 19 + Prisma + Tailwind 4, SQLite for dev. Schema has 15 models (Patient, ReferringDoctor, Order, OrderPanel, Sample, Analyte, Panel, PanelItem, ReferenceRange, Analyzer, AnalyzerMapping, ImportBatch, Result, Report, AuditLog, User). Working: analyzer CSV + ASTM ingestion, analyte catalog, reference ranges, calculation engine, flagging, result-entry UI, printable report.
 
-**Two operational risks found:** `node_modules` is not installed, and **the repo has no git commits** — the entire v0 is untracked working-tree files with nothing to restore from. Commit it before anything else touches that folder.
+**Operational risk found, since resolved:** `node_modules` is not installed, and at the time of review the prototype had **no git commits** — untracked working-tree files with nothing to restore from. Fixed later the same day by moving it into the main `priyam-ka-patora` repo. `npm install` still needed before it will run.
 
 Missing vs the product spec v1 above: billing/GST, the verification gate, sample-collection screen, both portals, the recall engine, and the Lab Bridge itself.
 

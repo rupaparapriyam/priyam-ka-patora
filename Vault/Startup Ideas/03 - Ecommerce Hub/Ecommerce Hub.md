@@ -6,7 +6,7 @@ tags: [idea]
 
 **Current verdict**: 🟡 Real gap, not a blue ocean — narrow to India-first wedge, not a full clone. Same core thesis as the original research (below), now folded into a live pitch: **the pain is genuine** (juggling GA4, ads, WhatsApp, payments, logistics, marketplaces separately across 8+ tools), **"AI explains your data" alone isn't a differentiator** (Polar Analytics, Lifesight already ship it), and **the real verified gap is India-native data** — no major global tool (Triple Whale, Polar, Northbeam, Rockerbox, Daasity, Glew) natively supports Razorpay/Cashfree/PayU or Indian logistics carriers. Closest competitor: **BiteSpeed** (WhatsApp+Shopify+Razorpay, positioned as CRM not analytics).
 
-**Status as of 2026-08-29 (end of day)**: no longer just desk research — Priyam is now in active conversations with D2C brand founders (pressure-testing the feature set) and has reached out to investors (FasterCapital, via a LinkedIn connection with Eric Bush). A full 18-slide pre-seed deck and 10-section global research report exist (see **Files in this folder** below), positioned as "one dashboard instead of 10 tools," explicitly NOT a payments/logistics company (those stay third-party/"out-house"; WhatsApp/email-SMS automation/warehouse monitoring are in-house). Product/company name is **still undecided** — "Ecommerce Hub" is a working title only; candidate names discussed but not chosen (three since ruled out — see below): Setu, Sutradhar, Dukaan OS, Vyapar IQ, Threadline, Compass Commerce. Own pricing not set yet — deliberately, pending founder conversations. **Next concrete step (planned 2026-08-30, see the execution-plan section at the end of this file)**: run 15 scored founder interviews over two weeks — target segment (₹10L–₹2Cr/month GMV, Shopify/Woo, running paid ads), sourcing channels, an eight-question Mom-Test script and explicit Green/Amber/Red kill criteria are all now written down. The decisive test is behavioural: how many founders have already built their own sheet/script to stitch this data together. No code until the result is Green or Amber; MVP is specced on paper only. Naming is timeboxed to 90 minutes after call #5 — **Setu, Dukaan OS and Vyapar IQ are now ruled out** (all three collide with real, established Indian companies).
+**Status as of 2026-08-29 (end of day)**: no longer just desk research — Priyam is now in active conversations with D2C brand founders (pressure-testing the feature set) and has reached out to investors (FasterCapital, via a LinkedIn connection with Eric Bush). A full 18-slide pre-seed deck and 10-section global research report exist (see **Files in this folder** below), positioned as "one dashboard instead of 10 tools," explicitly NOT a payments/logistics company (those stay third-party/"out-house"; WhatsApp/email-SMS automation/warehouse monitoring are in-house). Product/company name is **still undecided** — "Ecommerce Hub" is a working title only; candidate names discussed but not chosen (three since ruled out — see below): Setu, Sutradhar, Dukaan OS, Vyapar IQ, Threadline, Compass Commerce. Own pricing not set yet — deliberately, pending founder conversations. **Next concrete step (planned 2026-08-30, see the execution-plan section at the end of this file)**: run 15 scored founder interviews over two weeks — target segment (₹10L–₹2Cr/month GMV, Shopify/Woo, running paid ads), sourcing channels, an eight-question Mom-Test script and explicit Green/Amber/Red kill criteria are all now written down. The decisive test is behavioural: how many founders have already built their own sheet/script to stitch this data together. No code until the result is Green or Amber; MVP is specced on paper only. A Next.js+Prisma scaffold (`ecommerce-hub-app/` at the repo root) was nonetheless created on 2026-08-30 ahead of that gate — recorded openly as a deviation, not a change to the rule; its schema does not match the specced v0 job and would need replacing, not extending. Naming is timeboxed to 90 minutes after call #5 — **Setu, Dukaan OS and Vyapar IQ are now ruled out** (all three collide with real, established Indian companies).
 
 ---
 
@@ -32,6 +32,7 @@ tags: [idea]
 - **Regulatory**: DPDP Act 2025 applies — 18-month phased compliance window, not an immediate blocker at MVP stage.
 - **Strategic risk**: Razorpay is already building its own analytics (RTO Analytics Dashboard) — could commoditize the payments-data layer.
 - **Outreach in progress**: FasterCapital (via LinkedIn connection with Eric Bush) — draft in [[FasterCapital Outreach Email]], not yet sent.
+- **Feature set**: not decided. The deck's ten candidate jobs were decomposed, rated for defensibility and mapped to non-leading behavioural probes on 2026-08-30 (last section). Working recommendation pending the calls: v0 = true profit per order after RTO/COD/shipping/ad spend; RTO-attribution second; WhatsApp as a read-only connector rather than an in-house build; email/SMS, warehouse monitoring and marketplace panels dropped from in-house scope. Two internal contradictions in the deck flagged there (in-house scope vs MVP scope; slide 15's claim that founder conversations are already underway).
 - **Evidence gap that hasn't closed**: still no direct sourced evidence of founders complaining about this pain unprompted — the in-progress founder conversations are meant to close this, not desk research. As of 2026-08-30 those conversations have a written plan, target segment, script and pre-agreed kill criteria (end of this file); results not yet in.
 
 ---
@@ -328,3 +329,74 @@ The [[FasterCapital Outreach Email]] draft is still unsent. Before sending it: F
 **End of week 2** — score the 15 against the kill criteria and record the result as a new dated section here. Green → start the v0 build with the two API applications filed on day one. Amber → rewrite the deck around the single job that actually hurt. Red → shelve, and say so here plainly rather than letting the idea drift.
 
 **Verdict unchanged at 🟡** — this section adds no new market evidence. It converts the standing "talk to 10-20 founders" recommendation into a dated, scored, falsifiable plan, and rules out half the candidate names.
+
+---
+
+## Claude — Feature planning through the founder conversations (2026-08-30)
+
+Priyam's instruction this session: **no code, plan the features, and plan them in conversation with D2C brands.** This section is the instrument for doing that. It does not decide the feature set — deciding it now, before the calls, is the exact mistake the interview plan above was written to prevent. It decomposes the deck into testable jobs, states honestly which are defensible and which are not, and defines how each one gets scored from behaviour rather than opinion.
+
+### Two contradictions inside the existing deck, to resolve before pitching again
+
+1. **"In-house" scope conflicts with MVP scope.** Slide 6 states WhatsApp automation, email/SMS automation and warehouse monitoring are built in-house. Slide 5 states the MVP is GA4 + one payment gateway + one logistics carrier. Those are three separate products versus one thin slice. At the stated $40–60K ask and a few hours a week, the in-house claim is not fundable as written, and each of the three has an entrenched incumbent (BiteSpeed / Klaviyo–WebEngage / Unicommerce–Increff). **unverified/inference**: an investor who reads both slides will read it as scope confusion, not ambition. Recommendation: keep "in-house" as a stated *roadmap philosophy*, not a present-tense capability claim.
+2. **Slide 15 asserts founder conversations are already pressure-testing the feature set.** The execution-plan section above (same day) says the target list is not yet built and no results are in. Priyam to confirm which is true. If no structured conversations have happened, that sentence is a false claim in an investor document and should be softened before the deck goes anywhere — including to FasterCapital.
+
+### The candidate feature set, decomposed and rated
+
+Each row is a *job*, not a module. "Defensibility" is against the competitive research in the sections above, not a guess.
+
+| # | Candidate job | Who already does it | Honest defensibility |
+|---|---|---|---|
+| A | One consolidated view instead of 6–8 logins | Everyone claims it; Looker Studio approximates it free | **Weak alone.** This is plumbing. It is the pitch, not the wedge. |
+| B | Plain-language "what changed and why" | Polar Analytics, Lifesight, Triple Whale (Willy) — all shipping | **None.** Already commoditised. Should not be slide 3's hero. |
+| C | True profit per order after RTO, COD handling, shipping, ad spend | No global tool; needs Indian payment + Indian logistics data joined | **Strongest.** This is the v0 hypothesis in the execution plan and the only job the verified technical gap actually protects. |
+| D | RTO / COD failure attribution by campaign, carrier and pincode | No global tool. Razorpay's RTO Analytics Dashboard is the live threat | **Strong but contested.** Differentiator is the *cross-channel* join (campaign ↔ carrier ↔ pincode), not RTO data alone. |
+| E | WhatsApp automation in-house (cart recovery, order updates) | BiteSpeed, AiSensy, Wati, Interakt, Gupshup | **Weak as a build.** Strong as a *data connector* — reading BSP data into the profit view costs a fraction of building a BSP. |
+| F | Email/SMS automation in-house | Klaviyo, WebEngage, MoEngage, Mailchimp | **Weakest.** No stated reason to build this. Recommend dropping from in-house entirely. |
+| G | Warehouse / inventory monitoring in-house | Unicommerce, Increff, EasyEcom | **Off-buyer.** Sold to ops, not the founder-marketer this product targets. Scope creep. |
+| H | Marketplace panel consolidation (Amazon/Flipkart/Myntra/Nykaa/Meesho) | Unicommerce, Browntape, marketplace panels themselves | **Off-segment.** Target segment is Shopify/Woo D2C. Marketplace-heavy sellers are a different buyer with a different pain. |
+| I | Private brand-trained AI copilot | Nobody, at the claimed depth | **Roadmap only.** Correctly framed in the deck as a build target, not a feature. Do not let it migrate forward. |
+| J | "Ten subscriptions become one bill" | n/a — a procurement argument, not a feature | **Untested.** Cheap to test in the calls; may matter more to the buyer than any single feature, or not at all. |
+
+**Working recommendation (to be confirmed or overturned by the calls): v0 is C, with D as the first expansion, E as a read-only connector, and F/G/H removed from in-house scope entirely.** That is a deliberate narrowing of the deck, and it should not be applied to the deck until the calls support it.
+
+### How each job gets tested without leading the founder
+
+The Mom Test rule from the execution plan stands: **no product description in the first 15 minutes.** A founder asked "would you like per-order profit?" says yes, always, and the answer is worthless. Every job below is therefore mapped to a question about the *past*, and the eight-question script above remains the opening — these are probes layered onto it, not a replacement.
+
+| Job | Behavioural probe (ask about last week, never about a feature) |
+|---|---|
+| A | Q1/Q2 of the existing script — count the tools they actually opened, in order, and who opened them. |
+| B | "Last time a number surprised you, how did you work out why?" — if they answer in seconds, no pain; if it took a day of clicking, there is. |
+| C | **"How do you know which of last month's orders actually made you money? Walk me through it."** The single highest-value question in the set. Watch for: they don't know, they guess at a blended average, or they have a sheet. |
+| D | "What's your RTO rate by carrier? By campaign?" — if they can't answer the second one at all, that's the gap, unprompted. |
+| E | "What do you use WhatsApp for, what do you pay for it, and has anyone ever asked you what it earned you?" |
+| F | "Who sends your email/SMS, and when did you last change it?" — expect indifference; that is the finding. |
+| G | "Do you or a 3PL hold your stock, and who watches it?" — a 3PL answer removes G from scope permanently. |
+| H | "What share of your revenue is your own site vs marketplaces?" — screens segment fit; heavy-marketplace brands are out of band. |
+| J | Q5 of the existing script — get the rupee figures per tool, then: "if one tool replaced four of those, would that be a better deal or just a bigger risk?" |
+
+### Feature scoring sheet — fill one row per call, same day
+
+Per the existing write-up discipline: verbatim quotes, same day, no summaries written a week later.
+
+For each of A–J, record four things per founder:
+
+1. **Unprompted?** — did they raise this before Priyam described anything? (yes/no)
+2. **Workaround built?** — sheet, script, Zap, or a person whose job it is. (yes/no + what)
+3. **Cost named?** — a rupee figure or an hours-per-week figure, in their words. (the figure, or blank)
+4. **Would pay for this alone?** — asked only after the product is described, and only counted with a number attached. (₹ or no)
+
+**Ranking rule, set now so it can't be renegotiated later:** features rank by column 1 + column 2 first, and by column 4 last. Unprompted mention plus a self-built workaround is behaviour. "I'd pay for that" at the end of a call where the founder likes Priyam is politeness. If the ranking from columns 1–2 disagrees with the ranking from column 4, **columns 1–2 win.**
+
+**Decision output at the end of 15 calls:** the single job with the most unprompted mentions *and* the most self-built workarounds becomes v0 — even if it is not job C, and even if it makes the current deck wrong. That outcome is the Amber path already written into the kill criteria, and it is a good result, not a failure.
+
+### One free naming input, at no cost
+
+Per the naming section above, close every call with: *"if a tool did this, what would you expect it to be called?"* Fifteen founders' instincts beat a brainstorm, and it costs one sentence.
+
+### What this section deliberately does not do
+
+It does not pick the feature set, write specs, or touch code. **verified (filesystem, this session)**: an `ecommerce-hub-app/` Next.js + Prisma scaffold exists at the repo root, built earlier today ahead of the no-code gate; its `prisma/schema.prisma` models `Brand`/`Connector`/`DailyMetric`/`Insight` — a per-day, per-channel key-value grain that **cannot** compute job C, since per-order profit needs order-level rows joined to payment, shipment and ad cost. If the calls come back Green on C, that schema needs replacing, not extending. Flagged here rather than fixed, per Priyam's instruction this session to plan only.
+
+**Verdict unchanged at 🟡.** No new market evidence. This section converts the deck's feature list into a scored, non-leading test instrument, and records two internal contradictions in the deck that need resolving before it is sent to anyone.
