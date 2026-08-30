@@ -45,3 +45,46 @@ reported as done. Confirm labs beyond Priyam's family will pay before building f
 Direct and honest over optimistic; fact-check rather than agree. Be especially willing to say
 "this is a good small business, not a startup" — that framing is already the file's own verdict
 and shouldn't quietly drift upward into venture language.
+
+
+## File system map (read this before creating or saving anything)
+
+Everything lives under one folder on Priyam's Mac, connected to every Cowork project —
+`/Users/priyamrupapara/developer/A priyam ka patora/` (also the root of the `priyam-ka-patora`
+GitHub repo). **Always connect a project to exactly this folder, never a narrower or different one**
+— a stray folder called `abc` got created by accident on 2026-08-30 when a project was connected
+to the wrong place, and had to be cleaned up. Don't repeat that.
+
+```
+A priyam ka patora/                  <- connect every project here, nothing narrower
+├── Vault/                           <- Obsidian vault: research ONLY, one .md file per idea
+│   ├── Roadmap.md                   <- cross-idea ranking (Patora Hub project owns this)
+│   ├── AI Collaboration Rules.md    <- read before writing anything into Vault/
+│   ├── Startup Ideas/
+│   │   ├── 02 - Pathology Lab Ops Assistant/Pathology Lab Ops Assistant.md
+│   │   └── 03 - Ecommerce Hub/
+│   │       ├── Ecommerce Hub.md
+│   │       ├── Ecommerce_Hub_PreSeed_Deck.pptx (+ .md text version)
+│   │       ├── Ecommerce_Hub_Global_Report.docx (+ .md text version)
+│   │       └── FasterCapital Outreach Email.txt
+│   └── General Ideas/01 - Algo Trading Bot/Algo Trading Bot.md
+├── _project-briefs/                 <- these instruction files, one per Cowork project
+├── ecommerce-hub-app/               <- Ecommerce Hub CODE (Next.js+Prisma) - NOT inside the vault
+├── pathlab-ops-app/                 <- Pathology Lab CODE (Next.js+Prisma) - NOT inside the vault
+└── AI-RULES.md / CLAUDE.md / IDEA.md
+```
+
+**Where new things go**: research, decks, reports, outreach drafts -> inside that idea's own
+`Vault/Startup Ideas/<idea>/` folder (as both the "real" file and a lightweight `.md` text
+version, per convention). Actual runnable code -> its own folder at the project ROOT, sibling of
+`Vault/`, never inside the vault. Before creating any new folder, `ls` the root and the relevant
+vault idea folder first — if something like it might already exist, look before making a new one.
+
+
+## Recent session context (2026-08-30, for continuity)
+
+- The existing v0 prototype was moved today from a standalone `~/developer/pathlab-ops` folder
+  into `pathlab-ops-app/` at the project root (sibling of `Vault/`), and given a `README.md`
+  linking back to this vault file. Its prior standalone git history was preserved (renamed aside
+  to `.git-standalone-history-backup` inside the folder, not deleted) and it's now tracked by the
+  main `priyam-ka-patora` repo instead of its own separate repo.

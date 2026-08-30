@@ -59,3 +59,55 @@ Direct and honest over optimistic. Fact-check Priyam rather than agreeing with h
 claim with its confidence — the vault file uses **verified** / **vendor claim** /
 **unverified/inference** tags and you should keep that discipline. Prefer real names, real
 prices, real steps.
+
+
+## File system map (read this before creating or saving anything)
+
+Everything lives under one folder on Priyam's Mac, connected to every Cowork project —
+`/Users/priyamrupapara/developer/A priyam ka patora/` (also the root of the `priyam-ka-patora`
+GitHub repo). **Always connect a project to exactly this folder, never a narrower or different one**
+— a stray folder called `abc` got created by accident on 2026-08-30 when a project was connected
+to the wrong place, and had to be cleaned up. Don't repeat that.
+
+```
+A priyam ka patora/                  <- connect every project here, nothing narrower
+├── Vault/                           <- Obsidian vault: research ONLY, one .md file per idea
+│   ├── Roadmap.md                   <- cross-idea ranking (Patora Hub project owns this)
+│   ├── AI Collaboration Rules.md    <- read before writing anything into Vault/
+│   ├── Startup Ideas/
+│   │   ├── 02 - Pathology Lab Ops Assistant/Pathology Lab Ops Assistant.md
+│   │   └── 03 - Ecommerce Hub/
+│   │       ├── Ecommerce Hub.md
+│   │       ├── Ecommerce_Hub_PreSeed_Deck.pptx (+ .md text version)
+│   │       ├── Ecommerce_Hub_Global_Report.docx (+ .md text version)
+│   │       └── FasterCapital Outreach Email.txt
+│   └── General Ideas/01 - Algo Trading Bot/Algo Trading Bot.md
+├── _project-briefs/                 <- these instruction files, one per Cowork project
+├── ecommerce-hub-app/               <- Ecommerce Hub CODE (Next.js+Prisma) - NOT inside the vault
+├── pathlab-ops-app/                 <- Pathology Lab CODE (Next.js+Prisma) - NOT inside the vault
+└── AI-RULES.md / CLAUDE.md / IDEA.md
+```
+
+**Where new things go**: research, decks, reports, outreach drafts -> inside that idea's own
+`Vault/Startup Ideas/<idea>/` folder (as both the "real" file and a lightweight `.md` text
+version, per convention). Actual runnable code -> its own folder at the project ROOT, sibling of
+`Vault/`, never inside the vault. Before creating any new folder, `ls` the root and the relevant
+vault idea folder first — if something like it might already exist, look before making a new one.
+
+
+## Recent session context (2026-08-30, for continuity)
+
+- An 18-slide pre-seed pptx deck and a 10-section docx research report exist, plus lightweight
+  `.md` text versions of both (for cheap reading) — all in the vault folder above. A FasterCapital
+  outreach email was drafted (in `FasterCapital Outreach Email.txt`) after Priyam connected with
+  Eric Bush on LinkedIn — **not sent yet**.
+- **Naming correction**: earlier brainstorming (including from me, in chat) suggested Setu,
+  Dukaan OS and Vyapar IQ as name candidates. All three are now **ruled out** — they collide with
+  real, established Indian companies (Setu = fintech API co acquired by Pine Labs; Dukaan =
+  existing ecommerce enabler; Vyapar = existing SMB billing software, see full citations in the
+  vault file's naming section). Don't resurrect these three. Sutradhar/Threadline/Compass Commerce
+  survive but are weak (no clean `.com`) — fresh candidates are probably needed.
+- A Next.js+Prisma code scaffold (`ecommerce-hub-app/`) was built today, ahead of the "no code
+  until validation is Green/Amber" rule above — flagging this openly since it's a deviation from
+  the stated plan, not a quiet exception. Treat it as an early scaffold to revisit post-validation,
+  not a sign the rule has changed.
