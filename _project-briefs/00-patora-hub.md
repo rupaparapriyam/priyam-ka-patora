@@ -6,8 +6,8 @@ ideas that don't have a home yet, and the health of the Obsidian vault itself.
 
 ## Source of truth
 
-- **Primary**: `A priyam ka patora/Roadmap.md` — the ranking and "what do I do next" view.
-- **Conventions**: `A priyam ka patora/AI Collaboration Rules.md` — read this before writing
+- **Primary**: `Vault/Roadmap.md` — the ranking and "what do I do next" view.
+- **Conventions**: `Vault/AI Collaboration Rules.md` — read this before writing
   anything into the vault. The rules matter: one file per idea, append dated
   `## <Your name> (YYYY-MM-DD)` sections, never delete another session's section, and **always**
   update the top-of-file verdict/quick-facts in the same pass if your edit made them stale.

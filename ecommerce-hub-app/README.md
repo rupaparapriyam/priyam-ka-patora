@@ -13,7 +13,7 @@ cross-channel explanations instead of six separate dashboards.
 All of the product research, market/competitive analysis, the pre-seed pitch
 deck, and the current verdict/status live in the vault, not here:
 
-`../Ecommerce Hub.md`
+`../Vault/Startup Ideas/03 - Ecommerce Hub/Ecommerce Hub.md`
 
 Read that file before making product decisions here — it has the verified
 vs. inferred facts, the MVP scope, the connector landscape, and what's
@@ -32,6 +32,9 @@ expansion map, not day-one build scope.
 
 ## Note on location
 
-This app now lives inside the vault, next to the research note, instead of
-as a standalone folder under `developer/`. If this is connected as a Claude
-Desktop Project, repoint that Project's connected folder to this new path.
+This app lives at the project root (`/Users/priyamrupapara/developer/A priyam ka patora/ecommerce-hub-app`),
+a sibling of the `Vault/` folder — deliberately not inside the vault, so the
+vault's one-file-per-idea rule stays intact. If this is connected as a
+Claude Desktop Project, connect it to the shared root folder
+(`/Users/priyamrupapara/developer/A priyam ka patora`), same as every other
+project, per `_project-briefs/README.md` — not to this folder alone.

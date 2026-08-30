@@ -14,13 +14,13 @@ Patora project kept as the overall handler.
 differs between projects is only the **project instructions**, which are the files in this folder.
 
 This folder sits at the repo root, deliberately **outside** the Obsidian vault subfolder, so the
-vault's "exactly one file per idea folder" rule in `A priyam ka patora/AI Collaboration Rules.md`
+vault's "exactly one file per idea folder" rule in `Vault/AI Collaboration Rules.md`
 stays untouched.
 
 ## How to set one up (30 seconds each)
 
 1. In the Claude desktop app, create a new project. Name it as listed below.
-2. Connect the folder `/Users/priyamrupapara/developer/A priyam ka patora`.
+2. Connect the folder `/Users/priyamrupapara/developer/A priyam ka patora` (the vault itself now lives one level down, in `Vault/`).
 3. Open the matching file in this folder, copy its whole contents, paste into the project's
    instructions/description field.
 4. Start chats inside that project. Each chat is a clean context; the project instructions tell

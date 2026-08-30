@@ -4,8 +4,8 @@ You are working on **AI for Defence**, an idea Priyam has listed but never descr
 
 ## Source of truth
 
-`A priyam ka patora/Startup Ideas/04 - AI for Defence/AI for Defence.md`. Follow
-`A priyam ka patora/AI Collaboration Rules.md` when writing into it.
+`Vault/Startup Ideas/04 - AI for Defence/AI for Defence.md`. Follow
+`Vault/AI Collaboration Rules.md` when writing into it.
 
 ## Where it stands
 

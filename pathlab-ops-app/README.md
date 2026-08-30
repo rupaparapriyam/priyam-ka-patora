@@ -9,7 +9,7 @@ All product research, the validated willingness-to-pay signal (family lab,
 ₹40k one-time + AMC), the market ceiling analysis, and current status live
 in the vault, not here:
 
-`../Pathology Lab Ops Assistant.md`
+`../Vault/Startup Ideas/02 - Pathology Lab Ops Assistant/Pathology Lab Ops Assistant.md`
 
 Read that file before making product decisions here — it has the verdict,
 kill criteria, and what's already been ruled out (Flabs, Labsmart, Attune,

@@ -407,7 +407,7 @@ This is an excellent first business and a poor sole bet. Nothing else in the vau
 
 ### Build status as of this date
 
-A working v0 exists in [[pathlab-ops-app/README|pathlab-ops-app]] (moved here from `~/developer/pathlab-ops`; Next.js + Prisma): analyzer CSV/ASTM ingestion, 96-analyte catalog, 100+ age/sex reference ranges, 22-formula calculation engine (MCV/MCH/MCHC, absolute counts, NLR, Friedewald LDL with TG>400 refusal, CKD-EPI 2021 eGFR, anion gap, corrected calcium, eAG and others), flagging with critical-value detection, result-entry UI and a printable A4 report. 51/51 logic tests pass. Not yet run against a real machine file.
+A working v0 exists at `../../../pathlab-ops-app/` (at the project root, not in the vault — see its README; moved here from `~/developer/pathlab-ops`; Next.js + Prisma): analyzer CSV/ASTM ingestion, 96-analyte catalog, 100+ age/sex reference ranges, 22-formula calculation engine (MCV/MCH/MCHC, absolute counts, NLR, Friedewald LDL with TG>400 refusal, CKD-EPI 2021 eGFR, anion gap, corrected calcium, eAG and others), flagging with critical-value detection, result-entry UI and a printable A4 report. 51/51 logic tests pass. Not yet run against a real machine file.
 
 ### Sources (pass 5)
 

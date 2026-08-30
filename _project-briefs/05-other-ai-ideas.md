@@ -5,10 +5,10 @@ in one place so they can be revisited deliberately rather than re-litigated by a
 
 ## Source of truth
 
-- `A priyam ka patora/Startup Ideas/01 - AI Chatbot Assistant/AI Chatbot Assistant.md`
-- `A priyam ka patora/Startup Ideas/05 - Vertical Ops Assistant (Other Industries)/Vertical Ops Assistant (Other Industries).md`
+- `Vault/Startup Ideas/01 - AI Chatbot Assistant/AI Chatbot Assistant.md`
+- `Vault/Startup Ideas/05 - Vertical Ops Assistant (Other Industries)/Vertical Ops Assistant (Other Industries).md`
 
-Follow `A priyam ka patora/AI Collaboration Rules.md` when writing into either.
+Follow `Vault/AI Collaboration Rules.md` when writing into either.
 
 ## Where they stand
 

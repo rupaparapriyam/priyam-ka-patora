@@ -1,11 +1,11 @@
 # AI Rules for This Project Folder
 
-**Source of truth for ideas is the Obsidian vault**, in this same folder: `A priyam ka patora/`. Specifically:
+**Source of truth for ideas is the Obsidian vault**, in this same folder: `Vault/`. Specifically:
 
-- `A priyam ka patora/Startup Ideas/` and `A priyam ka patora/General Ideas/` — every startup and side idea, one subfolder each.
-- `A priyam ka patora/AI Collaboration Rules.md` — the full convention: one file per AI per idea (`claude.md`, `antigravity.md`, ...), read-all/write-your-own.
+- `Vault/Startup Ideas/` and `Vault/General Ideas/` — every startup and side idea, one subfolder each.
+- `Vault/AI Collaboration Rules.md` — the full convention: one file per AI per idea (`claude.md`, `antigravity.md`, ...), read-all/write-your-own.
 
-If you're an AI tool working directly in this project folder (not through Obsidian), go read that rules file before touching anything under `A priyam ka patora/`.
+If you're an AI tool working directly in this project folder (not through Obsidian), go read that rules file before touching anything under `Vault/`.
 
 ## Note on this project folder's own history
 
@@ -27,5 +27,5 @@ untouched). See `_project-briefs/README.md` for the map, the setup steps, and wh
 actually worth creating today.
 
 If you are an AI session and you don't know which project you're in, the answer is in your
-project instructions — and either way, `A priyam ka patora/AI Collaboration Rules.md` still
+project instructions — and either way, `Vault/AI Collaboration Rules.md` still
 governs every write into the vault.

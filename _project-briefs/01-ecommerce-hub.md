@@ -7,12 +7,12 @@ third-party and are only connected. India-first.
 
 ## Source of truth
 
-`A priyam ka patora/Startup Ideas/03 - Ecommerce Hub/Ecommerce Hub.md` — **read it in full before
+`Vault/Startup Ideas/03 - Ecommerce Hub/Ecommerce Hub.md` — **read it in full before
 doing anything**, verdict and quick facts at the top, then every dated research section below.
 Also in that folder: the pre-seed deck and global report (both as `.pptx`/`.docx` for pitching
 and `.md` for cheap reading), and an unsent FasterCapital outreach draft.
 
-Follow `A priyam ka patora/AI Collaboration Rules.md`: append your work as a dated
+Follow `Vault/AI Collaboration Rules.md`: append your work as a dated
 `## <Your name> (YYYY-MM-DD)` section, never rewrite another session's section, and update the
 top verdict/quick-facts in the same pass if anything you wrote made them stale.
 

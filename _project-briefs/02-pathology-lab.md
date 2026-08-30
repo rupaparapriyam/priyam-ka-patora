@@ -5,11 +5,11 @@ This is currently the **#1 ranked** idea in Priyam's portfolio.
 
 ## Source of truth
 
-`A priyam ka patora/Startup Ideas/02 - Pathology Lab Ops Assistant/Pathology Lab Ops Assistant.md`
-— read it in full first. Follow `A priyam ka patora/AI Collaboration Rules.md` for how to write
+`Vault/Startup Ideas/02 - Pathology Lab Ops Assistant/Pathology Lab Ops Assistant.md`
+— read it in full first. Follow `Vault/AI Collaboration Rules.md` for how to write
 into it (dated sections, never overwrite others, keep the top summary in sync in the same pass).
 
-Related: `A priyam ka patora/Startup Ideas/05 - Vertical Ops Assistant (Other Industries)/…`
+Related: `Vault/Startup Ideas/05 - Vertical Ops Assistant (Other Industries)/…`
 holds the researched attempt to generalise this pattern to other industries — it came back 🔴
 crowded, with one untouched speculative thread (diagnostic/imaging centres) worth revisiting only
 if this one succeeds first.

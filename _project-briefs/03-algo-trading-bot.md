@@ -5,8 +5,8 @@ the vault under `General Ideas/`, not `Startup Ideas/`, deliberately.
 
 ## Source of truth
 
-`A priyam ka patora/General Ideas/01 - Algo Trading Bot/Algo Trading Bot.md`. Follow
-`A priyam ka patora/AI Collaboration Rules.md` when writing into it.
+`Vault/General Ideas/01 - Algo Trading Bot/Algo Trading Bot.md`. Follow
+`Vault/AI Collaboration Rules.md` when writing into it.
 
 ## Where it stands
 

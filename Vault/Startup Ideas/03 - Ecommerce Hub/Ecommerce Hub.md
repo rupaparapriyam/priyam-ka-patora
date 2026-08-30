@@ -12,7 +12,7 @@ tags: [idea]
 
 ## Files in this folder
 
-- [[ecommerce-hub-app/README|Code (Next.js + Prisma scaffold)]] — moved inside this folder from `~/developer/abc`; repoint the Claude Desktop Project's connected folder here.
+- **Code**: `../../../ecommerce-hub-app/` (Next.js + Prisma scaffold, at the project root, not in the vault — see its README) — moved here from `~/developer/abc`; repoint the Claude Desktop Project's connected folder to the shared root per `_project-briefs/README.md`.
 - [[Ecommerce_Hub_PreSeed_Deck.pptx|Pre-Seed Pitch Deck (pptx, 18 slides)]] — the actual deck to send/present
 - [[Ecommerce_Hub_PreSeed_Deck.md|Pre-Seed Pitch Deck (plain text)]] — same content, lightweight/AI-readable
 - [[Ecommerce_Hub_Global_Report.docx|Global Market & Competitive Report (docx, 10 sections)]] — the full research writeup
