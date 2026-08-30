@@ -15,7 +15,9 @@ This file governs how any AI tool (Claude, Antigravity, or others added later) w
 
 ## Per-idea folder structure and naming
 
-Every idea folder contains exactly **one file**, named after the idea itself — e.g. `Startup Ideas/01 - AI Chatbot Assistant/AI Chatbot Assistant.md`. That single file holds the current verdict at the top, then the full research below it. Nothing else lives in an idea's folder.
+Every idea folder contains exactly **one file** for research/notes, named after the idea itself — e.g. `Startup Ideas/01 - AI Chatbot Assistant/AI Chatbot Assistant.md`. That single file holds the current verdict at the top, then the full research below it.
+
+**Exception (2026-08-30): actual code lives in the same folder once an idea starts being built.** When an idea moves from research into an actual app/prototype, its code lives in a subfolder right next to the research file — e.g. `Startup Ideas/03 - Ecommerce Hub/ecommerce-hub-app/`, `Startup Ideas/02 - Pathology Lab Ops Assistant/pathlab-ops-app/`. This keeps research and code in one place instead of scattered across separate folders on disk. The code subfolder gets its own `README.md` that links back to the idea's research `.md` file (relative link, e.g. `../Ecommerce Hub.md`), and the research `.md` file links to the code subfolder's README from its `Files in this folder` (or equivalent) section. A code subfolder is tracked by this same vault git repo — don't leave a separate, standalone `.git` inside it; if one already exists from before the move, rename it aside (e.g. `.git-standalone-history-backup`) rather than deleting it, so history isn't lost, but let this repo track the working files.
 
 The pattern for a new idea folder called "X" is always: one file, `X.md`.
 
@@ -36,6 +38,7 @@ When Priyam describes a new idea: pick the right top-level category (Startup Ide
 
 ## Changelog (structural decisions, most recent first)
 
+- **2026-08-30**: code for an idea now lives inside that idea's own vault folder (e.g. `ecommerce-hub-app/`, `pathlab-ops-app/`) instead of scattered under `~/developer/`, so research and code stay together in one repo. Amended "one file per idea" with this exception.
 - **2026-08-29**: clarified the core rule — keeping the top-of-file verdict/quick-facts summary in sync is mandatory on every edit that changes a stated fact, not just "big" verdict changes. Prompted by Ecommerce Hub's summary going stale for a full day of edits while the dated log below it kept moving.
 - **2026-08-27**: removed the `Memory/` (Sessions Log) and `Crews/` folders entirely, at Priyam's request — no separate meta/session folders, strictly one folder per idea/project. This changelog replaces that function in compact form.
 - **2026-08-27**: merged `- Overview.md` + `- Research.md` into a single `<Idea>.md` per folder — one file per idea, verdict at top, research below.

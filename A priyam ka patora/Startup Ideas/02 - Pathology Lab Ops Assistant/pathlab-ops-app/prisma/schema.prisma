@@ -1,0 +1,278 @@
+// PathLab Ops — core result pipeline
+// Dev provider is sqlite so it runs with zero setup. For production switch
+// provider to "postgresql" and point DATABASE_URL at Postgres — the model
+// definitions below are deliberately written to be portable (no native enums,
+// no Json columns, no arrays).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------- people
+
+model Patient {
+  id        String   @id @default(cuid())
+  mrn       String   @unique // lab's own patient id
+  name      String
+  sex       String // M | F | O
+  dob       DateTime?
+  ageYears  Int? // Indian labs often record age, not DOB
+  ageMonths Int?
+  ageDays   Int?
+  phone     String?
+  email     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  orders    Order[]
+}
+
+model ReferringDoctor {
+  id            String   @id @default(cuid())
+  name          String
+  qualification String?
+  clinic        String?
+  phone         String?
+  createdAt     DateTime @default(now())
+  orders        Order[]
+}
+
+// ---------------------------------------------------------------- workflow
+
+model Order {
+  id            String    @id @default(cuid())
+  orderNo       String    @unique
+  patientId     String
+  patient       Patient   @relation(fields: [patientId], references: [id])
+  doctorId      String?
+  doctor        ReferringDoctor? @relation(fields: [doctorId], references: [id])
+  status        String    @default("REGISTERED") // REGISTERED|COLLECTED|IN_PROCESS|VERIFIED|REPORTED
+  priority      String    @default("ROUTINE") // ROUTINE|URGENT|STAT
+  clinicalNotes String?
+  registeredAt  DateTime  @default(now())
+  collectedAt   DateTime?
+  reportedAt    DateTime?
+  samples       Sample[]
+  results       Result[]
+  reports       Report[]
+  panels        OrderPanel[]
+
+  @@index([status])
+  @@index([registeredAt])
+}
+
+model OrderPanel {
+  id      String @id @default(cuid())
+  orderId String
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  panelId String
+  panel   Panel  @relation(fields: [panelId], references: [id])
+
+  @@unique([orderId, panelId])
+}
+
+model Sample {
+  id          String    @id @default(cuid())
+  orderId     String
+  order       Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  barcode     String    @unique
+  type        String // SERUM|PLASMA|EDTA_WHOLE_BLOOD|CITRATE|URINE|STOOL|SWAB|OTHER
+  collectedAt DateTime?
+  receivedAt  DateTime?
+  condition   String? // OK|HEMOLYSED|LIPEMIC|ICTERIC|CLOTTED|INSUFFICIENT
+  rejected    Boolean   @default(false)
+  rejectReason String?
+  results     Result[]
+}
+
+// ---------------------------------------------------------------- catalog
+
+model Analyte {
+  id         String  @id @default(cuid())
+  code       String  @unique // internal canonical code, e.g. HB, CREAT
+  name       String
+  shortName  String?
+  unit       String?
+  category   String // HEMATOLOGY|BIOCHEMISTRY|IMMUNOASSAY|URINE|MICROBIOLOGY|OTHER
+  valueType  String  @default("NUMERIC") // NUMERIC|TEXT
+  decimals   Int     @default(1)
+  loinc      String?
+  method     String?
+  isDerived  Boolean @default(false)
+  formulaKey String? // key into lib/calc/formulas.ts when isDerived
+  sortOrder  Int     @default(100)
+
+  ranges     ReferenceRange[]
+  results    Result[]
+  panelItems PanelItem[]
+  mappings   AnalyzerMapping[]
+}
+
+model Panel {
+  id        String      @id @default(cuid())
+  code      String      @unique
+  name      String
+  category  String
+  sortOrder Int         @default(100)
+  items     PanelItem[]
+  orders    OrderPanel[]
+}
+
+model PanelItem {
+  id        String  @id @default(cuid())
+  panelId   String
+  panel     Panel   @relation(fields: [panelId], references: [id], onDelete: Cascade)
+  analyteId String
+  analyte   Analyte @relation(fields: [analyteId], references: [id])
+  sortOrder Int     @default(100)
+
+  @@unique([panelId, analyteId])
+}
+
+// Age is stored in days so a single comparison covers neonate -> adult.
+model ReferenceRange {
+  id           String  @id @default(cuid())
+  analyteId    String
+  analyte      Analyte @relation(fields: [analyteId], references: [id], onDelete: Cascade)
+  sex          String  @default("A") // A = any, else M | F
+  ageMinDays   Int     @default(0)
+  ageMaxDays   Int     @default(43800) // ~120y
+  low          Float?
+  high         Float?
+  criticalLow  Float?
+  criticalHigh Float?
+  textRange    String? // for qualitative analytes, e.g. "Negative"
+  note         String?
+
+  @@index([analyteId])
+}
+
+// ---------------------------------------------------------------- instruments
+
+model Analyzer {
+  id           String @id @default(cuid())
+  code         String @unique
+  name         String
+  manufacturer String?
+  model        String?
+  category     String // HEMATOLOGY|BIOCHEMISTRY|IMMUNOASSAY|URINE|OTHER
+  connection   String @default("FILE") // FILE|ASTM_SERIAL|ASTM_TCP|HL7_MLLP|MANUAL
+  parserKey    String @default("generic-csv") // key into lib/ingest/parsers
+  configJson   String? // parser-specific settings, stored as JSON text
+  active       Boolean @default(true)
+
+  mappings AnalyzerMapping[]
+  batches  ImportBatch[]
+  results  Result[]
+}
+
+// Translates a machine's own test code into our canonical analyte.
+model AnalyzerMapping {
+  id          String  @id @default(cuid())
+  analyzerId  String
+  analyzer    Analyzer @relation(fields: [analyzerId], references: [id], onDelete: Cascade)
+  machineCode String
+  analyteId   String
+  analyte     Analyte @relation(fields: [analyteId], references: [id])
+  factor      Float   @default(1) // unit conversion: value * factor + offset
+  offset      Float   @default(0)
+
+  @@unique([analyzerId, machineCode])
+}
+
+model ImportBatch {
+  id             String   @id @default(cuid())
+  analyzerId     String
+  analyzer       Analyzer @relation(fields: [analyzerId], references: [id])
+  filename       String?
+  rowCount       Int      @default(0)
+  matchedCount   Int      @default(0)
+  unmatchedCount Int      @default(0)
+  status         String   @default("PARSED") // PARSED|APPLIED|FAILED
+  notes          String?
+  rawSample      String? // first few lines, for debugging a bad file
+  createdAt      DateTime @default(now())
+  results        Result[]
+}
+
+// ---------------------------------------------------------------- results
+
+model Result {
+  id            String   @id @default(cuid())
+  orderId       String
+  order         Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  analyteId     String
+  analyte       Analyte  @relation(fields: [analyteId], references: [id])
+  sampleId      String?
+  sample        Sample?  @relation(fields: [sampleId], references: [id])
+
+  rawValue      String? // exactly what the machine sent, never overwritten
+  value         Float?
+  textValue     String?
+  unit          String?
+
+  flag          String   @default("N") // N|H|L|HH(critical high)|LL(critical low)|A(abnormal, qualitative)
+  refLow        Float?
+  refHigh       Float?
+  refText       String?
+
+  status        String   @default("ENTERED") // ENTERED|DERIVED|VERIFIED|AMENDED
+  source        String   @default("MANUAL") // MANUAL|IMPORT|DERIVED
+  analyzerId    String?
+  analyzer      Analyzer? @relation(fields: [analyzerId], references: [id])
+  importBatchId String?
+  importBatch   ImportBatch? @relation(fields: [importBatchId], references: [id])
+
+  comment       String?
+  enteredAt     DateTime @default(now())
+  enteredBy     String?
+  verifiedAt    DateTime?
+  verifiedBy    String?
+
+  @@unique([orderId, analyteId])
+  @@index([orderId])
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  orderId     String
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  version     Int      @default(1)
+  status      String   @default("DRAFT") // DRAFT|FINAL|AMENDED
+  generatedAt DateTime @default(now())
+  generatedBy String?
+  signedBy    String?
+  signedAt    DateTime?
+  snapshot    String? // frozen JSON of the report at signing time
+
+  @@unique([orderId, version])
+}
+
+// ---------------------------------------------------------------- audit (DPDP groundwork)
+
+model AuditLog {
+  id       String   @id @default(cuid())
+  at       DateTime @default(now())
+  actor    String   @default("system")
+  action   String // CREATE|UPDATE|VERIFY|IMPORT|VIEW|EXPORT|DELETE
+  entity   String
+  entityId String?
+  detail   String?
+
+  @@index([at])
+  @@index([entity, entityId])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      String   @default("TECHNICIAN") // ADMIN|PATHOLOGIST|TECHNICIAN|RECEPTION
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

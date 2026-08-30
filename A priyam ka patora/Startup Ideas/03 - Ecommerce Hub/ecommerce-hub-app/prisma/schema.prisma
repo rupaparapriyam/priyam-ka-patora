@@ -1,0 +1,74 @@
+// Ecommerce Hub — starter schema.
+// Reflects the MVP scope from the vault research: one brand connects
+// GA4 + ads + WhatsApp + one payment gateway + one logistics carrier,
+// and the product surfaces plain-language insights across all of it.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Brand {
+  id         String      @id @default(cuid())
+  name       String
+  createdAt  DateTime    @default(now())
+  connectors Connector[]
+  metrics    DailyMetric[]
+  insights   Insight[]
+}
+
+enum ConnectorCategory {
+  ANALYTICS
+  ADS
+  WHATSAPP
+  PAYMENTS
+  LOGISTICS
+  MARKETPLACE
+}
+
+// Provider examples per category (not enforced, just the known landscape):
+// ANALYTICS: GA4
+// ADS: Meta Ads, Google Ads
+// WHATSAPP: AiSensy, Wati, Interakt, Gupshup
+// PAYMENTS: Razorpay, Cashfree, PayU, PhonePe PG
+// LOGISTICS: Shiprocket, Delhivery, XpressBees, Ecom Express, Shadowfax
+// MARKETPLACE: Amazon, Flipkart, Myntra, Nykaa, Meesho
+model Connector {
+  id        String            @id @default(cuid())
+  brandId   String
+  brand     Brand             @relation(fields: [brandId], references: [id])
+  category  ConnectorCategory
+  provider  String
+  connected Boolean           @default(false)
+  createdAt DateTime          @default(now())
+}
+
+// One row per brand per day per channel — the raw cross-channel data
+// the "explain what changed and why" engine reasons over.
+model DailyMetric {
+  id        String   @id @default(cuid())
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id])
+  date      DateTime
+  channel   String // e.g. "meta_ads", "razorpay", "shiprocket"
+  metric    String // e.g. "spend", "cac", "rto_rate", "revenue"
+  value     Float
+  createdAt DateTime @default(now())
+
+  @@unique([brandId, date, channel, metric])
+}
+
+// A plain-language, cross-channel finding — the core differentiator
+// ("CAC rose 18% this week because Meta creative fatigue hit your top SKU").
+model Insight {
+  id        String   @id @default(cuid())
+  brandId   String
+  brand     Brand    @relation(fields: [brandId], references: [id])
+  summary   String
+  detail    String?
+  createdAt DateTime @default(now())
+}

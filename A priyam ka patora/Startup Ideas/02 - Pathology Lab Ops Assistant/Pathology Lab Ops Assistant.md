@@ -4,7 +4,7 @@ tags: [idea]
 
 # Pathology Lab Ops Assistant
 
-**Current verdict**: 🟡 BUILD — but not as a venture-scale startup. (2026-08-28, pass 5. Detail in the Claude section at the bottom of this file.)
+**Current verdict**: 🟡 BUILD — but not as a venture-scale startup, and **code is paused until the six lab interviews are done**. (2026-08-30. Detail in the dated sections at the bottom of this file.)
 
 - **Price reality**: one-time licence + AMC, never monthly. BUT the anchor is lower than first thought — incumbent **PathoOne** lists ₹3,500-6,500/user + ₹1,500 AMC. **Verify the family lab's ₹40,000 invoice** — this is the most important open number.
 - **Market ceiling**: ₹150-300 cr/yr for all of India, 30+ vendors, growing ~4%. Triangulated 2 ways. This number does not move with good execution.
@@ -13,7 +13,9 @@ tags: [idea]
 - **Don't build**: AI report drafting, patient app, anything diagnostic, per-brand hardware drivers.
 - **Pricing**: LIS priced near the anchor (₹8-12k + ₹2.5-3k AMC) as the way in; **money is made on the patient-recall engine** at 15-20% of recovered revenue. Positioning: "the lab software that grows your patient base", not "better lab software".
 - **Clocks**: DPDP enforcement May 2027 · ABDM required for insurance empanelment now · NABL reassessment cycles rolling.
-- **Next 14 days**: interview 6 labs. Not more desk research, not more code.
+- **Next 14 days**: interview 6 labs — script, sourcing plan, scoring sheet and green/red thresholds are in the Claude (2026-08-30) section below. Not more desk research, not more code.
+- **Architecture**: cloud web app + a small local Lab Bridge agent (analyzers and printers cannot be reached from a browser). Confirmed 2026-08-30, but **conditional on lab internet reliability** — an interview question, not a settled fact.
+- **v0 status**: working prototype at `~/developer/pathlab-ops` (Next.js + Prisma, 15 models, analyzer ingestion → calc → printable report). **Not yet committed to git** — untracked working-tree files only.
 - **Kill**: no 3 paying labs outside the family by day 90 → stop. SURGE being paused makes this rule more important, not less.
 
 ---
@@ -405,7 +407,7 @@ This is an excellent first business and a poor sole bet. Nothing else in the vau
 
 ### Build status as of this date
 
-A working v0 exists at `~/developer/pathlab-ops` (Next.js + Prisma): analyzer CSV/ASTM ingestion, 96-analyte catalog, 100+ age/sex reference ranges, 22-formula calculation engine (MCV/MCH/MCHC, absolute counts, NLR, Friedewald LDL with TG>400 refusal, CKD-EPI 2021 eGFR, anion gap, corrected calcium, eAG and others), flagging with critical-value detection, result-entry UI and a printable A4 report. 51/51 logic tests pass. Not yet run against a real machine file.
+A working v0 exists in [[pathlab-ops-app/README|pathlab-ops-app]] (moved here from `~/developer/pathlab-ops`; Next.js + Prisma): analyzer CSV/ASTM ingestion, 96-analyte catalog, 100+ age/sex reference ranges, 22-formula calculation engine (MCV/MCH/MCHC, absolute counts, NLR, Friedewald LDL with TG>400 refusal, CKD-EPI 2021 eGFR, anion gap, corrected calcium, eAG and others), flagging with critical-value detection, result-entry UI and a printable A4 report. 51/51 logic tests pass. Not yet run against a real machine file.
 
 ### Sources (pass 5)
 
@@ -689,3 +691,105 @@ Multi-branch, inventory/reagents, TPA/insurance claims, telemedicine, medication
 3. Do any of your referring doctors ask for online access?
 4. Have you ever sent a wrong report? What did you do?
 5. What database does PathoOne keep your data in? (or: may I look at the install folder?)
+
+---
+
+## Claude (2026-08-30) — the six lab interviews: script, scoring sheet, kill criteria
+
+_Priyam said "let's start building." Reviewed the brief, this file in full, and the v0 code at `~/developer/pathlab-ops`, then put the build question back to him against this file's own stated next action. **He chose interviews first, code paused.** This section is the executable version of that._
+
+### 0. Where the code actually stands (verified 2026-08-30)
+
+`~/developer/pathlab-ops` — Next.js 15 + React 19 + Prisma + Tailwind 4, SQLite for dev. Schema has 15 models (Patient, ReferringDoctor, Order, OrderPanel, Sample, Analyte, Panel, PanelItem, ReferenceRange, Analyzer, AnalyzerMapping, ImportBatch, Result, Report, AuditLog, User). Working: analyzer CSV + ASTM ingestion, analyte catalog, reference ranges, calculation engine, flagging, result-entry UI, printable report.
+
+**Two operational risks found:** `node_modules` is not installed, and **the repo has no git commits** — the entire v0 is untracked working-tree files with nothing to restore from. Commit it before anything else touches that folder.
+
+Missing vs the product spec v1 above: billing/GST, the verification gate, sample-collection screen, both portals, the recall engine, and the Lab Bridge itself.
+
+### 0b. Architecture question, answered — and why it is also blocked on the interviews
+
+Priyam re-asked: MVP as a web app or on the computer? The answer stands as written in the product spec v1 section — **cloud web app + a small local Lab Bridge agent**. Pure desktop kills the patient portal, doctor portal and recall engine, which are the entire differentiation over PathoOne, and means updating every lab's PC remotely from Delhi. Pure cloud cannot reach the analyzers (serial/USB/ethernet, ASTM/HL7) or the printers.
+
+**But that design assumes workable lab internet, which is still unverified.** If labs report daily multi-hour outages, PWA caching is not enough and the architecture has to be reconsidered before code. Question 14 below is therefore architecture-critical, not a nice-to-have.
+
+### 1. Homework before the first call
+
+**1a. Verify the ₹40,000 invoice.** Still the most important open number in the business, and still unverified. PathoOne lists ₹3,500–6,500/user + ₹1,500 AMC. Ask parents for: the actual invoice or receipt (photo), how many user licences, whether it bundled a PC/printer/barcode printer/installation/training, who sold it (PathoOne direct or a reseller), and what has been paid since. If the software-only number is really ₹8,000, the pricing model built on a ₹40,000 anchor collapses and the recall engine has to carry the business alone.
+
+**1b. Look inside the PathoOne install folder** on the family lab's PC. `C:\Program Files\` → PathoOne. Look for `.mdb`, `.fdb`, `.gdb`, `.sqlite`, `.bak`, or a `data/` folder, and whether a SQL Server / Firebird / MySQL service is running. The migration importer is the stated moat; whether it is a weekend or a month depends entirely on this. If the data is locked or encrypted, the moat argument is weaker than this file currently assumes and that should be recorded here.
+
+### 2. Who to call — the sample matters more than the count
+
+Target 6 completed conversations; expect ~20 approaches. Six labs that all look like the family lab prove nothing.
+
+| Slot | Profile | What it tests |
+|---|---|---|
+| 1–2 | Rajkot / Saurashtra, similar size to family lab | Does lab #1 generalise to lab #1.5 |
+| 3 | A lab **outside Gujarat** | National sale. A Gujarati-language differentiator means nothing in Pune. |
+| 4 | Currently on **different** software (Flabs, Labsmart, Attune, IndiaMART one-time seller) | Does the migration story land on a non-PathoOne user |
+| 5 | Still on **paper / Excel / no software** | The genuinely underserved segment, and the easiest sale if it exists |
+| 6 | **NABL-accredited**, or trying to be | Is the accreditation-documentation wedge real or theoretical |
+
+Sourcing, highest yield first: parents' network (ask for warm intros explicitly, not "do you know anyone"); the reagent/consumables distributor supplying the family lab — distributors know every lab in the district and one call yields five names; IndiaMART/Justdial for the out-of-Gujarat slot; local IMA or pathologists' WhatsApp groups if the family is in any. Phone or video is fine — Priyam is in Delhi and "I should visit in person" must not become the reason this doesn't happen.
+
+### 3. The script
+
+Rules for himself, because this is where the signal is usually lost: **do not pitch in the first 20 minutes** (the moment you describe the product they start being polite and the data stops); **ask about the past, not the future** ("what did you do the last time X happened" beats "would you use a tool that…"); **never ask "would you pay for this"** — ask what they pay now, to whom, and when they last switched anything; **shut up after asking** — the useful part comes after the pause.
+
+**A — Warm-up (3 min).** Years running; samples/day; headcount and who does registration vs reports; tests in-house vs sent out.
+
+**B — Current software, honest version (10 min).**
+1. What software today?
+2. Who sold it, and when?
+3. **What did you pay?** One-time or yearly? AMC — how much? _(the pricing-anchor question; get a number)_
+4. What made you buy it — what were you doing before?
+5. **Have you ever changed lab software? What happened?** _(most valuable answer in the call — dig: how long, what was lost, who migrated the data, what went wrong)_
+6. If you changed today, what would stop you?
+
+**C — Pain, from the past (12 min).**
+7. Walk me through patient walking in → report reaching them. _(let them narrate; note where they sigh)_
+8. What takes longest, or annoys staff most?
+9. **Ever sent out a wrong report? What did you do?** _(tests the amendment flow, and whether they'll be honest at all)_
+10. **Do patients ask for old reports? How do you find one from two years ago?**
+11. **Do referring doctors ask for online access?**
+12. How do you send reports — print/WhatsApp/email? Who does it, how long per day?
+13. Do you know which doctors send you most patients? How?
+14. **How often does your internet go down, and for how long?** _(architecture-critical — see §0b)_
+15. NABL accredited or trying? If yes: what documentation burden (QC logs, calibration, CAPA, critical-value logs), who does it, how long? If no: why not?
+
+**D — Repeat patients (5 min) — the money question.**
+16. Of this month's patients, how many have been here before?
+17. Do you do anything to bring patients back — reminders, packages, calls?
+18. Has anyone sold you marketing or patient-recall services? Did you buy? What did it cost?
+
+_This section tests the recall engine, which is where this file's business model says the money is. If lab owners have never thought about repeat patients and don't want to, the revenue-share pricing dies and that must be known before it is built._
+
+**E — Only now, the demo (10 min).** Show v0: registration → analyzer result → report. Do not describe the roadmap as if it exists. Then exactly one commitment question — _"I'm building this properly over the next few months. If it does what you've just described you need, would you be willing to be one of the first paid labs on it? I'd charge [₹X one-time + ₹Y AMC]. I'm not asking for money today, I'm asking whether you'd want to be on the list."_ — **then stop talking.** The hesitation is the data. If yes: get a soft date. A yes with no date is a no.
+
+**F — Close.** "Who else should I be talking to?" _(always ask — this is how 6 becomes 20)_ and "Can I come back when I have more built?"
+
+### 4. Scoring sheet — fill within 30 minutes of each call
+
+One row per lab: (1) name, city, samples/day · (2) current software + **what they actually paid**, one-time/AMC · (3) ever switched? what happened · (4) top 3 pains **in their words** · (5) wrong report sent? response · (6) old-report retrieval method · (7) doctors asking for online access Y/N · (8) **internet downtime frequency + duration** · (9) NABL status + documentation burden · (10) repeat-patient effort today · (11) ever paid for marketing/recall? how much · (12) demo reaction — what they lit up at, what they ignored · (13) **commitment: hard yes / soft yes / no + date given** · (14) referrals given.
+
+Then a one-line verdict per lab: _would this lab pay ₹10,000 to a 24-year-old from Delhi with no track record?_ Answer honestly.
+
+### 5. What the six calls have to prove — decide after all six, not after the encouraging one
+
+| Question | Green | Red |
+|---|---|---|
+| Willingness to pay outside family | ≥3 labs give soft-or-better yes with a date | ≤1 yes, or all yeses vague |
+| Price anchor | Labs report paying ₹8k+ for software | Everyone paid ₹3–6k → pricing model needs rebuilding |
+| Is the pain the pain we think it is? | Their top-3 pains overlap with what's being built | They complain about staffing, credit, doctor commissions, reagent cost — things with no plan |
+| Recall engine | Labs already spend on patient acquisition, or clearly want to | Blank looks → revenue-share model dies, LIS must stand alone |
+| Architecture | Outages rare/short | Daily multi-hour outages → cloud+Bridge is wrong, rethink before coding |
+| Migration moat | Switching described as painful **and** PathoOne data extractable | Switching easy, or data locked → moat weaker than this file assumes |
+| Generalisation (the Cydoc test) | Labs 2–6 want roughly the same product as lab 1 | Every lab needs something different → services business, not a product |
+
+**Overriding rule, already in this file's kill criteria:** six labs shown a working demo, fewer than three willing to commit to a paid pilot → that criterion has fired. Honour it.
+
+### 6. Process
+
+Log each call the same day. **Mid-point read after call 3** — if the first three are uniformly cold, don't grind through six out of stubbornness; change the pitch or the segment. After all six: write a dated section here, update the top-of-file verdict and the affected quick-fact bullets in the same pass, and only then decide whether the next slice of code is the verification gate, the billing module, or the migration importer.
+
+**Nothing gets built until this is done.**
