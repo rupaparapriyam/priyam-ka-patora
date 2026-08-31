@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>Priyam Rupapara — Systems Builder &amp; Engineer</title>
+  <meta name="description" content="Priyam Rupapara. Building Pathology Lab Ops (working MVP), Ecommerce Hub (pre-seed), Autonomous Defence AI, and vertical operational tools." />
+  <meta name="theme-color" content="#030508" />
+  <meta property="og:title" content="Priyam Rupapara — Systems Builder &amp; Engineer" />
+  <meta property="og:description" content="Pathology Lab Ops (working MVP), Ecommerce Hub (pre-seed truth layer), Autonomous Defence AI, and vertical operational tools." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://rupaparapriyam.github.io" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Priyam Rupapara — Systems Builder &amp; Engineer" />
+  <meta name="twitter:description" content="Pathology Lab Ops, Ecommerce Hub, and Autonomous Defence AI. Real operational automation, zero fluff." />
+
+  <!-- Fonts: Bebas Neue (display) + Inter (body) + Space Mono (labels/code) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- Top Scroll Progress Bar -->
+  <div id="scroll-progress" class="top-scroll-progress" aria-hidden="true"></div>
+
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- ===================== NAVBAR ===================== -->
+  <header class="nav-bar" id="main-header">
+    <nav class="nav-inner">
+      <a href="#hero" class="nav-logo" aria-label="Priyam Rupapara">PRIYAM.</a>
+
+      <ul class="nav-links" id="nav-links-list">
+        <li><a href="#about" class="nav-link">About</a></li>
+        <li><a href="#projects" class="nav-link">Projects</a></li>
+        <li><a href="#surge" class="nav-link">SURGE</a></li>
+        <li><a href="#defence" class="nav-link">Defence &amp; Drone</a></li>
+        <li><a href="#fun-zone" class="nav-link">Playground &amp; Fun</a></li>
+        <li><a href="#contact" class="nav-link">Contact</a></li>
+      </ul>
+
+      <div class="nav-actions">
+        <!-- Quick Command Palette ⌘K button -->
+        <button class="nav-cmd-btn" onclick="window.openCommandPalette()" title="Command Palette (⌘K / Ctrl+K)">
+          <span class="cmd-kbd">⌘K</span>
+          <span class="cmd-text">Search</span>
+        </button>
+
+        <button class="nav-chat-btn" onclick="window.togglePriyamChat(true)">[Talk to Priyam]</button>
+        <button id="theme-toggle" class="nav-icon-btn" aria-label="Toggle theme">
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <svg class="moon-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <button id="mobile-menu-btn" class="nav-icon-btn nav-mobile-only" aria-label="Menu">
+          <svg class="menu-open-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="8" x2="20" y2="8"/><line x1="4" y1="16" x2="20" y2="16"/></svg>
+          <svg class="menu-close-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Mobile menu -->
+    <div id="mobile-drawer" class="mobile-drawer hidden">
+      <a href="#about" class="mobile-link">About</a>
+      <a href="#projects" class="mobile-link">Projects</a>
+      <a href="#surge" class="mobile-link">SURGE Case Study</a>
+      <a href="#defence" class="mobile-link">Defence &amp; Drone 3D</a>
+      <a href="#fun-zone" class="mobile-link">Interactive Fun &amp; Tools</a>
+      <a href="#contact" class="mobile-link">Contact</a>
+      <button class="mobile-cmd-btn" onclick="window.openCommandPalette(); document.getElementById('mobile-drawer').classList.add('hidden');">⌘K Command Palette</button>
+      <button class="mobile-chat-btn" onclick="window.togglePriyamChat(true); document.getElementById('mobile-drawer').classList.add('hidden');">[Talk to Priyam AI]</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===================== HERO ===================== -->
+    <section id="hero" class="hero-section">
+      <!-- High-Performance Interactive 3D Cyber Horizon Canvas -->
+      <canvas id="hero-interactive-canvas" class="hero-interactive-canvas" aria-hidden="true"></canvas>
+
+      <!-- Grid texture -->
+      <div class="hero-grid-bg" aria-hidden="true"></div>
+
+      <div class="hero-content">
+
+        <!-- Left: main editorial type -->
+        <div class="hero-left">
+          <div class="hero-eyebrow">
+            <span class="mono-label">[SYSTEMS BUILDER · INDIA · 2026]</span>
+            <span class="hero-live-badge"><span class="live-pulse"></span>ACTIVE DEPLOYMENTS</span>
+          </div>
+
+          <h1 class="hero-headline" id="hero-kinetic-title" aria-label="I Build Systems Not Dashboards">
+            <!-- JS fills this with per-letter kinetic spans -->
+          </h1>
+
+          <p class="hero-sub">
+            Building software for messy real-world operations where generic SaaS fails.<br>
+            From diagnostic lab benches to Indian D2C attribution and edge UAV avionics.
+          </p>
+
+          <div class="hero-actions-row">
+            <a href="#projects" class="hero-cta">↓ Explore all projects</a>
+            <a href="https://www.instagram.com/priyamm_r?igsi=aXUzcmptY204Nm5t&utm_source=qr" target="_blank" rel="noopener" class="hero-link-pill">[INSTAGRAM · @priyamm_r ↗]</a>
+            <button class="hero-cmd-hint" onclick="window.openCommandPalette()">Press <kbd>⌘K</kbd> for quick menu</button>
+          </div>
+        </div>
+
+        <!-- Right: Mark's Style Simple & Funny Business Card -->
+        <div class="hero-right">
+          <div class="hero-tilted-card" id="hero-zuck-card" tabindex="0" role="button" aria-label="Priyam's Business Card">
+            <div class="tilted-card-inner zuck-simple-card">
+              <div class="zsc-quote">"I'm CEO, bitch. (And the only engineer)."</div>
+              <div class="zsc-center">
+                <h3 class="zsc-name">PRIYAM RUPAPARA</h3>
+                <div class="zsc-title">Founder &amp; Systems Builder</div>
+              </div>
+              <div class="zsc-footer">
+                <span>rupaparapriyam@gmail.com</span>
+                <span class="zsc-sep">·</span>
+                <a href="https://www.instagram.com/priyamm_r?igsi=aXUzcmptY204Nm5t&utm_source=qr" target="_blank" rel="noopener" class="zsc-link">@priyamm_r ↗</a>
+                <span class="zsc-sep">·</span>
+                <span>Rajkot / Delhi</span>
+              </div>
+            </div>
+          </div>
+          <div class="hero-stamp mono-label">[CLICK CARD TO COPY DIRECT EMAIL · RAJKOT / DELHI]</div>
+        </div>
+
+      </div>
+
+      <!-- Scrolling marquee -->
+      <div class="hero-marquee" aria-hidden="true">
+        <div class="marquee-track">
+          <span>PathLab Ops MVP</span><span class="marquee-sep">·</span>
+          <span>ASTM E1394 Serial Bridge</span><span class="marquee-sep">·</span>
+          <span>Ecommerce Hub</span><span class="marquee-sep">·</span>
+          <span>Indian COD/RTO Attribution</span><span class="marquee-sep">·</span>
+          <span>SURGE Grooming</span><span class="marquee-sep">·</span>
+          <span>MAVLink PX4 Avionics</span><span class="marquee-sep">·</span>
+          <span>100-Page PRR Slide Scanner</span><span class="marquee-sep">·</span>
+          <span>Parents' Lab Automation</span><span class="marquee-sep">·</span>
+          <span>Algo Trading Bot</span><span class="marquee-sep">·</span>
+          <span>JEE Burndown Tracker</span><span class="marquee-sep">·</span>
+          <span>Solana Stake Bot</span><span class="marquee-sep">·</span>
+          <span>PathLab Ops MVP</span><span class="marquee-sep">·</span>
+          <span>ASTM E1394 Serial Bridge</span><span class="marquee-sep">·</span>
+          <span>Ecommerce Hub</span><span class="marquee-sep">·</span>
+          <span>Indian COD/RTO Attribution</span><span class="marquee-sep">·</span>
+          <span>SURGE Grooming</span><span class="marquee-sep">·</span>
+          <span>MAVLink PX4 Avionics</span><span class="marquee-sep">·</span>
+          <span>100-Page PRR Slide Scanner</span><span class="marquee-sep">·</span>
+          <span>Parents' Lab Automation</span><span class="marquee-sep">·</span>
+          <span>Algo Trading Bot</span><span class="marquee-sep">·</span>
+          <span>JEE Burndown Tracker</span><span class="marquee-sep">·</span>
+          <span>Solana Stake Bot</span><span class="marquee-sep">·</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== ABOUT ME ===================== -->
+    <section id="about" class="section-about">
+      <div class="section-container">
+
+        <div class="section-tag-header">
+          <span class="section-tag-num">01 / ABOUT</span>
+          <span class="section-tag-line"></span>
+        </div>
+        <h2 class="section-clean-heading">A bit about me</h2>
+
+        <div class="about-grid-layout">
+          <!-- Left: Narrative Story -->
+          <div class="about-narrative-col">
+            <p>
+              I'm a founder and vibe coder who knows the basics and uses modern AI tools to build real software for messy real-world operations. My tech stack? <strong>Whatever AI can code.</strong> If an LLM or agent can write it, I can orchestrate it, test it against physical constraints, and ship it.
+            </p>
+            <p>
+              Currently building <strong>PathLab Ops Assistant</strong> (an automated LIS + ASTM machine interface with a working MVP deployed in an active lab) and <strong>Ecommerce Hub</strong> (an analytics &amp; reconciliation truth layer for Indian D2C brands). I don't get lost in syntax debates — I ship working systems.
+            </p>
+          </div>
+
+          <!-- Right: Categorized Skill & Focus Pills -->
+          <div class="about-skills-col">
+            <div class="about-skill-group">
+              <span class="about-group-label">TECH STACK (WHATEVER AI CAN CODE)</span>
+              <div class="about-pills-wrap">
+                <span class="skill-pill">Python</span>
+                <span class="skill-pill">TypeScript</span>
+                <span class="skill-pill">JavaScript</span>
+                <span class="skill-pill">SQL</span>
+                <span class="skill-pill">Rust</span>
+                <span class="skill-pill">C++</span>
+                <span class="skill-pill">Bash</span>
+                <span class="skill-pill">HTML/CSS</span>
+                <span class="skill-pill">Any LLM-Supported Stack</span>
+              </div>
+            </div>
+
+            <div class="about-skill-group">
+              <span class="about-group-label">BUILDING WITH AGENTS</span>
+              <div class="about-pills-wrap">
+                <span class="skill-pill">Next.js</span>
+                <span class="skill-pill">React</span>
+                <span class="skill-pill">Node.js</span>
+                <span class="skill-pill">Prisma</span>
+                <span class="skill-pill">TailwindCSS</span>
+                <span class="skill-pill">WebSockets</span>
+                <span class="skill-pill">Canvas 2D / 3D</span>
+                <span class="skill-pill">ASTM Protocols</span>
+                <span class="skill-pill">PX4 SITL</span>
+              </div>
+            </div>
+
+            <div class="about-skill-group">
+              <span class="about-group-label">FOCUS &amp; PHILOSOPHY</span>
+              <div class="about-pills-wrap">
+                <span class="skill-pill">Vibe Coding</span>
+                <span class="skill-pill">Whatever AI Can Build</span>
+                <span class="skill-pill">Agentic Workflows</span>
+                <span class="skill-pill">Healthcare Ops (LIS)</span>
+                <span class="skill-pill">D2C Attribution</span>
+                <span class="skill-pill">Rapid 0-to-1 Shipping</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===================== MAIN PROJECTS ===================== -->
+    <section id="projects" class="section-projects">
+      <div class="section-container">
+
+        <header class="section-head">
+          <div class="section-head-top">
+            <div class="section-tag-header" style="margin-bottom:0; flex:1;">
+              <span class="section-tag-num">02 / PROJECTS</span>
+              <span class="section-tag-line"></span>
+            </div>
+            <!-- Filter Pills -->
+            <div class="project-filters" id="project-filters">
+              <button class="pf-btn active" data-filter="all">All (10)</button>
+              <button class="pf-btn" data-filter="mvp">Active MVPs</button>
+              <button class="pf-btn" data-filter="commerce">Commerce &amp; D2C</button>
+              <button class="pf-btn" data-filter="hardware">Hardware &amp; AI</button>
+              <button class="pf-btn" data-filter="fun">Hacks &amp; Fun</button>
+            </div>
+          </div>
+
+          <h2 class="section-clean-heading" style="margin-top:0.75rem; margin-bottom:0.5rem;">The Projects.</h2>
+          <p class="section-lead">Every serious project, past experiment, and honest failure. Click any card for the full breakdown with architecture diagrams, verified numbers, and real stories.</p>
+        </header>
+
+        <!-- Primary Featured Projects Grid -->
+        <div class="stamp-cards-grid" id="projects-grid">
+
+          <!-- 1. PathLab Ops -->
+          <article class="stamp-card stamp-card--primary" data-category="mvp" onclick="window.openProjectDetail('pathlab')" tabindex="0" role="button" aria-label="Open PathLab Ops project detail">
+            <div class="sc-top-meta">
+              <span class="sc-index">[01]</span>
+              <span class="sc-status-tag sc-status--green">WORKING MVP</span>
+            </div>
+            <h3 class="sc-headline">PathLab<br>(Is) Your Lab's<br>Missing Brain.</h3>
+            <p class="sc-sub">Diagnostic workflow &amp; LIS software. Ingests ASTM E1394 serial data directly from haematology &amp; biochemistry machines, auto-drafts reports in 3s, and automates patient recall. Tested on real family lab bench (Vaibhav Lab).</p>
+            <div class="sc-footer">
+              <span class="sc-stack">Next.js 15 · Prisma (15 Models) · ASTM E1394</span>
+              <span class="sc-arrow">↗ Full Story &amp; Flow</span>
+            </div>
+          </article>
+
+          <!-- 2. Ecommerce Hub -->
+          <article class="stamp-card stamp-card--secondary" data-category="commerce mvp" onclick="window.openProjectDetail('ecom')" tabindex="0" role="button" aria-label="Open Ecommerce Hub project detail">
+            <div class="sc-top-meta">
+              <span class="sc-index">[02]</span>
+              <span class="sc-status-tag sc-status--amber">PRE-SEED / MVP STAGE · ACTIVELY RAISING</span>
+            </div>
+            <h3 class="sc-headline">Ecommerce<br>Hub (Is) The<br>D2C Truth Layer.</h3>
+            <p class="sc-sub">Unified per-order contribution margin dashboard for Indian D2C brands. Solves the 60%+ COD &amp; 25-28% RTO return leakage by joining Shopify orders + Razorpay settlement + Shiprocket tracking + Meta/Google ad spend.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">Shopify API · Razorpay · Shiprocket · Meta Ads</span>
+              <span class="sc-arrow">↗ Full Story &amp; Math</span>
+            </div>
+          </article>
+
+          <!-- 3. Defence AI & Edge Systems -->
+          <article class="stamp-card stamp-card--dark" data-category="hardware" onclick="window.openProjectDetail('defence')" tabindex="0" role="button" aria-label="Open Defence AI project detail">
+            <div class="sc-top-meta">
+              <span class="sc-index">[03]</span>
+              <span class="sc-status-tag sc-status--blue">RESEARCH &amp; SIMULATION</span>
+            </div>
+            <h3 class="sc-headline">Defence AI<br>(For) Edge<br>Zero-Tolerance.</h3>
+            <p class="sc-sub">Exploring tactical edge computing, MAVLink telemetry, PX4 flight controllers, and autonomous obstacle navigation for UAVs. Real hardware operating in high-consequence environments.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">MAVLink · PX4 · 3D Avionics · WebGL</span>
+              <span class="sc-arrow">↗ Telemetry &amp; Vision</span>
+            </div>
+          </article>
+
+          <!-- 4. AI Chatbot Assistant (Idea Only / Unstarted) -->
+          <article class="stamp-card stamp-card--paper" data-category="mvp" onclick="window.openProjectDetail('aichatbot')" tabindex="0" role="button" aria-label="Open AI Chatbot Assistant idea detail">
+            <div class="sc-top-meta">
+              <span class="sc-index">[04]</span>
+              <span class="sc-status-tag sc-status--amber">UNSTARTED CONCEPT · VAULT TEARDOWN</span>
+            </div>
+            <h3 class="sc-headline">AI Chatbot<br>(Was) Business<br>Agent OS Idea.</h3>
+            <p class="sc-sub">Native 24/7 action-oriented AI assistant idea for booking, lead triage, and Web/WhatsApp automation. Researched in vault, verified horizontal commoditization risks, and made the disciplined call not to write unvalidated code.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">Strategy Teardown · Agent OS · RAG Architecture</span>
+              <span class="sc-arrow">↗ Read Vault Teardown</span>
+            </div>
+          </article>
+
+          <!-- 5. SURGE Grooming -->
+          <article class="stamp-card stamp-card--paper" data-category="commerce" onclick="window.openProjectDetail('surge')" tabindex="0" role="button" aria-label="Open SURGE project detail">
+            <div class="sc-top-meta">
+              <span class="sc-index">[05]</span>
+              <span class="sc-status-tag sc-status--gray">PAUSED FOR CAPITAL DISCIPLINE</span>
+            </div>
+            <h3 class="sc-headline">SURGE (Was)<br>Full Hair Styling<br>&amp; Grooming Line.</h3>
+            <p class="sc-sub">Complete high-performance men's hair styling brand — Matte Volumizing Texture Powder (shown rotating 360° below), alcohol-free matte clay, sea salt spray, curl cream, pomade, and styling mousse — formulated with a cosmetic chemist and sampled for personal use. Stage 2 was planned around active skincare. Paused to avoid 5,000+ unit MOQ debt per SKU.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">Full Hair Styling Line · Chemistry R&amp;D · 7 SKUs · Sourcing</span>
+              <span class="sc-arrow">↗ The Sourcing Story</span>
+            </div>
+          </article>
+
+          <!-- 6. n8n WhatsApp & Parents' Lab Automation -->
+          <article class="stamp-card stamp-card--paper" data-category="mvp" onclick="window.openProjectDetail('chatbot')" tabindex="0" role="button" aria-label="Open n8n WhatsApp Automation project detail">
+            <div class="sc-top-meta">
+              <span class="sc-index">[06]</span>
+              <span class="sc-status-tag sc-status--green">LIVE AT FAMILY LAB</span>
+            </div>
+            <h3 class="sc-headline">n8n WhatsApp<br>&amp; Parents' Lab<br>Automation.</h3>
+            <p class="sc-sub">Deterministic n8n workflow engine built for Vaibhav Laboratory. Automatically confirms test appointments, dispatches PDF test reports via WhatsApp when signed, and triggers quarterly diabetic/thyroid patient recalls. Zero AI slop — pure rock-solid automation.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">n8n Workflows · WhatsApp Cloud API · Webhooks</span>
+              <span class="sc-arrow">↗ Architecture</span>
+            </div>
+          </article>
+
+          <!-- 7. Academic Knowledge Graph & Study Intelligence Engine -->
+          <article class="stamp-card stamp-card--paper" data-category="fun" onclick="window.openProjectDetail('kg')" tabindex="0" role="button" aria-label="Open Academic Knowledge Graph detail">
+            <div class="sc-top-meta">
+              <span class="sc-index">[07]</span>
+              <span class="sc-status-tag sc-status--blue">BUILT FOR FUN / EXAM PREP</span>
+            </div>
+            <h3 class="sc-headline">Academic Knowledge<br>Graph (College<br>Study Engine).</h3>
+            <p class="sc-sub">Personal study tool built for fun. Ingests university pre-reads, lecture slides, and syllabus modules into an interactive concept graph. Extracts entity connections and spits out high-yield active-recall briefs before exams.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">Semantic Graph · Entity Extraction · Vector Indexing · RAG</span>
+              <span class="sc-arrow">↗ System Architecture</span>
+            </div>
+          </article>
+
+          <!-- 8. Algo Trading Bot -->
+          <article class="stamp-card stamp-card--paper" data-category="fun" onclick="window.openProjectDetail('algo')" tabindex="0" role="button" aria-label="Open Algo Trading Bot detail">
+            <div class="sc-top-meta">
+              <span class="sc-index">[08]</span>
+              <span class="sc-status-tag sc-status--gray">UNTESTED CODE SCAFFOLD</span>
+            </div>
+            <h3 class="sc-headline">Algo Trading<br>Bot (Didn't Test)<br>Never Made Cash.</h3>
+            <p class="sc-sub">Rule-based momentum + RSI order execution script written on Zerodha Kite API. Built as a coding exploration — never live tested with real capital, never generated returns. Parked honestly.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">Python · Zerodha Kite API · Order Engine</span>
+              <span class="sc-arrow">↗ The Honest Postmortem</span>
+            </div>
+          </article>
+
+          <!-- 9. JEE Backlog Tracker -->
+          <article class="stamp-card stamp-card--paper" data-category="fun" onclick="window.openProjectDetail('jee')" tabindex="0" role="button" aria-label="Open JEE Tracker detail">
+            <div class="sc-top-meta">
+              <span class="sc-index">[09]</span>
+              <span class="sc-status-tag sc-status--amber">ORIGIN STORY / JOKE</span>
+            </div>
+            <h3 class="sc-headline">JEE Backlog<br>(Built Instead<br>Of Studying).</h3>
+            <p class="sc-sub">Had 3 days to finish a crucial JEE chemistry chapter. Built a full burndown chart, streak tracker, and estimate calculator in React instead. Chemistry survived; barely.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">React · Chart.js · Procrastination Engine</span>
+              <span class="sc-arrow">↗ Read The Story</span>
+            </div>
+          </article>
+
+          <!-- 10. Solana Stake Bot -->
+          <article class="stamp-card stamp-card--paper" data-category="fun" onclick="window.openProjectDetail('stake')" tabindex="0" role="button" aria-label="Open Solana Stake Bot detail">
+            <div class="sc-top-meta">
+              <span class="sc-index">[10]</span>
+              <span class="sc-status-tag sc-status--gray">FOR FUN</span>
+            </div>
+            <h3 class="sc-headline">Solana Stake<br>Auto-Compound<br>Bot.</h3>
+            <p class="sc-sub">Automated staking yields and epoch compounding engine on Solana. Ran smoothly in background without human intervention. Zero drama, exactly how bots should run.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">Solana Web3.js · RPC Node · Epoch Listener</span>
+              <span class="sc-arrow">↗ Details</span>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SURGE CASE STUDY ===================== -->
+    <section id="surge" class="section-surge">
+      <div class="surge-sticky-header">
+        <div class="section-container surge-header-row">
+          <div class="surge-title-block">
+            <span class="mono-label">[03 · D2C BRAND CASE STUDY]</span>
+            <h3 class="surge-bar-headline">SURGE Grooming — Complete Hair Styling Line &amp; Chemistry Formulations</h3>
+          </div>
+          <div class="surge-phase-stamps">
+            <span class="phase-stamp phase-done">STAGE 1: ENTIRE HAIR STYLING LINE ✓</span>
+            <span class="phase-stamp phase-done">PERSONAL SAMPLING &amp; R&amp;D ✓</span>
+            <span class="phase-stamp phase-hold">STAGE 2: SKINCARE (PAUSED) ⏸</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="surge-scroll-body">
+        <div class="surge-sticky-viewport">
+          <div class="section-container surge-split">
+
+            <div class="surge-bottle-col">
+              <div class="surge-bottle-pedestal">
+                <canvas id="surge-scroll-bottle-canvas" width="400" height="560"></canvas>
+                <div class="surge-editorial-note">
+                  <span class="mono-label">Formulation &amp; Packaging R&amp;D</span>
+                  <span class="surge-cities">Matte Volumizing<br>Texture Powder &amp;<br>Hair Styling Line</span>
+                </div>
+                <div class="surge-scroll-hint mono-label">
+                  ↓ SCROLL TO ROTATE 360° · DRAG TO SPIN
+                </div>
+              </div>
+            </div>
+
+            <div class="surge-narrative-col">
+              <div class="surge-story-card active" id="surge-card-1">
+                <div class="sc-index sc-index--light">[01 / 04]</div>
+                <h3 class="surge-story-title">SURGE (Was)<br>Hair Styling Line →<br>Stage 2 Skincare.</h3>
+                <p class="surge-story-body">Engineered as an entire high-performance hair styling brand for men: Matte Volumizing Texture Powder (shown rotating 360° on the left), alcohol-free matte styling clay, sea salt spray, curl cream, pomade, and styling mousse, formulated alongside a cosmetic chemist and sampled for personal use. Stage 2 was planned around active skincare tailored for Indian men.</p>
+              </div>
+              <div class="surge-story-card" id="surge-card-2">
+                <div class="sc-index sc-index--light">[02 / 04]</div>
+                <h3 class="surge-story-title">Manufacturing<br>&amp; The Factory<br>MOQ Trap.</h3>
+                <p class="surge-story-body">Formulated custom packaging samples and evaluated factory quotes across the full hair styling lineup and skincare containers. Minimum Order Quantities (5,000+ units per SKU across multiple styling containers) required heavy upfront capital that risked balance sheet debt before demand was proven.</p>
+              </div>
+              <div class="surge-story-card" id="surge-card-3">
+                <div class="sc-index sc-index--light">[03 / 04]</div>
+                <h3 class="surge-story-title">I Paused It.<br>Capital Discipline<br>Over Ego.</h3>
+                <p class="surge-story-body">Rather than taking on dangerous debt for unvalidated inventory across multiple hair styling and skincare lines, I made the conscious decision to pause. Understanding capital allocation before scale is true builder discipline.</p>
+              </div>
+              <div class="surge-story-card" id="surge-card-4">
+                <div class="sc-index sc-index--light">[04 / 04]</div>
+                <h3 class="surge-story-title">The Spark<br>For Ecommerce<br>Hub SaaS.</h3>
+                <p class="surge-story-body">Running SURGE exposed the nightmare of Indian D2C attribution: juggling Meta ads, Razorpay, and Shiprocket RTO returns. That lived pain directly gave birth to Ecommerce Hub — solving unit economics for hundreds of other brands.</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== DEFENCE & 3D HARDWARE SCHEMATIC ===================== -->
+    <section id="defence" class="section-defence">
+      <div class="section-container">
+
+        <header class="section-head">
+          <div class="section-head-top">
+            <span class="mono-label">[03 · HARDWARE &amp; AVIONICS]</span>
+            <div class="drone-status-pill">
+              <span class="live-pulse-dot"></span>
+              <span>PX4 FLIGHT HARDWARE SPEC</span>
+            </div>
+          </div>
+          <h2 class="section-display">Tactical UAV<br>Avionics.</h2>
+          <p class="section-lead">Interactive 3D CAD schematic for autonomous edge computing and companion hardware. Drag to orbit, inspect sub-systems, and explore fail-operational architecture.</p>
+        </header>
+
+        <!-- Clean Editorial CAD Stage -->
+        <div class="cad-stage-wrapper" id="defence-stage-wrapper">
+
+          <!-- Top Technical Spec Bar -->
+          <div class="cad-spec-bar">
+            <div class="cad-spec-item">
+              <span class="cs-k mono-label">AIRFRAME</span>
+              <span class="cs-v">450mm Carbon Quad</span>
+            </div>
+            <div class="cad-spec-item">
+              <span class="cs-k mono-label">FLIGHT CONTROLLER</span>
+              <span class="cs-v">PX4 Autopilot / MAVLink</span>
+            </div>
+            <div class="cad-spec-item">
+              <span class="cs-k mono-label">PROPULSION</span>
+              <span class="cs-v">4× 2400KV (4.8kg Thrust)</span>
+            </div>
+            <div class="cad-spec-item">
+              <span class="cs-k mono-label">PAYLOAD</span>
+              <span class="cs-v">4K Tri-Axis Optical Gimbal</span>
+            </div>
+          </div>
+
+          <!-- Clean Canvas Viewport -->
+          <div class="cad-canvas-wrap" id="drone-canvas-container">
+            <canvas id="hero-drone-canvas"></canvas>
+
+            <!-- CAD Subsystem Selector / Inspect Pills -->
+            <div class="cad-hotspot-deck">
+              <button class="cad-pill active" id="pill-frame" onclick="window.selectDronePart('frame')">01 · Carbon Unibody</button>
+              <button class="cad-pill" id="pill-motors" onclick="window.selectDronePart('motors')">02 · 2400KV Motors</button>
+              <button class="cad-pill" id="pill-px4" onclick="window.selectDronePart('px4')">03 · PX4 Companion</button>
+              <button class="cad-pill" id="pill-gimbal" onclick="window.selectDronePart('gimbal')">04 · Optical Gimbal</button>
+            </div>
+
+            <!-- Inspect Tooltip Card -->
+            <div class="cad-inspect-card" id="drone-hotspot-card">
+              <div class="cic-title mono-label" id="dh-title">[01 · CARBON UNIBODY FRAME]</div>
+              <div class="cic-desc" id="dh-desc">Toray T700 carbon fiber cross-arm spar. 450mm motor-to-motor diagonal with high-vibration damping.</div>
+            </div>
+          </div>
+
+          <!-- Bottom Interaction Controls -->
+          <div class="cad-bottom-deck">
+            <div class="mono-label">[DRAG TO ORBIT 360° · SCROLL TO ZOOM]</div>
+            <div class="cad-actions">
+              <button class="tool-btn" id="btn-toggle-drone-rot" onclick="window.toggleDroneAutoRotate()">[PAUSE / RESUME ROTATION]</button>
+              <button class="tool-btn" id="btn-reset-drone">[RESET VIEW ↺]</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===================== PLAYGROUND & TACTICAL STATIONS ===================== -->
+    <section id="fun-zone" class="section-fun">
+      <div class="section-container">
+
+        <header class="section-head">
+          <span class="mono-label">[04 · INTERACTIVE TACTICAL SIMULATOR]</span>
+          <h2 class="section-display">Playground &amp;<br>Tactical Radar C2.</h2>
+          <p class="section-lead">A playable real-time tactical air defence simulator extracted directly from Priyam's Autonomous Defence AI companion avionics track. Real canvas physics, Kalman trajectory prediction, kinetic interceptors, drone swarms, and authentic telemetry.</p>
+        </header>
+
+        <!-- Tactical Air Defence AI & Missile Interception C2 -->
+        <div class="game-card-wrapper game-card--dark">
+          <div class="game-header-bar">
+            <div class="gh-title-block">
+              <span class="mono-label" style="color:var(--cyan);">[TACTICAL RADAR C2 · KALMAN TRAJECTORY PREDICTION &amp; MISSILE INTERCEPTION]</span>
+              <h3 class="game-title" style="color:#FFF;">Tactical Air Defence AI: Missile Interception C2</h3>
+            </div>
+            <div class="flight-hud-pills">
+              <span class="game-score-badge" id="uav-hud-score" style="background:#0F766E;">INTERCEPTED: 0</span>
+              <span class="game-score-badge" id="uav-hud-high">BEST: 0</span>
+              <button class="audio-toggle-btn" id="uav-pause-btn" onclick="window.toggleUavPause()" aria-label="Toggle Pause Simulation">⏸️ PAUSE [P]</button>
+              <button class="audio-toggle-btn" id="uav-audio-toggle" onclick="window.toggleUavAudio()" aria-label="Toggle Sound Effects">🔊 RADAR AUDIO: ON</button>
+            </div>
+          </div>
+
+          <!-- Tactical Defence Telemetry Bar -->
+          <div class="uav-telemetry-bar">
+            <div class="uav-tele-item"><span class="mono-label">RADAR TRACKING</span><span class="uav-tval" id="uav-state-val" style="color:var(--green);">ONLINE</span></div>
+            <div class="uav-tele-item"><span class="mono-label">INTERCEPTORS READY</span><span class="uav-tval" id="uav-missiles-val" style="color:var(--cyan);">6 / 6 KINETIC</span></div>
+            <div class="uav-tele-item"><span class="mono-label">THREATS IN AIRSPACE</span><span class="uav-tval" id="uav-threats-val" style="color:var(--amber);">0 TRACKED</span></div>
+            <div class="uav-tele-item"><span class="mono-label">BASE INTEGRITY</span><span class="uav-tval" id="uav-shield-val">100%</span></div>
+          </div>
+
+          <!-- Playable Radar C2 Canvas Viewport -->
+          <div class="uav-canvas-container">
+            <canvas id="drone-game-canvas" width="800" height="400"></canvas>
+            
+            <!-- In-Canvas Overlay for Airspace Compromise / Reset -->
+            <div class="uav-overlay hidden" id="uav-overlay">
+              <div class="uav-overlay-box">
+                <h4 class="uav-overlay-title" id="uav-overlay-title">AIRSPACE SECTOR COMPROMISED</h4>
+                <p class="uav-overlay-desc" id="uav-overlay-desc">Hostile cruise missiles breached base perimeter. Final Interception Score: 0.</p>
+                <button class="uav-btn-primary" onclick="window.startUavGame()">[PRESS SPACE OR CLICK TO RE-ARM DEFENCE BATTERY ↺]</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controls Guidance / Tactical Button Deck -->
+          <div class="uav-controls-bar">
+            <div class="uav-key-hints mono-label">
+              <span>[SPACE] FIRE</span> · <span>[S] 🚀 SALVO [x6]</span> · <span>[F] 💥 FLAK</span> · <span>[R] ⚡ RAILGUN</span> · <span>[D] 🤖 DRONES</span> · <span>[E] 📡 ECCM</span> · <span>[P] ⏸️ PAUSE</span>
+            </div>
+            <div class="uav-touch-controls">
+              <button class="touch-ctrl-btn touch-ctrl-btn--boost" onpointerdown="window.triggerInterceptorLaunch()">🚀 MISSILE</button>
+              <button class="touch-ctrl-btn" onpointerdown="window.triggerMultiSalvo()">🚀 SALVO x6</button>
+              <button class="touch-ctrl-btn" onpointerdown="window.triggerAreaFlak()">💥 AREA FLAK</button>
+              <button class="touch-ctrl-btn" onpointerdown="window.triggerOrbitalRailgun()">⚡ RAILGUN</button>
+              <button class="touch-ctrl-btn" onpointerdown="window.deployPatrolUav()">🤖 DRONES</button>
+              <button class="touch-ctrl-btn" onpointerdown="window.triggerEccmBurst()">📡 ECCM</button>
+              <button class="touch-ctrl-btn" onpointerdown="window.toggleUavPause()">⏸️ PAUSE</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ===================== CONTACT ===================== -->
+    <section id="contact" class="section-contact">
+      <div class="section-container">
+        
+        <div class="section-tag-header">
+          <span class="section-tag-num">06 / CONTACT</span>
+          <span class="section-tag-line"></span>
+        </div>
+        <h2 class="section-clean-heading">Get in touch</h2>
+
+        <div class="contact-card-clean">
+          <p class="contact-clean-lead">
+            Whether you want to discuss pre-seed funding &amp; investment, automate something painful with agentic AI, or just drop by for pure unhinged <em>bakchodi</em> and banter — I'm in for everything. Email is fastest.
+          </p>
+          
+          <div class="contact-clean-email-wrap">
+            <a href="mailto:rupaparapriyam@gmail.com" class="contact-clean-email" id="contact-main-email">
+              <span class="cce-text">rupaparapriyam@gmail.com</span>
+              <span class="cce-arrow">↗</span>
+            </a>
+            <button class="contact-copy-pill" id="copy-email-btn" data-email="rupaparapriyam@gmail.com" title="Copy email address to clipboard">
+              <svg class="copy-svg" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              <span>COPY EMAIL</span>
+            </button>
+          </div>
+
+          <div class="contact-clean-divider"></div>
+
+          <div class="contact-clean-links">
+            <a href="https://github.com/rupaparapriyam" target="_blank" rel="noopener" class="contact-clean-link">GITHUB ↗</a>
+            <a href="https://www.linkedin.com/in/priyam-rupapara" target="_blank" rel="noopener" class="contact-clean-link">LINKEDIN ↗</a>
+            <a href="https://www.instagram.com/priyamm_r?igsi=aXUzcmptY204Nm5t&utm_source=qr" target="_blank" rel="noopener" class="contact-clean-link">INSTAGRAM ↗</a>
+            <button class="contact-clean-link" onclick="window.togglePriyamChat(true)">TALK TO PRIYAM AI →</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="site-footer">
+    <div class="section-container footer-inner">
+      <div class="footer-left">
+        <span class="footer-logo">PRIYAM.</span>
+        <span class="mono-label footer-tag">Systems Builder · Rajkot &amp; Delhi, India</span>
+      </div>
+      <div class="footer-right">
+        <span class="mono-label footer-copy">© 2026 Priyam Rupapara · Built with raw HTML/CSS/JS · Zero templates</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===================== COMMAND PALETTE (⌘K) ===================== -->
+  <div id="cmd-palette-modal" class="cmd-palette-modal hidden" role="dialog" aria-modal="true">
+    <div class="cmd-backdrop" onclick="window.closeCommandPalette()"></div>
+    <div class="cmd-box">
+      <div class="cmd-search-row">
+        <span class="cmd-search-icon">🔍</span>
+        <input type="text" id="cmd-search-input" class="cmd-input" placeholder="Type a project, technology, or action... (e.g. PathLab, ASTM, SURGE)" autocomplete="off" />
+        <span class="cmd-esc-hint mono-label">ESC</span>
+      </div>
+      <div class="cmd-results-list" id="cmd-results-list">
+        <!-- JS dynamically fills results -->
+      </div>
+      <div class="cmd-footer mono-label">
+        <span><kbd>↑</kbd> <kbd>↓</kbd> Navigate</span>
+        <span><kbd>↵</kbd> Select</span>
+        <span><kbd>ESC</kbd> Dismiss</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PROJECT DETAIL MODAL ===================== -->
+  <div id="project-modal" class="project-modal hidden" role="dialog" aria-modal="true">
+    <div class="pm-backdrop" onclick="window.closeProjectDetail()"></div>
+    <div class="pm-panel">
+      <div class="pm-panel-header">
+        <span class="mono-label pm-modal-badge">[PROJECT DEEP DIVE &amp; ARCHITECTURE]</span>
+        <button class="pm-close" onclick="window.closeProjectDetail()" aria-label="Close">[CLOSE × / ESC]</button>
+      </div>
+      <div class="pm-content" id="pm-content">
+        <!-- JS dynamically populates with rich graphs, tables, before/after, and patora notes -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PRIYAM AI CLONE DRAWER ===================== -->
+  <div class="ai-widget-wrapper" id="priyam-ai-widget-wrapper">
+    <button class="ai-trigger-btn" id="priyam-ai-trigger" onclick="window.togglePriyamChat()">
+      <span class="ai-trigger-dot"></span>
+      <span>Talk to Priyam (AI Clone)</span>
+    </button>
+
+    <div class="ai-drawer hidden" id="priyam-ai-drawer">
+      <div class="ai-drawer-header">
+        <div class="ai-header-info">
+          <div class="ai-header-status-line">
+            <span class="ai-trigger-dot"></span>
+            <span class="ai-header-name">Priyam (AI Clone)</span>
+            <span class="ai-status-badge mono-label">RAG NEURAL BRAIN</span>
+          </div>
+          <span class="mono-label ai-header-sub">Trained on Real Gen-Z Data &amp; RAG Knowledge Corpus · RS232 ASTM &amp; D2C Math</span>
+        </div>
+        <div class="ai-header-actions">
+          <button class="ai-header-tool-btn" id="priyam-ai-clear" onclick="window.clearPriyamChat()" title="Clear Chat History">↺</button>
+          <button class="ai-close-btn" id="priyam-ai-close" onclick="window.togglePriyamChat()" aria-label="Close Chat">[×]</button>
+        </div>
+      </div>
+      <div class="ai-messages" id="priyam-ai-messages">
+        <div class="ai-msg ai-msg--bot">
+          <div class="ai-rag-badge"><span>⚡ RAG BRAIN ACTIVE</span> · 17 Chunks Indexed</div>
+          <p>Kem chho! 👋 I'm **Priyam's AI Clone** (⁠⌐⁠■⁠-⁠■⁠) <span class="genz-sticker">🚀 PRIYAM AI 🚀</span></p>
+          <p style="margin-top:0.4rem; color:rgba(255,255,255,0.85); font-size:0.8125rem;">Trained on real Gen-Z data and powered by live RAG retrieval. Ask me about my projects, crazy D2C unit math, ASTM serial cables, or just drop some unhinged banter!</p>
+          <div class="ai-msg-actions">
+            <button class="ai-action-chip" onclick="window.openProjectDetail('pathlab')">🔬 PathLab MVP</button>
+            <button class="ai-action-chip" onclick="window.askPriyamAI('Show me the exact D2C RTO math')">📊 ₹835 COD RTO Math</button>
+            <button class="ai-action-chip" onclick="window.askPriyamAI('Roast generic AI wrapper startups')">🔥 Roast AI Wrappers</button>
+            <button class="ai-action-chip" onclick="window.askPriyamAI('Why the CEO bitch business card?')">⚡ Zuck Card Story</button>
+          </div>
+        </div>
+      </div>
+      <div class="ai-chips-row" id="priyam-ai-chips">
+        <button class="ai-chip" onclick="window.askPriyamAI('Bhai PathLab me testing machine ka kya jugaad lagaya?')">🔬 PathLab Ka Jugaad</button>
+        <button class="ai-chip" onclick="window.askPriyamAI('Dhandha ma D2C COD no ketlo moto locha chhe?')">📊 D2C COD Locha Math</button>
+        <button class="ai-chip" onclick="window.askPriyamAI('Bawa OpenAI wrapper wale founders ka kya kaand hua?')">🔥 Roast AI Wrappers</button>
+        <button class="ai-chip" onclick="window.askPriyamAI('Skibidi rizz aura check bro is cooked or what?')">💅 Aura Check</button>
+        <button class="ai-chip" onclick="window.askPriyamAI('Why the CEO bitch business card?')">⚡ Zuck 2005 Card</button>
+        <button class="ai-chip" onclick="window.askPriyamAI('JEE exam na 3 divas pehla su story hati?')">🔥 72h JEE Sprint</button>
+        <button class="ai-chip" onclick="window.askPriyamAI('Bawa SURGE hair product ko kyu pause kiya?')">🧴 SURGE Formulation</button>
+        <button class="ai-chip" onclick="window.askPriyamAI('Rajkot Kathiyawadi Sev Tameta ane 2 AM chai na jalsa')">☕ Rajkot 2 AM Chai</button>
+        <button class="ai-chip" onclick="window.askPriyamAI('Are you raising pre-seed funding for PathLab and Ecom Hub?')">💸 Pre-Seed Round</button>
+      </div>
+      <div class="ai-input-row">
+        <input type="text" id="priyam-ai-input" class="ai-input" placeholder="Ask Priyam anything..." autocomplete="off" />
+        <button class="ai-send-btn" id="priyam-ai-send">[SEND →]</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Free Client-Side LLM SDK (Puter AI - Zero API Key Required) -->
+  <script src="https://js.puter.com/v2/"></script>
+  <script src="app.js"></script>
+</body>
+</html>
