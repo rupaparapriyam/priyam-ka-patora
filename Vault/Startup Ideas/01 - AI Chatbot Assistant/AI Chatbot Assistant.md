@@ -1,5 +1,5 @@
 ---
-tags: [idea]
+tags: [idea, project-dead]
 ---
 
 # AI Chatbot Assistant

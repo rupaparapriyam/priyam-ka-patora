@@ -1,5 +1,12 @@
 # AI Rules for This Project Folder
 
+> **If you just connected this folder and need to find what to work on → read `CLAUDE.md` first.**
+> This file covers coding *behaviour* rules only (simplicity, surgical edits, goal-driven execution).
+> Navigation — which vault files to read for which project — is in `CLAUDE.md`.
+
+---
+
+
 **Source of truth for ideas is the Obsidian vault**, in this same folder: `Vault/`. Specifically:
 
 - `Vault/Startup Ideas/` and `Vault/General Ideas/` — every startup and side idea, one subfolder each.

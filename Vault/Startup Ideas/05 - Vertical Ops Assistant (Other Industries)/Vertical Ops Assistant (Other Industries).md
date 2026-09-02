@@ -1,5 +1,5 @@
 ---
-tags: [idea]
+tags: [idea, project-dead]
 ---
 
 # Vertical Ops Assistant (Other Industries)

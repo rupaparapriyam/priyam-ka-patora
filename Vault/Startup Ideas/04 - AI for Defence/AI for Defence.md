@@ -1,5 +1,5 @@
 ---
-tags: [idea]
+tags: [idea, project-defence]
 ---
 
 # AI for Defence

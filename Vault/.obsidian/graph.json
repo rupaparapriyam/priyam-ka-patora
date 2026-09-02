@@ -6,17 +6,42 @@
   "hideUnresolved": false,
   "showOrphans": true,
   "collapse-color-groups": false,
-  "colorGroups": [],
+  "colorGroups": [
+    {
+      "query": "tag:index OR tag:plan OR tag:rules",
+      "color": { "a": 1, "rgb": 16737792 }
+    },
+    {
+      "query": "tag:project-pathlab",
+      "color": { "a": 1, "rgb": 1096065 }
+    },
+    {
+      "query": "tag:project-ecommerce",
+      "color": { "a": 1, "rgb": 16096779 }
+    },
+    {
+      "query": "tag:project-defence",
+      "color": { "a": 1, "rgb": 6514417 }
+    },
+    {
+      "query": "tag:project-trading",
+      "color": { "a": 1, "rgb": 3900150 }
+    },
+    {
+      "query": "tag:project-dead",
+      "color": { "a": 1, "rgb": 15680580 }
+    }
+  ],
   "collapse-display": false,
   "showArrow": false,
   "textFadeMultiplier": 0,
-  "nodeSizeMultiplier": 1,
+  "nodeSizeMultiplier": 1.2,
   "lineSizeMultiplier": 1,
   "collapse-forces": true,
   "centerStrength": 0.518713248970312,
   "repelStrength": 10,
   "linkStrength": 1,
   "linkDistance": 250,
-  "scale": 1.0613385787084524,
-  "close": true
+  "scale": 1,
+  "close": false
 }
