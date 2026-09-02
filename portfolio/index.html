@@ -2,7 +2,7 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Priyam Rupapara — Systems Builder &amp; Engineer</title>
   <meta name="description" content="Priyam Rupapara. Building Pathology Lab Ops (working MVP), Ecommerce Hub (pre-seed), Autonomous Defence AI, and vertical operational tools." />
   <meta name="theme-color" content="#030508" />
@@ -17,9 +17,11 @@
   <!-- Fonts: Bebas Neue (display) + Inter (body) + Space Mono (labels/code) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <!-- High-Priority Image Preloads for 0ms Instant Rendering -->
+  <link rel="preload" as="image" href="assets/avatar-priyam-casual.webp" type="image/webp" fetchpriority="high" />
+  <link rel="preload" as="image" href="assets/surge/bottle_frames/bottle_000.webp" type="image/webp" />
 
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=20260902_45" />
 </head>
 <body>
 
@@ -32,7 +34,7 @@
   <!-- ===================== NAVBAR ===================== -->
   <header class="nav-bar" id="main-header">
     <nav class="nav-inner">
-      <a href="#hero" class="nav-logo" aria-label="Priyam Rupapara">PRIYAM.</a>
+      <a href="#hero" class="nav-logo" aria-label="Priyam Rupapara">PRIYAM<span class="logo-dot">.</span></a>
 
       <ul class="nav-links" id="nav-links-list">
         <li><a href="#about" class="nav-link">About</a></li>
@@ -71,7 +73,7 @@
       <a href="#fun-zone" class="mobile-link">Interactive Fun &amp; Tools</a>
       <a href="#contact" class="mobile-link">Contact</a>
       <button class="mobile-cmd-btn" onclick="window.openCommandPalette(); document.getElementById('mobile-drawer').classList.add('hidden');">⌘K Command Palette</button>
-      <button class="mobile-chat-btn" onclick="window.togglePriyamChat(true); document.getElementById('mobile-drawer').classList.add('hidden');">[Talk to Priyam AI]</button>
+      <button class="mobile-chat-btn" onclick="window.togglePriyamChat(true); document.getElementById('mobile-drawer').classList.add('hidden');">[Talk to Priyuum]</button>
     </div>
   </header>
 
@@ -106,7 +108,7 @@
           <div class="hero-actions-row">
             <a href="#projects" class="hero-cta">↓ Explore all projects</a>
             <a href="https://www.instagram.com/priyamm_r?igsi=aXUzcmptY204Nm5t&utm_source=qr" target="_blank" rel="noopener" class="hero-link-pill">[INSTAGRAM · @priyamm_r ↗]</a>
-            <button class="hero-cmd-hint" onclick="window.openCommandPalette()">Press <kbd>⌘K</kbd> for quick menu</button>
+            <button class="hero-cmd-hint" onclick="window.openCommandPalette()"><span class="desktop-hint">Press <kbd>⌘K</kbd> for quick menu</span><span class="mobile-hint">⚡ Search (⌘K)</span></button>
           </div>
         </div>
 
@@ -114,10 +116,10 @@
         <div class="hero-right">
           <div class="hero-tilted-card" id="hero-zuck-card" tabindex="0" role="button" aria-label="Priyam's Business Card">
             <div class="tilted-card-inner zuck-simple-card">
-              <div class="zsc-quote">"I'm CEO, bitch. (And the only engineer)."</div>
+              <div class="zsc-quote">"I'm a vibe coder, bitch."</div>
               <div class="zsc-center">
                 <h3 class="zsc-name">PRIYAM RUPAPARA</h3>
-                <div class="zsc-title">Founder &amp; Systems Builder</div>
+                <div class="zsc-title">Founder &amp; Vibe Coder</div>
               </div>
               <div class="zsc-footer">
                 <span>rupaparapriyam@gmail.com</span>
@@ -573,12 +575,22 @@
           <div class="uav-canvas-container">
             <canvas id="drone-game-canvas" width="800" height="400"></canvas>
             
+            <!-- Ready to Play / Start Mission Overlay -->
+            <div class="uav-overlay" id="uav-start-overlay">
+              <div class="uav-overlay-box">
+                <span class="mono-label" style="color:var(--cyan);">[TACTICAL C2 DEFENCE SIMULATOR]</span>
+                <h4 class="uav-overlay-title" style="color:#FFF;">DEFEND AIRSPACE</h4>
+                <p class="uav-overlay-desc">Tap radar or fire interceptor missiles to shoot down incoming hypersonic cruise missiles &amp; drone swarms.</p>
+                <button class="uav-btn-primary" onclick="window.startUavGame()">[ 🎮 START TACTICAL SIMULATION ▶ ]</button>
+              </div>
+            </div>
+
             <!-- In-Canvas Overlay for Airspace Compromise / Reset -->
             <div class="uav-overlay hidden" id="uav-overlay">
               <div class="uav-overlay-box">
                 <h4 class="uav-overlay-title" id="uav-overlay-title">AIRSPACE SECTOR COMPROMISED</h4>
                 <p class="uav-overlay-desc" id="uav-overlay-desc">Hostile cruise missiles breached base perimeter. Final Interception Score: 0.</p>
-                <button class="uav-btn-primary" onclick="window.startUavGame()">[PRESS SPACE OR CLICK TO RE-ARM DEFENCE BATTERY ↺]</button>
+                <button class="uav-btn-primary" onclick="window.startUavGame()">[RE-ARM DEFENCE BATTERY ↺]</button>
               </div>
             </div>
           </div>
@@ -636,7 +648,7 @@
             <a href="https://github.com/rupaparapriyam" target="_blank" rel="noopener" class="contact-clean-link">GITHUB ↗</a>
             <a href="https://www.linkedin.com/in/priyam-rupapara" target="_blank" rel="noopener" class="contact-clean-link">LINKEDIN ↗</a>
             <a href="https://www.instagram.com/priyamm_r?igsi=aXUzcmptY204Nm5t&utm_source=qr" target="_blank" rel="noopener" class="contact-clean-link">INSTAGRAM ↗</a>
-            <button class="contact-clean-link" onclick="window.togglePriyamChat(true)">TALK TO PRIYAM AI →</button>
+            <button class="contact-clean-link" onclick="window.togglePriyamChat(true)">TALK TO PRIYUUM →</button>
           </div>
         </div>
 
@@ -649,7 +661,7 @@
   <footer class="site-footer">
     <div class="section-container footer-inner">
       <div class="footer-left">
-        <span class="footer-logo">PRIYAM.</span>
+        <span class="footer-logo">PRIYAM<span class="logo-dot">.</span></span>
         <span class="mono-label footer-tag">Systems Builder · Rajkot &amp; Delhi, India</span>
       </div>
       <div class="footer-right">
@@ -678,6 +690,100 @@
     </div>
   </div>
 
+  <!-- ===================== INTERACTIVE ROAMING AVATAR COMPANION (16-BIT PIXEL PRIYAM) ===================== -->
+  <div id="roaming-avatar-container" class="roaming-avatar-wrap" aria-label="Interactive Companion Avatar">
+    <!-- Retro Comic Pixel Speech / Thought Bubble -->
+    <div class="avatar-bubble comic-pixel-bubble" id="avatar-thought-bubble">
+      <div class="comic-bubble-header">
+        <span class="comic-badge" id="avatar-bubble-tag">💬 PRIYAM</span>
+        <button class="comic-bubble-close" onclick="window.dismissAvatarBubble(event)" title="Dismiss">×</button>
+      </div>
+      <p class="comic-bubble-text" id="avatar-bubble-msg">Kem chho! 🚀 Vibe coding mode ON!</p>
+      <div class="comic-bubble-tail" id="avatar-bubble-tail"></div>
+    </div>
+
+    <!-- Avatar Character High-Definition Pixel Stage (Exact 1:1 Match to Photo) -->
+    <div class="avatar-character" id="avatar-character-body" onclick="window.triggerAvatarInteraction()" title="Drag me around or click for Saiyan transformation!">
+      <!-- Dynamic Super Saiyan Aura FX Behind Character -->
+      <div class="avatar-fx-underlay" id="avatar-fx-underlay">
+        <div class="aura-saiyan-energy hidden" id="aura-saiyan-energy"></div>
+      </div>
+
+      <!-- Main High-Definition Pixel Sprite (1:1 Exact Match to Photo - Modern WebP) -->
+      <img src="assets/avatar-priyam-casual.webp?v=20260902_45" class="avatar-sprite-img" id="avatar-sprite-img" alt="Priyam Pixel Companion" draggable="false" width="360" height="400" loading="eager" fetchpriority="high" decoding="async" />
+
+      <!-- Dynamic Emotion & Combat Overlays -->
+      <div class="avatar-emotes-layer" id="avatar-emotes-layer">
+        <div class="emote-anger-vein hidden" id="emote-anger-vein">💢</div>
+        <div class="emote-teardrop hidden" id="emote-teardrop">💧</div>
+        <div class="emote-sweat hidden" id="emote-sweat">💦</div>
+        <div class="avatar-impact-bubble hidden" id="avatar-impact-bubble">
+          <span class="impact-text" id="avatar-impact-text">💥 BAM!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== FLOATING BRUTALIST WARDROBE CAROUSEL (HIDDEN UNTIL 18+ UNLOCKED) ===================== -->
+  <div class="floating-wardrobe-hub wardrobe-hidden-public" id="floating-wardrobe-hub">
+    <button class="wardrobe-hub-trigger" id="wardrobe-hub-trigger" onclick="window.toggleWardrobeMenu()" title="Change Priyam's Outfit">
+      <span class="wh-icon">👔</span>
+      <span class="wh-label">FITS</span>
+      <span class="wh-badge" id="wardrobe-active-badge">CASUAL</span>
+    </button>
+
+    <div class="wardrobe-popup-panel hidden" id="wardrobe-popup-panel">
+      <div class="wpp-header">
+        <span class="wpp-title">[ WARDROBE · 7 FITS ]</span>
+        <button class="wpp-close" onclick="window.toggleWardrobeMenu(false)" title="Close">✕</button>
+      </div>
+      <div class="wpp-carousel-wrapper">
+        <button class="wpp-arrow wpp-arrow-left" onclick="window.scrollWardrobeCarousel(-1)" aria-label="Previous Outfit">‹</button>
+        <div class="wpp-carousel-track" id="wpp-carousel-track">
+          <button class="wpp-card active" data-outfit="casual" onclick="window.setAvatarOutfit('casual')" title="Founder Casual">
+            <span class="wpp-card-icon">👔</span>
+            <span class="wpp-card-name">CASUAL</span>
+          </button>
+          <button class="wpp-card" data-outfit="techwear" onclick="window.setAvatarOutfit('techwear')" title="Cyber Techwear">
+            <span class="wpp-card-icon">🕶️</span>
+            <span class="wpp-card-name">TECH</span>
+          </button>
+          <button class="wpp-card" data-outfit="saiyan" onclick="window.setAvatarOutfit('saiyan')" title="Super Saiyan">
+            <span class="wpp-card-icon">🔥</span>
+            <span class="wpp-card-name">SAIYAN</span>
+          </button>
+          <button class="wpp-card" data-outfit="spiderman" onclick="window.setAvatarOutfit('spiderman')" title="Spider-Man">
+            <span class="wpp-card-icon">🕷️</span>
+            <span class="wpp-card-name">SPIDEY</span>
+          </button>
+          <button class="wpp-card" data-outfit="ironman" onclick="window.setAvatarOutfit('ironman')" title="Iron Man">
+            <span class="wpp-card-icon">🤖</span>
+            <span class="wpp-card-name">IRON</span>
+          </button>
+          <button class="wpp-card" data-outfit="football" onclick="window.setAvatarOutfit('football')" title="CR7 Real Madrid No. 7">
+            <span class="wpp-card-icon">⚽</span>
+            <span class="wpp-card-name">CR7 #7</span>
+          </button>
+          <button class="wpp-card" data-outfit="f1" onclick="window.setAvatarOutfit('f1')" title="F1 Scuderia">
+            <span class="wpp-card-icon">🏎️</span>
+            <span class="wpp-card-name">F1</span>
+          </button>
+        </div>
+        <button class="wpp-arrow wpp-arrow-right" onclick="window.scrollWardrobeCarousel(1)" aria-label="Next Outfit">›</button>
+      </div>
+      <div class="wpp-footer">
+        <button class="wpp-toggle-btn" id="wpp-avatar-toggle-btn" onclick="window.toggleAvatarEnabled()" title="Turn Companion Avatar ON or OFF">
+          <span class="wpp-toggle-icon" id="wpp-toggle-icon">👁️</span>
+          <span class="wpp-toggle-text" id="wpp-toggle-text">COMPANION: ON</span>
+        </button>
+        <button class="wpp-lock-btn" onclick="window.deactivateFuckerMode18Plus()" title="Lock Wardrobe & Return to Normal Mode">
+          <span>🔒</span>
+          <span>LOCK NORMAL</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===================== PROJECT DETAIL MODAL ===================== -->
   <div id="project-modal" class="project-modal hidden" role="dialog" aria-modal="true">
     <div class="pm-backdrop" onclick="window.closeProjectDetail()"></div>
@@ -692,61 +798,62 @@
     </div>
   </div>
 
-  <!-- ===================== PRIYAM AI CLONE DRAWER ===================== -->
+  <!-- ===================== PRIYUUM AI CHAT ===================== -->
   <div class="ai-widget-wrapper" id="priyam-ai-widget-wrapper">
     <button class="ai-trigger-btn" id="priyam-ai-trigger" onclick="window.togglePriyamChat()">
       <span class="ai-trigger-dot"></span>
-      <span>Talk to Priyam (AI Clone)</span>
+      <span>Message Priyuum</span>
     </button>
 
     <div class="ai-drawer hidden" id="priyam-ai-drawer">
+      <!-- Clean Minimalist Header -->
       <div class="ai-drawer-header">
-        <div class="ai-header-info">
-          <div class="ai-header-status-line">
-            <span class="ai-trigger-dot"></span>
-            <span class="ai-header-name">Priyam (AI Clone)</span>
-            <span class="ai-status-badge mono-label">RAG NEURAL BRAIN</span>
+        <div class="ai-header-user">
+          <div class="ai-avatar-circle">
+            <span class="ai-avatar-initial">P</span>
+            <span class="ai-online-dot"></span>
           </div>
-          <span class="mono-label ai-header-sub">Trained on Real Gen-Z Data &amp; RAG Knowledge Corpus · RS232 ASTM &amp; D2C Math</span>
+          <div class="ai-header-meta">
+            <span class="ai-header-title">Priyuum</span>
+            <span class="ai-header-status">online</span>
+          </div>
         </div>
         <div class="ai-header-actions">
-          <button class="ai-header-tool-btn" id="priyam-ai-clear" onclick="window.clearPriyamChat()" title="Clear Chat History">↺</button>
-          <button class="ai-close-btn" id="priyam-ai-close" onclick="window.togglePriyamChat()" aria-label="Close Chat">[×]</button>
+          <button class="ai-action-btn" onclick="window.clearPriyamChat()" title="Clear chat">↺</button>
+          <button class="ai-action-btn" onclick="window.togglePriyamChat()" title="Close chat">✕</button>
         </div>
       </div>
+
+      <!-- Messages Stream -->
       <div class="ai-messages" id="priyam-ai-messages">
         <div class="ai-msg ai-msg--bot">
-          <div class="ai-rag-badge"><span>⚡ RAG BRAIN ACTIVE</span> · 17 Chunks Indexed</div>
-          <p>Kem chho! 👋 I'm **Priyam's AI Clone** (⁠⌐⁠■⁠-⁠■⁠) <span class="genz-sticker">🚀 PRIYAM AI 🚀</span></p>
-          <p style="margin-top:0.4rem; color:rgba(255,255,255,0.85); font-size:0.8125rem;">Trained on real Gen-Z data and powered by live RAG retrieval. Ask me about my projects, crazy D2C unit math, ASTM serial cables, or just drop some unhinged banter!</p>
-          <div class="ai-msg-actions">
-            <button class="ai-action-chip" onclick="window.openProjectDetail('pathlab')">🔬 PathLab MVP</button>
-            <button class="ai-action-chip" onclick="window.askPriyamAI('Show me the exact D2C RTO math')">📊 ₹835 COD RTO Math</button>
-            <button class="ai-action-chip" onclick="window.askPriyamAI('Roast generic AI wrapper startups')">🔥 Roast AI Wrappers</button>
-            <button class="ai-action-chip" onclick="window.askPriyamAI('Why the CEO bitch business card?')">⚡ Zuck Card Story</button>
-          </div>
+          <p>hey! 👋 i'm priyuum, priyam's ai clone. ask me about my projects, crazy D2C unit math, blood analyzer hacks, my tech stack, or just talk some shit haha</p>
+        </div>
+        <div class="ai-starters" id="priyam-ai-starters">
+          <button class="ai-starter-pill" onclick="window.triggerDabInteraction()">🤝 Dab Me Up Bruhh! (+50k Aura)</button>
+          <button class="ai-starter-pill" onclick="window.askPriyamAI('Roast my startup idea with zero mercy')">🔥 Roast My Startup</button>
+          <button class="ai-starter-pill" onclick="window.askPriyamAI('Explain how you tapped the blood testing machines for PathLab')">🔬 PathLab Serial Tap</button>
+          <button class="ai-starter-pill" onclick="window.askPriyamAI('Show me the exact ₹835 D2C COD return math')">📊 ₹835 COD Unit Math</button>
+          <button class="ai-starter-pill" onclick="window.askPriyamAI('Why is CR7 the GOAT over Messi?')">⚽ CR7 vs Messi (GOAT)</button>
+          <button class="ai-starter-pill" onclick="window.askPriyamAI('What is your 3 AM vibe coding philosophy and stack?')">🧠 Vibe Coding & Stack</button>
+          <button class="ai-starter-pill" onclick="window.askPriyamAI('How much aura do I have right now?')">⚡ Calculate My Aura</button>
         </div>
       </div>
-      <div class="ai-chips-row" id="priyam-ai-chips">
-        <button class="ai-chip" onclick="window.askPriyamAI('Bhai PathLab me testing machine ka kya jugaad lagaya?')">🔬 PathLab Ka Jugaad</button>
-        <button class="ai-chip" onclick="window.askPriyamAI('Dhandha ma D2C COD no ketlo moto locha chhe?')">📊 D2C COD Locha Math</button>
-        <button class="ai-chip" onclick="window.askPriyamAI('Bawa OpenAI wrapper wale founders ka kya kaand hua?')">🔥 Roast AI Wrappers</button>
-        <button class="ai-chip" onclick="window.askPriyamAI('Skibidi rizz aura check bro is cooked or what?')">💅 Aura Check</button>
-        <button class="ai-chip" onclick="window.askPriyamAI('Why the CEO bitch business card?')">⚡ Zuck 2005 Card</button>
-        <button class="ai-chip" onclick="window.askPriyamAI('JEE exam na 3 divas pehla su story hati?')">🔥 72h JEE Sprint</button>
-        <button class="ai-chip" onclick="window.askPriyamAI('Bawa SURGE hair product ko kyu pause kiya?')">🧴 SURGE Formulation</button>
-        <button class="ai-chip" onclick="window.askPriyamAI('Rajkot Kathiyawadi Sev Tameta ane 2 AM chai na jalsa')">☕ Rajkot 2 AM Chai</button>
-        <button class="ai-chip" onclick="window.askPriyamAI('Are you raising pre-seed funding for PathLab and Ecom Hub?')">💸 Pre-Seed Round</button>
-      </div>
+
+      <!-- Clean Input Row -->
       <div class="ai-input-row">
-        <input type="text" id="priyam-ai-input" class="ai-input" placeholder="Ask Priyam anything..." autocomplete="off" />
-        <button class="ai-send-btn" id="priyam-ai-send">[SEND →]</button>
+        <input type="text" id="priyam-ai-input" class="ai-input" placeholder="Message Priyuum..." autocomplete="off" />
+        <button class="ai-send-btn" id="priyam-ai-send" aria-label="Send Message">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+          </svg>
+        </button>
       </div>
     </div>
   </div>
 
-  <!-- Free Client-Side LLM SDK (Puter AI - Zero API Key Required) -->
-  <script src="https://js.puter.com/v2/"></script>
-  <script src="app.js"></script>
+  <script src="avatar-data.js?v=20260902_48"></script>
+  <script src="app.js?v=20260902_48"></script>
 </body>
 </html>
