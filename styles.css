@@ -1579,6 +1579,39 @@ button { font-family: inherit; }
   flex-wrap: wrap;
 }
 
+.hud-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: #101520;
+  border: 1px solid #222C3E;
+  padding: 0.35rem 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  border-radius: 0;
+}
+
+.hud-pill-lbl {
+  color: #64748B;
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+}
+
+.hud-pill-val {
+  color: #00F0FF;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.hud-pill-badge--gold {
+  border-color: rgba(255, 230, 0, 0.35);
+}
+
+.hud-pill-badge--gold .hud-pill-val {
+  color: #FFE600;
+}
+
 .game-score-badge {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
@@ -1782,6 +1815,32 @@ button { font-family: inherit; }
   text-align: center;
   transition: all 0.12s ease;
   user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.ctrl-kbd {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: #64748B;
+  background: #060910;
+  border: 1px solid #222C3E;
+  padding: 0.05rem 0.25rem;
+  border-radius: 0;
+  line-height: 1.2;
+}
+
+.touch-ctrl-btn:hover .ctrl-kbd,
+.touch-ctrl-btn:active .ctrl-kbd {
+  color: #00F0FF;
+  border-color: #00F0FF;
+}
+
+.ctrl-txt {
+  font-family: inherit;
 }
 
 .touch-ctrl-btn:hover,
@@ -1795,6 +1854,16 @@ button { font-family: inherit; }
   border-color: #00F0FF;
   color: #00F0FF;
   background: rgba(0, 240, 255, 0.08);
+}
+
+.touch-ctrl-btn--primary .ctrl-kbd {
+  color: #00F0FF;
+  border-color: rgba(0, 240, 255, 0.4);
+}
+
+.roaming-avatar-wrap.avatar-in-combat {
+  opacity: 0.08 !important;
+  pointer-events: none !important;
 }
 
 /* Tactical Score Submission Dossier */
