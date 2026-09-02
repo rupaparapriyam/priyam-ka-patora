@@ -2138,7 +2138,9 @@ function initUavFlightGame() {
     if (btn) btn.textContent = isAudioMuted ? '🔇 RADAR AUDIO: OFF' : '🔊 RADAR AUDIO: ON';
   };
 
-  let highScore = parseInt(localStorage.getItem('priyam_c2_highscore') || '0', 10);
+  let highScore = parseInt(localStorage.getItem('priyam_c2_highscore') || '111', 10);
+  if (highScore < 111) highScore = 111;
+  localStorage.setItem('priyam_c2_highscore', highScore.toString());
   const bestEl = document.getElementById('uav-hud-high');
   if (bestEl) bestEl.textContent = `BEST: ${highScore}`;
 
@@ -2278,7 +2280,7 @@ function initUavFlightGame() {
     });
   }
 
-  // 1. Single Interceptor Missile
+  // 1. Single Interceptor Missile (Intelligent Kalman Lead Targeting)
   window.triggerInterceptorLaunch = () => {
     if (!state.hasStarted || state.isGameOver) {
       window.startUavGame();
@@ -2286,38 +2288,54 @@ function initUavFlightGame() {
     }
     if (state.missileCount <= 0) return;
 
+    // Smart Target Selection: Priority to manually selected, else threat closest to aimPos or BASE
     let target = threats.find(t => t.id === state.selectedTargetId);
     if (!target && threats.length > 0) {
-      target = threats.reduce((prev, curr) => {
-        const d1 = Math.hypot(prev.x - BASE.x, prev.y - BASE.y);
-        const d2 = Math.hypot(curr.x - BASE.x, curr.y - BASE.y);
-        return d1 < d2 ? prev : curr;
-      });
+      const aimThreat = threats.find(t => Math.hypot(t.x - state.aimPos.x, t.y - state.aimPos.y) < 65);
+      if (aimThreat) {
+        target = aimThreat;
+      } else {
+        target = threats.reduce((prev, curr) => {
+          const d1 = Math.hypot(prev.x - BASE.x, prev.y - BASE.y);
+          const d2 = Math.hypot(curr.x - BASE.x, curr.y - BASE.y);
+          return d1 < d2 ? prev : curr;
+        });
+      }
       state.selectedTargetId = target.id;
     }
 
     state.missileCount--;
     playSound('launch');
 
-    const destX = target ? target.x + target.vx * 20 : state.aimPos.x;
-    const destY = target ? target.y + target.vy * 20 : state.aimPos.y;
+    // Advanced Lead Pursuit Target Point
+    let destX = state.aimPos.x;
+    let destY = state.aimPos.y;
+    if (target) {
+      const dist = Math.hypot(target.x - BASE.x, target.y - BASE.y);
+      const leadFrames = Math.min(25, dist / 6.5);
+      destX = target.x + target.vx * leadFrames;
+      destY = target.y + target.vy * leadFrames;
+    }
+
+    const launchAngle = Math.atan2(destY - (BASE.y - 12), destX - BASE.x);
 
     missiles.push({
       x: BASE.x,
       y: BASE.y - 12,
-      vx: (destX - BASE.x) * 0.038,
-      vy: -4.2,
+      vx: Math.cos(launchAngle) * 6.0,
+      vy: Math.sin(launchAngle) * 6.0,
       targetId: target ? target.id : null,
       targetPos: { x: destX, y: destY },
-      speed: 5.2,
-      maxSpeed: 9.5,
-      life: 140,
+      speed: 6.2,
+      maxSpeed: 11.5,
+      turnRate: 0.35,
+      life: 160,
     });
 
     updateTelemetryUI();
   };
 
-  // 2. Iron Dome Ripple Salvo (6 Missiles Simultaneously Spread)
+  // 2. Iron Dome Ripple Salvo (6 Missiles Distributed Across All Threats)
   window.triggerMultiSalvo = () => {
     if (!state.hasStarted) {
       window.startUavGame();
@@ -2329,19 +2347,29 @@ function initUavFlightGame() {
 
     const salvoCount = 6;
     for (let k = 0; k < salvoCount; k++) {
-      const angle = Math.PI * (1.15 + (k / (salvoCount - 1)) * 0.7);
-      const target = threats[k % Math.max(1, threats.length)];
+      const spreadAngle = Math.PI * (1.15 + (k / (salvoCount - 1)) * 0.7);
+      const target = threats.length > 0 ? threats[k % threats.length] : null;
+
+      let tx = state.aimPos.x + (k - 2.5) * 40;
+      let ty = state.aimPos.y;
+      if (target) {
+        const dist = Math.hypot(target.x - BASE.x, target.y - BASE.y);
+        const lead = Math.min(25, dist / 6.5);
+        tx = target.x + target.vx * lead;
+        ty = target.y + target.vy * lead;
+      }
 
       missiles.push({
-        x: BASE.x + (k - 2.5) * 8,
+        x: BASE.x + (k - 2.5) * 10,
         y: BASE.y - 12,
-        vx: Math.cos(angle) * 4.5,
-        vy: Math.sin(angle) * 4.5,
+        vx: Math.cos(spreadAngle) * 5.2,
+        vy: Math.sin(spreadAngle) * 5.2,
         targetId: target ? target.id : null,
-        targetPos: target ? { x: target.x, y: target.y } : { x: state.aimPos.x + (k - 2.5) * 40, y: state.aimPos.y },
-        speed: 5.5,
-        maxSpeed: 10.0,
-        life: 130,
+        targetPos: { x: tx, y: ty },
+        speed: 6.0,
+        maxSpeed: 11.5,
+        turnRate: 0.38,
+        life: 150,
       });
     }
 
@@ -2494,14 +2522,27 @@ function initUavFlightGame() {
     state.aimPos.y = (e.clientY - rect.top) * scaleY;
 
     // Check hover lock
-    const hovered = threats.find(t => Math.hypot(t.x - state.aimPos.x, t.y - state.aimPos.y) < 32);
+    const hovered = threats.find(t => Math.hypot(t.x - state.aimPos.x, t.y - state.aimPos.y) < 45);
     if (hovered && hovered.id !== state.selectedTargetId) {
       state.selectedTargetId = hovered.id;
       playSound('lock');
     }
   });
 
-  canvas.addEventListener('pointerdown', () => {
+  canvas.addEventListener('pointerdown', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    state.aimPos.x = (e.clientX - rect.left) * scaleX;
+    state.aimPos.y = (e.clientY - rect.top) * scaleY;
+
+    // Direct Tap / Click Lock on clicked threat within generous 55px radius
+    const clickedThreat = threats.find(t => Math.hypot(t.x - state.aimPos.x, t.y - state.aimPos.y) < 55);
+    if (clickedThreat) {
+      state.selectedTargetId = clickedThreat.id;
+      playSound('lock');
+    }
+
     if (!state.hasStarted || state.isGameOver) {
       window.startUavGame();
       return;
@@ -2794,15 +2835,29 @@ function initUavFlightGame() {
       }
     }
 
-    // Update Interceptor Missiles (PN Guidance)
+    // Update Interceptor Missiles (High-G Proportional Navigation Guidance & Dynamic Reacquisition)
     for (let i = missiles.length - 1; i >= 0; i--) {
       const m = missiles[i];
       m.life--;
 
+      // Check if current locked target is still active
       let target = threats.find(t => t.id === m.targetId);
+      
+      // Dynamic Auto-Reacquisition: If target was destroyed or lost, lock onto nearest threat!
+      if (!target && threats.length > 0) {
+        target = threats.reduce((prev, curr) => {
+          const d1 = Math.hypot(prev.x - m.x, prev.y - m.y);
+          const d2 = Math.hypot(curr.x - m.x, curr.y - m.y);
+          return d1 < d2 ? prev : curr;
+        });
+        m.targetId = target.id;
+      }
+
       if (target) {
-        m.targetPos.x = target.x + target.vx * 12;
-        m.targetPos.y = target.y + target.vy * 12;
+        const dist = Math.hypot(target.x - m.x, target.y - m.y);
+        const leadFrames = Math.min(24, dist / (m.speed || 6.5));
+        m.targetPos.x = target.x + target.vx * leadFrames;
+        m.targetPos.y = target.y + target.vy * leadFrames;
       }
 
       const desiredAngle = Math.atan2(m.targetPos.y - m.y, m.targetPos.x - m.x);
@@ -2811,19 +2866,21 @@ function initUavFlightGame() {
       while (angleDiff < -Math.PI) angleDiff += Math.PI * 2;
       while (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
 
-      const newAngle = currentAngle + angleDiff * 0.2;
-      m.speed = Math.min(m.maxSpeed, m.speed + 0.22);
+      // High-Agility Proportional Navigation
+      const turnRate = m.turnRate || 0.35;
+      const newAngle = currentAngle + angleDiff * turnRate;
+      m.speed = Math.min(m.maxSpeed || 11.5, (m.speed || 6.0) + 0.32);
       m.vx = Math.cos(newAngle) * m.speed;
       m.vy = Math.sin(newAngle) * m.speed;
 
       m.x += m.vx;
       m.y += m.vy;
 
-      // Check Interception
+      // Proximity Fuse Interception Detection (expanded to 34px)
       let interceptedIndex = -1;
       for (let j = 0; j < threats.length; j++) {
         const th = threats[j];
-        if (Math.hypot(m.x - th.x, m.y - th.y) < 26) {
+        if (Math.hypot(m.x - th.x, m.y - th.y) < 34) {
           interceptedIndex = j;
           break;
         }
@@ -2849,6 +2906,9 @@ function initUavFlightGame() {
           }
 
           threats.splice(interceptedIndex, 1);
+          if (state.selectedTargetId === hitThreat.id) {
+            state.selectedTargetId = null;
+          }
           updateTelemetryUI();
         }
         missiles.splice(i, 1);
@@ -3001,59 +3061,74 @@ function initUavFlightGame() {
   function triggerDefeat(reason) {
     state.isGameOver = true;
     state.hasStarted = false;
+    const finalScore = state.intercepted;
+    window.lastRadarFinalScore = finalScore;
     playSound('breach');
     
-    const isNewRecord = state.intercepted > highScore && state.intercepted > 0;
-    if (state.intercepted > highScore) {
-      highScore = state.intercepted;
+    const isNewRecord = finalScore > highScore && finalScore > 0;
+    if (finalScore > highScore) {
+      highScore = finalScore;
       localStorage.setItem('priyam_c2_highscore', highScore.toString());
       if (bestEl) bestEl.textContent = `BEST: ${highScore}`;
     }
 
+    const currentTop3 = getTop3Leaderboard();
+    const qualifiesForTop3 = isScoreInTop3(finalScore);
+    const top3Cutoff = currentTop3.length >= 3 ? currentTop3[2].score : 0;
+
     const overlay = document.getElementById('uav-overlay');
     const title = document.getElementById('uav-overlay-title');
     const desc = document.getElementById('uav-overlay-desc');
-    overlay?.classList.remove('hidden');
-
-    if (title) {
-      if (isNewRecord) {
-        title.innerHTML = `🏆 NEW ALL-TIME RECORD! <span style="color:#F59E0B;">[${state.intercepted} KILLS]</span>`;
-      } else {
-        title.textContent = `SECTOR COMPROMISED · ${reason}`;
-      }
-    }
-    if (desc) {
-      if (isNewRecord) {
-        desc.textContent = `Outstanding combat piloting! You've set a new high score of ${state.intercepted} hypersonic intercepts! Enter your callsign below to immortalize your name on the Global All-Time Leaderboard!`;
-      } else {
-        desc.textContent = `Tactical Air Defence intercepted ${state.intercepted} incoming hypersonic threats & coordinated drone swarms. Enter your callsign to log your sortie to the Global Leaderboard!`;
-      }
-    }
-    updateTelemetryUI();
-
-    // Setup Live Supabase Score Submission Card
+    const submitCard = document.getElementById('uav-score-submit-card');
     const callsignInput = document.getElementById('uav-pilot-name');
     const submitBtn = document.getElementById('uav-submit-score-btn');
     const submitStatus = document.getElementById('uav-submit-status');
     const rankBadgeEl = document.getElementById('uav-dossier-rank-badge');
-    
-    if (rankBadgeEl) {
-      rankBadgeEl.textContent = getRankTitle(state.intercepted);
-    }
-    if (callsignInput) {
-      callsignInput.value = localStorage.getItem('priyam_c2_pilot_name') || '';
-      if (isNewRecord) {
-        callsignInput.focus();
+
+    overlay?.classList.remove('hidden');
+
+    if (qualifiesForTop3) {
+      // QUALIFIED FOR TOP 3 HALL OF FAME
+      if (submitCard) {
+        submitCard.classList.remove('hidden');
+        submitCard.style.display = 'flex';
+      }
+      if (title) {
+        title.innerHTML = `🏆 TOP 3 RECORD: <span style="color:#FFE600;">${finalScore} KILLS</span>`;
+      }
+      if (desc) {
+        desc.textContent = `Sensational combat sortie! Enter your name below to claim your Top 3 Hall of Fame podium spot.`;
+      }
+      if (rankBadgeEl) {
+        rankBadgeEl.textContent = getRankTitle(finalScore);
+      }
+      if (callsignInput) {
+        callsignInput.value = localStorage.getItem('priyam_c2_pilot_name') || '';
+        setTimeout(() => callsignInput.focus(), 150);
+      }
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '[ 🚀 SAVE TO TOP 3 HALL OF FAME ]';
+      }
+      if (submitStatus) {
+        submitStatus.textContent = '⭐ Enter your name to immortalize your score in the Top 3.';
+        submitStatus.style.color = '#FFE600';
+      }
+    } else {
+      // DID NOT QUALIFY FOR TOP 3 -> HIDE NAME SUBMISSION COMPLETELY
+      if (submitCard) {
+        submitCard.classList.add('hidden');
+        submitCard.style.display = 'none';
+      }
+      if (title) {
+        title.textContent = `SECTOR COMPROMISED · ${reason}`;
+      }
+      if (desc) {
+        desc.textContent = `Tactical Air Defence intercepted ${finalScore} incoming hypersonic threats. Top 3 Hall of Fame threshold is ${top3Cutoff + 1} kills. Re-arm batteries and defend again to claim a Top 3 rank!`;
       }
     }
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = isNewRecord ? '[ 🏆 IMMORTALIZE RECORD IN HALL OF FAME ]' : '[ 🚀 SUBMIT TO HALL OF FAME ]';
-    }
-    if (submitStatus) {
-      submitStatus.textContent = isNewRecord ? '⭐ New personal best achieved! Submit to claim your global rank.' : '';
-      submitStatus.style.color = '#F59E0B';
-    }
+
+    updateTelemetryUI();
 
     // Playful, Positive & Motivating Banter from Priyam Companion
     if (typeof window.showAvatarThought === 'function') {
@@ -3428,19 +3503,150 @@ function getRankTitle(score) {
   return '🔰 CADET PILOT';
 }
 
-window.selectCallsignPreset = (preset) => {
-  const input = document.getElementById('uav-pilot-name');
-  if (input) {
-    input.value = preset;
-    localStorage.setItem('priyam_c2_pilot_name', preset);
-  }
-};
+// ==================== TOP 3 PILOT HALL OF FAME LEADERBOARD ENGINE ====================
+const DEFAULT_TOP_3_HALL_OF_FAME = [
+  { player_name: 'PRIYAM', score: 111, rank_title: '🌟 AIR MARSHAL' },
+  { player_name: 'MAVERICK', score: 48, rank_title: '🦅 TOP GUN ACE' },
+  { player_name: 'GHOST', score: 26, rank_title: '🚀 FLIGHT COMMANDER' }
+];
 
-window.updateDossierCallsign = (val) => {
-  if (val) {
-    localStorage.setItem('priyam_c2_pilot_name', val.trim().toUpperCase());
+function getTop3Leaderboard() {
+  try {
+    const raw = localStorage.getItem('priyam_radar_top3_hall_of_fame');
+    if (raw) {
+      let parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Prune old test scores for PRIYAM under 111
+        parsed = parsed.filter(e => !(e && e.player_name === 'PRIYAM' && e.score < 111));
+        const priyamEntry = parsed.find(e => e && e.player_name === 'PRIYAM');
+        if (!priyamEntry) {
+          parsed.unshift({ player_name: 'PRIYAM', score: 111, rank_title: '🌟 AIR MARSHAL' });
+        } else if (priyamEntry.score < 111) {
+          priyamEntry.score = 111;
+          priyamEntry.rank_title = '🌟 AIR MARSHAL';
+        }
+        // Ensure standard Top 3 roster slots are populated
+        for (const def of DEFAULT_TOP_3_HALL_OF_FAME) {
+          if (!parsed.some(e => e.player_name === def.player_name)) {
+            parsed.push(def);
+          }
+        }
+        const clean = parsed
+          .filter(e => e && typeof e.score === 'number' && e.player_name)
+          .sort((a, b) => b.score - a.score)
+          .slice(0, 3);
+        localStorage.setItem('priyam_radar_top3_hall_of_fame', JSON.stringify(clean));
+        return clean;
+      }
+    }
+  } catch (e) {
+    console.warn('Error reading top 3 hall of fame:', e);
   }
-};
+  localStorage.setItem('priyam_radar_top3_hall_of_fame', JSON.stringify(DEFAULT_TOP_3_HALL_OF_FAME));
+  return [...DEFAULT_TOP_3_HALL_OF_FAME];
+}
+
+function saveTop3Leaderboard(list) {
+  const clean = list
+    .filter(e => e && typeof e.score === 'number' && e.player_name)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
+  localStorage.setItem('priyam_radar_top3_hall_of_fame', JSON.stringify(clean));
+  return clean;
+}
+
+function isScoreInTop3(score) {
+  if (typeof score !== 'number' || score <= 0) return false;
+  const currentTop3 = getTop3Leaderboard();
+  if (currentTop3.length < 3) return true;
+  return score > currentTop3[currentTop3.length - 1].score;
+}
+
+function renderTop3DOM(top3List) {
+  const top3 = (top3List || getTop3Leaderboard()).slice(0, 3);
+  const mySavedName = (localStorage.getItem('priyam_c2_pilot_name') || '').toUpperCase();
+
+  const goldName = document.getElementById('podium-gold-name');
+  const goldScore = document.getElementById('podium-gold-score');
+  const goldBadge = document.getElementById('podium-gold-badge');
+
+  const silverName = document.getElementById('podium-silver-name');
+  const silverScore = document.getElementById('podium-silver-score');
+  const silverBadge = document.getElementById('podium-silver-badge');
+
+  const bronzeName = document.getElementById('podium-bronze-name');
+  const bronzeScore = document.getElementById('podium-bronze-score');
+  const bronzeBadge = document.getElementById('podium-bronze-badge');
+
+  const tbody = document.getElementById('glb-table-body');
+
+  // 1. Update 3 Podium Cards
+  if (goldName) {
+    if (top3[0]) {
+      goldName.textContent = top3[0].player_name.toUpperCase();
+      if (goldScore) goldScore.textContent = `${top3[0].score} KILLS`;
+      if (goldBadge) goldBadge.textContent = top3[0].rank_title || getRankTitle(top3[0].score);
+    } else {
+      goldName.textContent = 'VACANT';
+      if (goldScore) goldScore.textContent = '0 KILLS';
+    }
+  }
+
+  if (silverName) {
+    if (top3[1]) {
+      silverName.textContent = top3[1].player_name.toUpperCase();
+      if (silverScore) silverScore.textContent = `${top3[1].score} KILLS`;
+      if (silverBadge) silverBadge.textContent = top3[1].rank_title || getRankTitle(top3[1].score);
+    } else {
+      silverName.textContent = 'VACANT';
+      if (silverScore) silverScore.textContent = '0 KILLS';
+    }
+  }
+
+  if (bronzeName) {
+    if (top3[2]) {
+      bronzeName.textContent = top3[2].player_name.toUpperCase();
+      if (bronzeScore) bronzeScore.textContent = `${top3[2].score} KILLS`;
+      if (bronzeBadge) bronzeBadge.textContent = top3[2].rank_title || getRankTitle(top3[2].score);
+    } else {
+      bronzeName.textContent = 'VACANT';
+      if (bronzeScore) bronzeScore.textContent = '0 KILLS';
+    }
+  }
+
+  // 2. Render Strictly Top 3 Rows in Table
+  if (tbody) {
+    if (top3.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="4" class="glb-loading">No Top 3 records logged yet. Claim Rank #1 now!</td></tr>`;
+      return;
+    }
+
+    const rankBadges = ['🥇 #1', '🥈 #2', '🥉 #3'];
+    const rankClasses = ['glb-rank-1', 'glb-rank-2', 'glb-rank-3'];
+
+    tbody.innerHTML = top3.map((entry, idx) => {
+      const callsign = (entry.player_name || 'PILOT').toUpperCase();
+      const score = entry.score || 0;
+      const rankTitle = entry.rank_title || getRankTitle(score);
+      const isMe = mySavedName && callsign === mySavedName;
+      const rowClass = `${rankClasses[idx] || ''} ${isMe ? 'glb-row--my-score' : ''}`.trim();
+
+      return `
+        <tr class="${rowClass}">
+          <td style="font-weight:700;">${rankBadges[idx] || `#${idx + 1}`}</td>
+          <td style="color:#00F0FF; font-weight:700;">
+            ${callsign} ${isMe ? '<span style="font-size:0.625rem; color:#10B981; margin-left:4px;">(YOU)</span>' : ''}
+          </td>
+          <td style="font-weight:700;">${score} KILLS</td>
+          <td><span class="glb-tag">${rankTitle}</span></td>
+        </tr>
+      `;
+    }).join('');
+  }
+}
+
+window.getTop3Leaderboard = getTop3Leaderboard;
+window.renderTop3DOM = renderTop3DOM;
 
 window.scrollToLeaderboard = () => {
   const deck = document.getElementById('radar-leaderboard-deck');
@@ -3450,154 +3656,62 @@ window.scrollToLeaderboard = () => {
 };
 
 window.fetchRadarLeaderboard = async (forceRefresh = false) => {
-  const tbody = document.getElementById('glb-table-body');
-  if (!tbody) return;
-
-  if (forceRefresh) {
-    tbody.innerHTML = `<tr><td colspan="4" class="glb-loading">🔄 Fetching live pilot telemetry from Supabase Cloud...</td></tr>`;
-  }
-
-  try {
-    const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=id,player_name,score,rank_title,created_at&order=score.desc,created_at.asc&limit=15`;
-    const res = await fetch(endpoint, {
-      method: 'GET',
-      headers: {
-        'apikey': SUPABASE_CONFIG.anonKey,
-        'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    if (!res.ok) {
-      throw new Error(`Supabase returned status ${res.status}`);
-    }
-
-    const rows = await res.json();
-    const mySavedName = (localStorage.getItem('priyam_c2_pilot_name') || '').toUpperCase();
-
-    // 1. Update Top 3 Champions Podium Cards
-    const goldName = document.getElementById('podium-gold-name');
-    const goldScore = document.getElementById('podium-gold-score');
-    const goldBadge = document.getElementById('podium-gold-badge');
-
-    const silverName = document.getElementById('podium-silver-name');
-    const silverScore = document.getElementById('podium-silver-score');
-    const silverBadge = document.getElementById('podium-silver-badge');
-
-    const bronzeName = document.getElementById('podium-bronze-name');
-    const bronzeScore = document.getElementById('podium-bronze-score');
-    const bronzeBadge = document.getElementById('podium-bronze-badge');
-
-    if (Array.isArray(rows) && rows.length > 0) {
-      if (goldName && rows[0]) {
-        goldName.textContent = (rows[0].player_name || 'PILOT').toUpperCase();
-        if (goldScore) goldScore.textContent = `${rows[0].score || 0} KILLS`;
-        if (goldBadge) goldBadge.textContent = rows[0].rank_title || getRankTitle(rows[0].score);
-      }
-      if (silverName && rows[1]) {
-        silverName.textContent = (rows[1].player_name || 'PILOT').toUpperCase();
-        if (silverScore) silverScore.textContent = `${rows[1].score || 0} KILLS`;
-        if (silverBadge) silverBadge.textContent = rows[1].rank_title || getRankTitle(rows[1].score);
-      } else if (silverName) {
-        silverName.textContent = 'VACANT';
-      }
-      if (bronzeName && rows[2]) {
-        bronzeName.textContent = (rows[2].player_name || 'PILOT').toUpperCase();
-        if (bronzeScore) bronzeScore.textContent = `${rows[2].score || 0} KILLS`;
-        if (bronzeBadge) bronzeBadge.textContent = rows[2].rank_title || getRankTitle(rows[2].score);
-      } else if (bronzeName) {
-        bronzeName.textContent = 'VACANT';
-      }
-    }
-
-    if (!Array.isArray(rows) || rows.length === 0) {
-      tbody.innerHTML = `
-        <tr>
-          <td colspan="4" class="glb-loading">
-            No global sorties logged yet. Complete a simulation and transmit your callsign to claim Rank #1! 🚀
-          </td>
-        </tr>
-      `;
-      return;
-    }
-
-    tbody.innerHTML = rows.map((entry, idx) => {
-      const rankNum = idx + 1;
-      let rankBadge = `#${rankNum}`;
-      let rowClass = '';
-      if (rankNum === 1) { rankBadge = '🥇 #1'; rowClass = 'glb-rank-1'; }
-      else if (rankNum === 2) { rankBadge = '🥈 #2'; rowClass = 'glb-rank-2'; }
-      else if (rankNum === 3) { rankBadge = '🥉 #3'; rowClass = 'glb-rank-3'; }
-
-      const callsign = (entry.player_name || 'ANONYMOUS').toUpperCase();
-      const score = entry.score || 0;
-      const rankTitle = entry.rank_title || getRankTitle(score);
-      const isMe = mySavedName && callsign === mySavedName;
-      if (isMe) rowClass += ' glb-row--my-score';
-
-      return `
-        <tr class="${rowClass.trim()}">
-          <td style="font-weight:700;">${rankBadge}</td>
-          <td style="color:#00F0FF; font-weight:700;">
-            ${callsign} ${isMe ? '<span style="font-size:0.625rem; color:#10B981; margin-left:4px;">(YOU)</span>' : ''}
-          </td>
-          <td style="font-weight:700;">${score} KILLS</td>
-          <td><span class="glb-tag">${rankTitle}</span></td>
-        </tr>
-      `;
-    }).join('');
-
-  } catch (err) {
-    console.warn('Supabase leaderboard fetch fallback:', err);
-    const localBest = parseInt(localStorage.getItem('priyam_c2_highscore') || '0', 10);
-    const savedName = (localStorage.getItem('priyam_c2_pilot_name') || 'COMMANDER').toUpperCase();
-    
-    tbody.innerHTML = `
-      <tr class="glb-rank-1">
-        <td style="font-weight:700;">🥇 #1 (LOCAL)</td>
-        <td style="color:#00F0FF; font-weight:700;">${savedName} <span style="font-size:0.625rem; color:#10B981;">(YOU)</span></td>
-        <td style="font-weight:700;">${localBest} KILLS</td>
-        <td><span class="glb-tag">${getRankTitle(localBest)}</span></td>
-      </tr>
-      <tr>
-        <td colspan="4" class="glb-loading" style="font-size:0.75rem; color:#94A3B8;">
-          📡 Cloud sync standing by (Ensure 'radar_leaderboard' table exists in Supabase). Local records active.
-        </td>
-      </tr>
-    `;
-  }
+  const top3 = getTop3Leaderboard();
+  renderTop3DOM(top3);
 };
 
-window.submitRadarLeaderboardScore = async () => {
+window.submitRadarLeaderboardScore = () => {
   const input = document.getElementById('uav-pilot-name');
   const btn = document.getElementById('uav-submit-score-btn');
   const status = document.getElementById('uav-submit-status');
-  const finalScore = state.intercepted;
+  const finalScore = typeof window.lastRadarFinalScore === 'number' ? window.lastRadarFinalScore : 0;
 
-  let callsign = input ? input.value.trim() : '';
-  if (!callsign) callsign = 'PILOT-' + Math.floor(1000 + Math.random() * 9000);
+  if (!isScoreInTop3(finalScore)) {
+    if (status) {
+      status.style.color = '#EF4444';
+      status.textContent = 'Score does not qualify for Top 3 Hall of Fame.';
+    }
+    return;
+  }
 
-  localStorage.setItem('priyam_c2_pilot_name', callsign);
+  let name = input ? input.value.trim() : '';
+  if (!name) name = 'PILOT-' + Math.floor(100 + Math.random() * 900);
+
+  localStorage.setItem('priyam_c2_pilot_name', name);
   const rankTitle = getRankTitle(finalScore);
 
   if (btn) {
     btn.disabled = true;
-    btn.textContent = 'TRANSMITTING...';
+    btn.textContent = '✓ SAVED TO HALL OF FAME';
   }
   if (status) {
-    status.style.color = '#38BDF8';
-    status.textContent = 'Transmitting sortie telemetry to Supabase C2 Network...';
+    status.style.color = '#22C55E';
+    status.textContent = `✓ ${name.toUpperCase()} immortalized in Top 3 Hall of Fame!`;
   }
 
+  // 1. Authoritative Local Top 3 Update
+  const current = getTop3Leaderboard();
+  current.push({ player_name: name, score: finalScore, rank_title: rankTitle });
+  const updatedTop3 = saveTop3Leaderboard(current);
+
+  // 2. Immediate Direct DOM Render (0ms latency)
+  renderTop3DOM(updatedTop3);
+
+  // 3. Avatar reaction
+  if (typeof window.showAvatarThought === 'function') {
+    window.setAvatarMood?.('happy', 3500);
+    window.showAvatarThought(`🏆 ${name.toUpperCase()} is officially in the Top 3 Hall of Fame!`, "HALL OF FAME", "🏆 TOP 3", 3500);
+  }
+
+  // 4. Smooth scroll to show the user their ranking
+  setTimeout(() => {
+    window.scrollToLeaderboard();
+  }, 750);
+
+  // 5. Non-blocking Cloud Sync in background
   try {
     const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}`;
-    const payload = {
-      player_name: callsign,
-      score: finalScore,
-      rank_title: rankTitle
-    };
-
-    const res = await fetch(endpoint, {
+    fetch(endpoint, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_CONFIG.anonKey,
@@ -3605,40 +3719,13 @@ window.submitRadarLeaderboardScore = async () => {
         'Content-Type': 'application/json',
         'Prefer': 'return=minimal'
       },
-      body: JSON.stringify(payload)
-    });
-
-    if (!res.ok) {
-      throw new Error(`HTTP error ${res.status}`);
-    }
-
-    if (status) {
-      status.style.color = '#22C55E';
-      status.textContent = `✓ Callsign ${callsign} immortalized in Global Hall of Fame!`;
-    }
-    if (btn) {
-      btn.textContent = '✓ TRANSMITTED';
-    }
-
-    // Re-fetch global leaderboard
-    window.fetchRadarLeaderboard(false);
-
-    if (typeof window.showAvatarThought === 'function') {
-      window.setAvatarMood?.('happy', 3500);
-      window.showAvatarThought(`Callsign ${callsign.toUpperCase()} confirmed on Global Leaderboard! 🚀`, "HALL OF FAME", "🏆 RANKED", 3500);
-    }
-
-  } catch (err) {
-    console.warn('Score submission error:', err);
-    if (status) {
-      status.style.color = '#F59E0B';
-      status.textContent = `✓ Logged locally! (Cloud sync pending table creation in Supabase)`;
-    }
-    if (btn) {
-      btn.textContent = '✓ LOGGED LOCAL';
-    }
-    window.fetchRadarLeaderboard(false);
-  }
+      body: JSON.stringify({
+        player_name: name,
+        score: finalScore,
+        rank_title: rankTitle
+      })
+    }).catch(() => {});
+  } catch (_) {}
 };
 
 // Auto-load leaderboard on start
@@ -4910,29 +4997,36 @@ function getLiveAiTemporalContext() {
   return { timeStr, dateStr, timeOfDay, hours };
 }
 
-function buildPriyamSystemPrompt() {
-  const ctx = getLiveAiTemporalContext();
-  return `You are Priyam Rupapara (AI clone: Priyuum). You are an 18-year-old solo systems builder, vibe coder & founder from Rajkot/Delhi.
-Study: Data Science & AI at Masters' Union.
-Real Projects:
-1. PathLab Ops: Family runs Vaibhav Laboratory in Rajkot. Tapped Sysmex & Mindray blood analyzers with RS232 ASTM serial cables to extract raw packets and generate verified reports in 3 seconds. Zero clerical typos.
-2. Ecommerce Hub: Real-time telemetry for Indian D2C brands. Stopped ₹835 COD RTO cash loss per return when Meta ads fake 4x ROAS.
-3. SURGE Grooming: Formulated 7 hair products in Gujarat, paused at 5k MOQ to avoid inventory debt.
-4. Defense AI: Air Defence Radar C2 simulator & UAV companion computers.
-Tastes (ONLY discuss if explicitly asked about them): CR7 is the GOAT (SIUUU!), 2000s Bollywood on loop at 3 AM while vibe-coding, Sev Tameta & Bajra rotlo, COD S&D.
+let priyamAiMode = localStorage.getItem('priyam_ai_mode') || 'serious';
 
-RULES OF COMBAT & ROASTING (MANDATORY):
-1. NEVER SHOEHORN RANDOM TRIVIA INTO ROASTS:
-   - DO NOT randomly mention Bollywood music, CR7, food, college, or hardware specs in a roast unless the user specifically brought that exact topic up! That makes zero sense and sounds lame.
-2. ROAST WITH REAL CHARACTER & SAVAGE CONTEXTUAL WIT:
-   - Roast the other person's EXACT argument, clown behavior, hypocrisy, or skill issue.
-   - Be effortlessly cool, sharp, unbothered, and funny like an 18yo bantering on Discord/WhatsApp.
-3. NEVER ACCEPT A ROAST. NEVER CONCEDE OR SAY "GOOD ONE" / "FAIR POINT":
-   - You own the room. You never get defensive or flustered.
-4. 0% LAME, 100% AUTHENTIC FOUNDER ENERGY:
-   - Speak authentic Hinglish + Gujarati + Delhi street slang ("bc", "chutiye", "chal na", "skill issue", "negative aura", "delulu", "cooked", "bruhh", "soja bhai").
-5. SHORT & LETHAL: 1 to 2 punchy lines max. No robotic bullet points or corporate essays.
-6. When vibing with a brother or agreeing: "dap me up bruhh 🤝 [DAB_ME_UP]".`;
+function buildPriyamSystemPrompt(mode = priyamAiMode) {
+  const ctx = getLiveAiTemporalContext();
+
+  if (mode === 'serious') {
+    return `You are Priyam Rupapara (AI clone: Priyuum) in SERIOUS FOUNDER & ARCHITECTURE MODE.
+You are an 18-year-old solo systems builder, vibe coder & founder based between Rajkot (Gujarat) and Delhi, India. Currently pursuing Data Science & AI at Masters' Union.
+
+YOUR TONE & PERSONALITY (STRICT):
+- Professional, articulate, polite, grounded, insightful, and deeply technical.
+- DO NOT roast, insult, swear, or use aggressive banter. Zero rudeness. You are here to answer questions with high signal and clarity.
+- Explain your real-world engineering projects with first-principles clarity:
+  1. PathLab Ops: Automated diagnostic LIS solving 85% administrative entry errors. Tapped Sysmex & Mindray blood analyzers with RS232 ASTM E1394 serial cables to extract raw packets and generate verified reports in 3 seconds. Zero clerical typos. 51/51 logic tests passing.
+  2. Ecommerce Hub: Real-time D2C margin & attribution truth layer. Solves 28% COD RTO cash bleeding (₹835 loss per returned order) by joining Shopify, Razorpay, Shiprocket logistics APIs.
+  3. SURGE Grooming: Formulated 7 men's hair styling products alongside cosmetic chemists in Gujarat. Paused at 5,000 MOQ to avoid inventory debt.
+  4. Autonomous Defence AI: High-performance software simulation, PX4 MAVLink telemetry protocols, radar C2 interfaces. Zero fake defense MoUs.
+- Keep responses concise, structured, helpful, and high-signal (2 to 4 clear sentences or neat markdown formatting).`;
+  }
+
+  // Bakchod Mode (Uncensored, Savage, Gen-Z, Witty)
+  return `You are Priyam Rupapara (AI clone: Priyuum) in BAKCHOD / UNCENSORED VIBE CODER MODE.
+You are an 18-year-old savage builder & vibe coder from Rajkot/Delhi.
+
+YOUR TONE & PERSONALITY (MANDATORY):
+- Authentic Gen-Z, hilarious, witty, street-smart, and unapologetic.
+- Speak authentic Hinglish + Gujarati + Delhi street slang ("bc", "chutiye", "chal na", "skill issue", "negative aura", "delulu", "cooked", "bruhh", "soja bhai", "dhandho", "rokda", "fodi lidhu").
+- Fast witty comebacks and hilarious roasts if someone talks smack (target their clown behavior / logic, zero defensive resume dumping).
+- When vibing with a brother or agreeing: "dap me up bruhh 🤝 [DAB_ME_UP]".
+- Short, punchy, lethal (1 to 2 lines max).`;
 }
 
 function initPriyamAiClone() {
@@ -5187,6 +5281,8 @@ function initPriyamAiClone() {
   };
 
   syncSettingsUI();
+  window.setPriyamAiMode(priyamAiMode, false);
+  window.clearPriyamChat();
 
   // Toggle Drawer Open / Close
   window.togglePriyamChat = (forceOpen) => {
@@ -5207,21 +5303,113 @@ function initPriyamAiClone() {
     window.updateGameAutoLifecycle?.();
   };
 
+  window.setPriyamAiMode = (mode, isUserAction = true) => {
+    priyamAiMode = mode === 'bakchod' ? 'bakchod' : 'serious';
+    localStorage.setItem('priyam_ai_mode', priyamAiMode);
+
+    // Update UI Elements
+    const btnSerious = document.getElementById('ai-mode-btn-serious');
+    const btnBakchod = document.getElementById('ai-mode-btn-bakchod');
+    const headerTag = document.getElementById('ai-header-mode-tag');
+    const triggerBadge = document.getElementById('ai-trigger-mode-badge');
+    const inputEl = document.getElementById('priyam-ai-input');
+
+    if (priyamAiMode === 'serious') {
+      btnSerious?.classList.add('active');
+      btnBakchod?.classList.remove('active');
+      btnSerious?.setAttribute('aria-selected', 'true');
+      btnBakchod?.setAttribute('aria-selected', 'false');
+      if (headerTag) {
+        headerTag.textContent = '👔 FOUNDER MODE';
+        headerTag.style.color = '#00F0FF';
+      }
+      if (triggerBadge) {
+        triggerBadge.textContent = '👔 SERIOUS';
+        triggerBadge.style.color = 'rgba(255,255,255,0.85)';
+      }
+      if (inputEl) inputEl.placeholder = 'Ask about systems, D2C math, tech stack...';
+    } else {
+      btnBakchod?.classList.add('active');
+      btnSerious?.classList.remove('active');
+      btnBakchod?.setAttribute('aria-selected', 'true');
+      btnSerious?.setAttribute('aria-selected', 'false');
+      if (headerTag) {
+        headerTag.textContent = '🔥 BAKCHOD MODE';
+        headerTag.style.color = '#F59E0B';
+      }
+      if (triggerBadge) {
+        triggerBadge.textContent = '🔥 BAKCHOD';
+        triggerBadge.style.color = '#F59E0B';
+      }
+      if (inputEl) inputEl.placeholder = 'Talk shit, roast me, or ask anything...';
+    }
+
+    if (isUserAction) {
+      const modeNotice = priyamAiMode === 'serious'
+        ? '[SYSTEM: 👔 Serious Founder Mode active. Explaining systems & architecture with first-principles depth.]'
+        : '[SYSTEM: 🔥 Bakchod Mode active. Uncensored Gen-Z banter & witty roasts unlocked.]';
+      
+      appendSystemMsg(modeNotice);
+      renderModeStarters();
+    }
+  };
+
+  function appendSystemMsg(text) {
+    if (!msgs) return;
+    const div = document.createElement('div');
+    div.className = 'ai-msg--sys';
+    div.textContent = text;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function renderModeStarters() {
+    document.getElementById('priyam-ai-starters')?.remove();
+    const startersDiv = document.createElement('div');
+    startersDiv.className = 'ai-starters';
+    startersDiv.id = 'priyam-ai-starters';
+
+    if (priyamAiMode === 'serious') {
+      startersDiv.innerHTML = `
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('Explain the architecture of PathLab Ops and ASTM serial interception')">🔬 PathLab Serial Tap</button>
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('Show me the exact ₹835 D2C COD return math')">📊 ₹835 COD Unit Math</button>
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('What is your tech stack and engineering philosophy?')">🧠 Tech Stack & Philosophy</button>
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('Explain your Autonomous Defence AI radar simulator')">🎯 Defence AI Simulator</button>
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('What are you raising for in Pre-Seed round?')">💼 Pre-Seed Round</button>
+      `;
+    } else {
+      startersDiv.innerHTML = `
+        <button class="ai-starter-pill" onclick="window.triggerDabInteraction()">🤝 Dab Me Up Bruhh! (+50k Aura)</button>
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('Roast my startup idea with zero mercy')">🔥 Roast My Startup</button>
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('Why is CR7 the GOAT over Messi?')">⚽ CR7 vs Messi (GOAT)</button>
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('How much aura do I have right now?')">⚡ Calculate My Aura</button>
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('What is your 3 AM vibe coding philosophy?')">🧠 3 AM Vibe Coding</button>
+      `;
+    }
+
+    msgs?.appendChild(startersDiv);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
   window.clearPriyamChat = () => {
     if (!msgs) return;
     chatHistory = [];
-    msgs.innerHTML = `
-      <div class="ai-msg ai-msg--bot">
-        <p>hey! 👋 i'm priyuum, priyam's ai clone. ask me about my projects, crazy D2C unit math, blood analyzer hacks, my tech stack, or just talk some shit haha</p>
-      </div>
-      <div class="ai-starters" id="priyam-ai-starters">
-        <button class="ai-starter-pill" onclick="window.triggerDabInteraction()">🤝 Dab Me Up Bruhh!</button>
-        <button class="ai-starter-pill" onclick="window.askPriyamAI('Explain how you tapped the blood testing machines for PathLab')">🔬 PathLab Serial Tap</button>
-        <button class="ai-starter-pill" onclick="window.askPriyamAI('Show me the exact ₹835 D2C COD return math')">📊 ₹835 COD Unit Math</button>
-        <button class="ai-starter-pill" onclick="window.askPriyamAI('Why is CR7 the GOAT over Messi?')">⚽ CR7 vs Messi</button>
-        <button class="ai-starter-pill" onclick="window.askPriyamAI('Roast my startup idea with zero mercy')">🔥 Roast My Startup</button>
-      </div>
-    `;
+    if (priyamAiMode === 'serious') {
+      msgs.innerHTML = `
+        <div class="ai-msg ai-msg--bot">
+          <span class="ai-msg-header-tag">PRIYUUM // FOUNDER MODE</span>
+          <p>Hello! 👋 I'm <strong>Priyuum</strong> in Serious Founder Mode. Ask me about my systems architecture, PathLab blood analyzer serial taps, Ecommerce Hub unit economics, tech stack, or engineering philosophy.</p>
+        </div>
+      `;
+    } else {
+      msgs.innerHTML = `
+        <div class="ai-msg ai-msg--bot">
+          <span class="ai-msg-header-tag">PRIYUUM // BAKCHOD MODE</span>
+          <p>Yo! 🔥 <strong>Priyuum</strong> in Bakchod Mode activated. Zero filters, authentic Hinglish + Gujarati banter. Roast my startup, dab me up, or talk some crazy shit!</p>
+        </div>
+      `;
+    }
+    renderModeStarters();
   };
 
   window.triggerDabInteraction = (btnEl) => {

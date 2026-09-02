@@ -100,7 +100,7 @@
   <link rel="preload" as="image" href="assets/surge/bottle_frames/bottle_040.webp" type="image/webp" />
   <link rel="preload" as="image" href="assets/surge/bottle_frames/bottle_060.webp" type="image/webp" />
 
-  <link rel="stylesheet" href="styles.css?v=20260902_49" />
+  <link rel="stylesheet" href="styles.css?v=20260902_50" />
 </head>
 <body>
 
@@ -633,14 +633,14 @@
         <div class="game-card-wrapper game-card--dark">
           <div class="game-header-bar">
             <div class="gh-title-block">
-              <span class="mono-label" style="color:var(--cyan);">[TACTICAL RADAR C2 · KALMAN TRAJECTORY PREDICTION &amp; MISSILE INTERCEPTION]</span>
-              <h3 class="game-title" style="color:#FFF;">Tactical Air Defence AI: Missile Interception C2</h3>
+              <span class="mono-label">[SYS.C2 · KALMAN TRAJECTORY PREDICTION &amp; MISSILE INTERCEPTION]</span>
+              <h3 class="game-title">Tactical Air Defence C2</h3>
             </div>
             <div class="flight-hud-pills">
-              <span class="game-score-badge" id="uav-hud-score" style="background:#0F766E;">INTERCEPTED: 0</span>
-              <span class="game-score-badge" id="uav-hud-high">BEST: 0</span>
-              <button class="audio-toggle-btn" id="uav-pause-btn" onclick="window.toggleUavPause()" aria-label="Toggle Pause Simulation">⏸️ PAUSE [P]</button>
-              <button class="audio-toggle-btn" id="uav-audio-toggle" onclick="window.toggleUavAudio()" aria-label="Toggle Sound Effects">🔊 RADAR AUDIO: ON</button>
+              <span class="game-score-badge" id="uav-hud-score">[ KILLS: 0 ]</span>
+              <span class="game-score-badge" id="uav-hud-high">[ BEST: 111 ]</span>
+              <button class="audio-toggle-btn" id="uav-pause-btn" onclick="window.toggleUavPause()" aria-label="Toggle Pause Simulation">[ ⏸️ PAUSE ]</button>
+              <button class="audio-toggle-btn" id="uav-audio-toggle" onclick="window.toggleUavAudio()" aria-label="Toggle Sound Effects">[ 🔊 AUDIO: ON ]</button>
             </div>
           </div>
 
@@ -660,9 +660,9 @@
             <div class="uav-overlay" id="uav-start-overlay">
               <div class="uav-overlay-box">
                 <span class="mono-label" style="color:var(--cyan);">[TACTICAL C2 DEFENCE SIMULATOR]</span>
-                <h4 class="uav-overlay-title" style="color:#FFF;">DEFEND AIRSPACE</h4>
+                <h4 class="uav-overlay-title">DEFEND AIRSPACE</h4>
                 <p class="uav-overlay-desc">Tap radar or fire interceptor missiles to shoot down incoming hypersonic cruise missiles &amp; drone swarms.</p>
-                <button class="uav-btn-primary" onclick="window.startUavGame()">[ 🎮 START TACTICAL SIMULATION ▶ ]</button>
+                <button class="uav-btn-primary" onclick="window.startUavGame()">[ 🎮 START SIMULATION ▶ ]</button>
               </div>
             </div>
 
@@ -670,35 +670,24 @@
             <div class="uav-overlay hidden" id="uav-overlay">
               <div class="uav-overlay-box">
                 <h4 class="uav-overlay-title" id="uav-overlay-title">AIRSPACE SECTOR COMPROMISED</h4>
-                <p class="uav-overlay-desc" id="uav-overlay-desc">Hostile cruise missiles breached base perimeter. Final Interception Score: 0.</p>
+                <p class="uav-overlay-desc" id="uav-overlay-desc">Hostile cruise missiles breached base perimeter.</p>
                 
-                <!-- High-Tech Tactical Pilot Dossier Card -->
-                <div class="uav-score-submit-card" id="uav-score-submit-card">
+                <!-- High-Tech Tactical Pilot Dossier Card (Only shown if score qualifies for Top 3 Hall of Fame) -->
+                <div class="uav-score-submit-card hidden" id="uav-score-submit-card" style="display:none;">
                   <div class="uav-dossier-header">
-                    <span class="uav-dossier-tag mono-label">[ PILOT SORTIE DEBRIEF ]</span>
-                    <span class="uav-dossier-rank" id="uav-dossier-rank-badge">🔰 CADET PILOT</span>
-                  </div>
-
-                  <!-- Quick Callsign Selector Chips -->
-                  <div class="uav-callsign-chips">
-                    <span class="uav-chip-label mono-label">CALLSIGN PRESETS:</span>
-                    <button type="button" class="uav-chip" onclick="window.selectCallsignPreset('VIPER')">⚡ VIPER</button>
-                    <button type="button" class="uav-chip" onclick="window.selectCallsignPreset('MAVERICK')">🦅 MAVERICK</button>
-                    <button type="button" class="uav-chip" onclick="window.selectCallsignPreset('GHOST')">🥷 GHOST</button>
-                    <button type="button" class="uav-chip" onclick="window.selectCallsignPreset('PRIYAM-ACE')">👑 PRIYAM-ACE</button>
-                    <button type="button" class="uav-chip" onclick="window.selectCallsignPreset('CYBER-PIONEER')">🚀 CYBER</button>
+                    <span class="uav-dossier-tag mono-label">[ SORTIE DEBRIEF // TOP 3 QUALIFIER ]</span>
                   </div>
 
                   <div class="uav-submit-inputs">
-                    <input type="text" id="uav-pilot-name" class="uav-callsign-input" placeholder="ENTER CUSTOM CALLSIGN (e.g. VIPER)" maxlength="20" autocomplete="off" oninput="window.updateDossierCallsign(this.value)" />
-                    <button class="uav-btn-submit" id="uav-submit-score-btn" onclick="window.submitRadarLeaderboardScore()">[ 🚀 TRANSMIT TO HALL OF FAME ]</button>
+                    <input type="text" id="uav-pilot-name" class="uav-callsign-input" placeholder="ENTER YOUR CALLSIGN" maxlength="25" autocomplete="off" />
+                    <button class="uav-btn-submit" id="uav-submit-score-btn" onclick="window.submitRadarLeaderboardScore()">[ 🚀 SAVE TO TOP 3 HALL OF FAME ]</button>
                   </div>
                   <p class="uav-submit-status" id="uav-submit-status"></p>
                 </div>
 
                 <div class="uav-action-btns">
-                  <button class="uav-btn-primary" onclick="window.startUavGame()">[ RE-ARM DEFENCE BATTERY ↺ ]</button>
-                  <button class="uav-btn-secondary" onclick="window.scrollToLeaderboard()">[ 🏆 VIEW HALL OF FAME ]</button>
+                  <button class="uav-btn-primary" onclick="window.startUavGame()">[ ↺ RE-ARM BATTERY ]</button>
+                  <button class="uav-btn-secondary" onclick="window.scrollToLeaderboard()">[ 🏆 TOP 3 ROSTER ]</button>
                 </div>
               </div>
             </div>
@@ -707,74 +696,66 @@
           <!-- Controls Guidance / Tactical Button Deck -->
           <div class="uav-controls-bar">
             <div class="uav-key-hints mono-label">
-              <span>[SPACE] FIRE</span> · <span>[S] 🚀 SALVO [x6]</span> · <span>[F] 💥 FLAK</span> · <span>[R] ⚡ RAILGUN</span> · <span>[D] 🤖 DRONES</span> · <span>[E] 📡 ECCM</span> · <span>[P] ⏸️ PAUSE</span>
+              <span>[SPACE] FIRE</span> · <span>[S] 🚀 SALVO</span> · <span>[F] 💥 FLAK</span> · <span>[R] ⚡ RAILGUN</span> · <span>[D] 🤖 DRONES</span> · <span>[E] 📡 ECCM</span> · <span>[P] ⏸️ PAUSE</span>
             </div>
             <div class="uav-touch-controls">
-              <button class="touch-ctrl-btn touch-ctrl-btn--boost" onpointerdown="window.triggerInterceptorLaunch()">🚀 MISSILE</button>
-              <button class="touch-ctrl-btn" onpointerdown="window.triggerMultiSalvo()">🚀 SALVO x6</button>
-              <button class="touch-ctrl-btn" onpointerdown="window.triggerAreaFlak()">💥 AREA FLAK</button>
-              <button class="touch-ctrl-btn" onpointerdown="window.triggerOrbitalRailgun()">⚡ RAILGUN</button>
-              <button class="touch-ctrl-btn" onpointerdown="window.deployPatrolUav()">🤖 DRONES</button>
-              <button class="touch-ctrl-btn" onpointerdown="window.triggerEccmBurst()">📡 ECCM</button>
-              <button class="touch-ctrl-btn" onpointerdown="window.toggleUavPause()">⏸️ PAUSE</button>
+              <div class="uav-touch-row">
+                <button class="touch-ctrl-btn touch-ctrl-btn--primary" onpointerdown="window.triggerInterceptorLaunch()">[ 🚀 MISSILE ]</button>
+                <button class="touch-ctrl-btn" onpointerdown="window.triggerMultiSalvo()">[ 🚀 SALVO x6 ]</button>
+                <button class="touch-ctrl-btn" onpointerdown="window.triggerAreaFlak()">[ 💥 FLAK ]</button>
+                <button class="touch-ctrl-btn" onpointerdown="window.triggerOrbitalRailgun()">[ ⚡ RAILGUN ]</button>
+              </div>
+              <div class="uav-touch-row">
+                <button class="touch-ctrl-btn" onpointerdown="window.deployPatrolUav()">[ 🤖 DRONES ]</button>
+                <button class="touch-ctrl-btn" onpointerdown="window.triggerEccmBurst()">[ 📡 ECCM ]</button>
+                <button class="touch-ctrl-btn" onpointerdown="window.toggleUavPause()">[ ⏸️ PAUSE ]</button>
+              </div>
             </div>
           </div>
 
         </div>
 
-        <!-- Tactical Global Leaderboard & Hall of Fame (Powered by Supabase Cloud) -->
+        <!-- Tactical Top 3 Leaderboard & Hall of Fame -->
         <div class="game-leaderboard-deck" id="radar-leaderboard-deck">
           <div class="glb-header">
             <div class="glb-title-group">
-              <span class="mono-label" style="color:var(--cyan);">[ALL-TIME SORTIE RECORDS · SUPABASE CLOUD SATELLITE NETWORK]</span>
-              <h3 class="glb-title">Global Air Defence · Pilot Hall of Fame</h3>
+              <span class="mono-label">[ ALL-TIME TOP 3 // HALL OF FAME ]</span>
+              <h3 class="glb-title">Top 3 Defenders</h3>
             </div>
             <div class="glb-actions">
-              <span class="glb-live-badge"><span class="glb-dot"></span> LIVE CLOUD SYNC</span>
-              <button class="glb-refresh-btn" onclick="window.fetchRadarLeaderboard(true)" aria-label="Refresh Leaderboard">🔄 REFRESH</button>
+              <span class="glb-live-badge"><span class="glb-dot"></span> LIVE ROSTER</span>
+              <button class="glb-refresh-btn" onclick="window.fetchRadarLeaderboard(true)" aria-label="Refresh Leaderboard">[ 🔄 REFRESH ]</button>
             </div>
           </div>
 
-          <!-- Top 3 Champions Podium Grid -->
+          <!-- Unified Top 3 Champions Podium Grid / Mobile Condensed Strip -->
           <div class="glb-podium-grid" id="glb-podium-cards">
-            <!-- Rendered dynamically by app.js -->
-            <div class="glb-podium-card glb-podium--gold">
-              <span class="glb-podium-rank">🥇 #1 ALL-TIME CHAMPION</span>
-              <h4 class="glb-podium-name" id="podium-gold-name">---</h4>
-              <div class="glb-podium-score" id="podium-gold-score">0 KILLS</div>
-              <span class="glb-tag" id="podium-gold-badge">🌟 AIR MARSHAL</span>
+            <!-- Rank 01 Champion -->
+            <div class="glb-podium-card glb-podium--gold" id="podium-card-1">
+              <div class="glb-podium-meta">
+                <span class="glb-podium-rank mono-label">01 // CHAMPION</span>
+                <h4 class="glb-podium-name" id="podium-gold-name">PRIYAM</h4>
+              </div>
+              <div class="glb-podium-score" id="podium-gold-score">111 KILLS</div>
             </div>
-            <div class="glb-podium-card glb-podium--silver">
-              <span class="glb-podium-rank">🥈 #2 WINGMAN ELITE</span>
-              <h4 class="glb-podium-name" id="podium-silver-name">---</h4>
-              <div class="glb-podium-score" id="podium-silver-score">0 KILLS</div>
-              <span class="glb-tag" id="podium-silver-badge">🦅 TOP GUN ACE</span>
-            </div>
-            <div class="glb-podium-card glb-podium--bronze">
-              <span class="glb-podium-rank">🥉 #3 KINETIC STRIKER</span>
-              <h4 class="glb-podium-name" id="podium-bronze-name">---</h4>
-              <div class="glb-podium-score" id="podium-bronze-score">0 KILLS</div>
-              <span class="glb-tag" id="podium-bronze-badge">🚀 FLIGHT COMMANDER</span>
-            </div>
-          </div>
 
-          <!-- Full Leaderboard Roster Table -->
-          <div class="glb-table-container">
-            <table class="glb-table">
-              <thead>
-                <tr>
-                  <th style="width:12%;">RANK</th>
-                  <th style="width:38%;">PILOT CALLSIGN</th>
-                  <th style="width:25%;">INTERCEPTS</th>
-                  <th style="width:25%;">TACTICAL RANK</th>
-                </tr>
-              </thead>
-              <tbody id="glb-table-body">
-                <tr>
-                  <td colspan="4" class="glb-loading">Connecting to Supabase Cloud Radar Network...</td>
-                </tr>
-              </tbody>
-            </table>
+            <!-- Rank 02 Runner Up -->
+            <div class="glb-podium-card glb-podium--silver" id="podium-card-2">
+              <div class="glb-podium-meta">
+                <span class="glb-podium-rank mono-label">02 // RUNNER UP</span>
+                <h4 class="glb-podium-name" id="podium-silver-name">MAVERICK</h4>
+              </div>
+              <div class="glb-podium-score" id="podium-silver-score">48 KILLS</div>
+            </div>
+
+            <!-- Rank 03 3rd Place -->
+            <div class="glb-podium-card glb-podium--bronze" id="podium-card-3">
+              <div class="glb-podium-meta">
+                <span class="glb-podium-rank mono-label">03 // 3RD PLACE</span>
+                <h4 class="glb-podium-name" id="podium-bronze-name">GHOST</h4>
+              </div>
+              <div class="glb-podium-score" id="podium-bronze-score">26 KILLS</div>
+            </div>
           </div>
         </div>
 
@@ -970,15 +951,29 @@
     </div>
   </div>
 
-  <!-- ===================== PRIYUUM AI CHAT ===================== -->
+  <!-- ===================== PRIYUUM AI CLONE (CYBER BRUTALIST DRAWER) ===================== -->
   <div class="ai-widget-wrapper" id="priyam-ai-widget-wrapper">
+    <!-- Floating Trigger Capsule -->
     <button class="ai-trigger-btn" id="priyam-ai-trigger" onclick="window.togglePriyamChat()">
       <span class="ai-trigger-dot"></span>
-      <span>Message Priyuum</span>
+      <span class="ai-trigger-label">PRIYUUM // AI CLONE</span>
+      <span class="ai-trigger-mode" id="ai-trigger-mode-badge">👔 SERIOUS</span>
     </button>
 
-    <div class="ai-drawer hidden" id="priyam-ai-drawer">
-      <!-- Clean Minimalist Header -->
+    <!-- Main Cyber Brutalist Drawer -->
+    <div class="ai-drawer hidden" id="priyam-ai-drawer" role="dialog" aria-modal="true" aria-label="Priyam AI Clone">
+      <!-- Cyber Top Status Strip -->
+      <div class="ai-drawer-topbar">
+        <div class="ai-topbar-left">
+          <span class="ai-topbar-dot"></span>
+          <span class="ai-topbar-mono">[NODE // PRIYUUM_V3.8]</span>
+        </div>
+        <div class="ai-topbar-right">
+          <span class="ai-latency-badge" id="ai-latency-badge">350ms LPU</span>
+        </div>
+      </div>
+
+      <!-- Main Header with Segmented Mode Switcher -->
       <div class="ai-drawer-header">
         <div class="ai-header-user">
           <div class="ai-avatar-circle">
@@ -987,35 +982,41 @@
           </div>
           <div class="ai-header-meta">
             <span class="ai-header-title">Priyuum</span>
-            <span class="ai-header-status">online</span>
+            <span class="ai-header-mode-tag" id="ai-header-mode-tag">👔 FOUNDER MODE</span>
           </div>
         </div>
+
+        <!-- Mode Toggle Segmented Control -->
+        <div class="ai-mode-segmented-control" role="tablist" aria-label="Personality Mode">
+          <button class="ai-mode-tab active" id="ai-mode-btn-serious" onclick="window.setPriyamAiMode('serious')" role="tab" aria-selected="true" title="Polite & Serious Founder Mode">
+            <span class="ai-mode-icon">👔</span>
+            <span class="ai-mode-name">SERIOUS</span>
+          </button>
+          <button class="ai-mode-tab" id="ai-mode-btn-bakchod" onclick="window.setPriyamAiMode('bakchod')" role="tab" aria-selected="false" title="Savage & Funny Uncensored Mode">
+            <span class="ai-mode-icon">🔥</span>
+            <span class="ai-mode-name">BAKCHOD</span>
+          </button>
+        </div>
+
         <div class="ai-header-actions">
-          <button class="ai-action-btn" onclick="window.clearPriyamChat()" title="Clear chat">↺</button>
-          <button class="ai-action-btn" onclick="window.togglePriyamChat()" title="Close chat">✕</button>
+          <button class="ai-action-btn" onclick="window.clearPriyamChat()" title="Reset conversation" aria-label="Reset">↺</button>
+          <button class="ai-action-btn" onclick="window.togglePriyamChat(false)" title="Close chat (ESC)" aria-label="Close">✕</button>
         </div>
       </div>
 
       <!-- Messages Stream -->
       <div class="ai-messages" id="priyam-ai-messages">
-        <div class="ai-msg ai-msg--bot">
-          <p>hey! 👋 i'm priyuum, priyam's ai clone. ask me about my projects, crazy D2C unit math, blood analyzer hacks, my tech stack, or just talk some shit haha</p>
-        </div>
-        <div class="ai-starters" id="priyam-ai-starters">
-          <button class="ai-starter-pill" onclick="window.triggerDabInteraction()">🤝 Dab Me Up Bruhh! (+50k Aura)</button>
-          <button class="ai-starter-pill" onclick="window.askPriyamAI('Roast my startup idea with zero mercy')">🔥 Roast My Startup</button>
-          <button class="ai-starter-pill" onclick="window.askPriyamAI('Explain how you tapped the blood testing machines for PathLab')">🔬 PathLab Serial Tap</button>
-          <button class="ai-starter-pill" onclick="window.askPriyamAI('Show me the exact ₹835 D2C COD return math')">📊 ₹835 COD Unit Math</button>
-          <button class="ai-starter-pill" onclick="window.askPriyamAI('Why is CR7 the GOAT over Messi?')">⚽ CR7 vs Messi (GOAT)</button>
-          <button class="ai-starter-pill" onclick="window.askPriyamAI('What is your 3 AM vibe coding philosophy and stack?')">🧠 Vibe Coding & Stack</button>
-          <button class="ai-starter-pill" onclick="window.askPriyamAI('How much aura do I have right now?')">⚡ Calculate My Aura</button>
-        </div>
+        <!-- JS dynamically populates initial welcome and mode starters -->
       </div>
 
-      <!-- Clean Input Row -->
+      <!-- Cyber Input Box -->
       <div class="ai-input-row">
-        <input type="text" id="priyam-ai-input" class="ai-input" placeholder="Message Priyuum..." autocomplete="off" />
-        <button class="ai-send-btn" id="priyam-ai-send" aria-label="Send Message">
+        <div class="ai-input-wrapper">
+          <span class="ai-input-prompt-sym">&gt;</span>
+          <input type="text" id="priyam-ai-input" class="ai-input" placeholder="Ask about systems, D2C math, tech stack..." autocomplete="off" />
+          <kbd class="ai-input-kbd">↵</kbd>
+        </div>
+        <button class="ai-send-btn" id="priyam-ai-send" aria-label="Send Message" title="Send (Enter)">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"></line>
             <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -1025,7 +1026,7 @@
     </div>
   </div>
 
-  <script src="avatar-data.js?v=20260902_49"></script>
-  <script src="app.js?v=20260902_49"></script>
+  <script src="avatar-data.js?v=20260902_50"></script>
+  <script src="app.js?v=20260902_50"></script>
 </body>
 </html>
