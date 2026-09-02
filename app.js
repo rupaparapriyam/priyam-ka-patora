@@ -2178,19 +2178,19 @@ function initUavFlightGame() {
 
   let animId = null;
 
-  // Threat Classes
+  // Threat Classes with elevated tactical velocity
   const THREAT_TYPES = [
-    { type: 'CRUISE_MISSILE', name: 'HYPERSONIC CRUISE MISSILE', speed: 2.0, rcs: '0.4m²', color: '#EF4444', score: 150 },
-    { type: 'STEALTH_UAV', name: 'STEALTH LOITERING MUNITION', speed: 1.25, rcs: '0.05m²', color: '#F59E0B', score: 200 },
-    { type: 'EW_JAMMER', name: 'EW RADAR JAMMER AIRCRAFT', speed: 0.95, rcs: '2.5m²', color: '#A855F7', score: 300, isJammer: true },
-    { type: 'BALLISTIC_RV', name: 'BALLISTIC RE-ENTRY WARHEAD', speed: 2.8, rcs: '0.8m²', color: '#00F0FF', score: 250 },
+    { type: 'CRUISE_MISSILE', name: 'HYPERSONIC CRUISE MISSILE', speed: 2.35, rcs: '0.4m²', color: '#EF4444', score: 150 },
+    { type: 'STEALTH_UAV', name: 'STEALTH LOITERING MUNITION', speed: 1.60, rcs: '0.05m²', color: '#F59E0B', score: 200 },
+    { type: 'EW_JAMMER', name: 'EW RADAR JAMMER AIRCRAFT', speed: 1.20, rcs: '2.5m²', color: '#A855F7', score: 300, isJammer: true },
+    { type: 'BALLISTIC_RV', name: 'BALLISTIC RE-ENTRY WARHEAD', speed: 3.30, rcs: '0.8m²', color: '#00F0FF', score: 250 },
   ];
 
   function spawnThreat() {
-    // Progressive Threat Unlocking (Mildly unlocks as score increases)
+    // Progressive Threat Unlocking (Unlocks faster for higher action)
     let availableTypes = [THREAT_TYPES[0], THREAT_TYPES[1]]; // Missiles + Loitering Munitions
-    if (state.intercepted >= 4) availableTypes.push(THREAT_TYPES[2]); // EW Jammer
-    if (state.intercepted >= 8) availableTypes.push(THREAT_TYPES[3]); // Ballistic Warhead
+    if (state.intercepted >= 3) availableTypes.push(THREAT_TYPES[2]); // EW Jammer
+    if (state.intercepted >= 6) availableTypes.push(THREAT_TYPES[3]); // Ballistic Warhead
 
     const template = availableTypes[Math.floor(Math.random() * availableTypes.length)];
     const startAngle = Math.PI + (Math.random() * Math.PI * 0.8 + 0.1 * Math.PI); // Northern arc
@@ -2198,12 +2198,12 @@ function initUavFlightGame() {
     const startX = BASE.x + Math.cos(startAngle) * startDist;
     const startY = BASE.y + Math.sin(startAngle) * startDist;
 
-    const targetX = BASE.x + (Math.random() - 0.5) * 80;
+    const targetX = BASE.x + (Math.random() - 0.5) * 90;
     const targetY = BASE.y;
     const angleToBase = Math.atan2(targetY - startY, targetX - startX);
 
-    // Very gentle mild speed scaling (+0.6% per kill, capped at +30% max)
-    const speedMultiplier = 1.0 + Math.min(0.30, state.intercepted * 0.006);
+    // Dynamic speed scaling (+1.2% per kill, capped at +50% max)
+    const speedMultiplier = 1.0 + Math.min(0.50, state.intercepted * 0.012);
     const finalSpeed = template.speed * speedMultiplier;
 
     threats.push({
@@ -2219,23 +2219,23 @@ function initUavFlightGame() {
       color: template.color,
       score: template.score,
       isJammer: !!template.isJammer,
-      jamRadius: template.isJammer ? 95 : 0,
+      jamRadius: template.isJammer ? 110 : 0,
       sinOffset: Math.random() * Math.PI * 2,
       lastPingAlpha: 1.0,
       isSwarm: false,
     });
   }
 
-  // Hostile Coordinated Drone Swarm (3 to 5 Micro-Drones in Formation)
+  // Hostile Coordinated Drone Swarm (4 to 6 Micro-Drones in Formation)
   function spawnDroneSwarm() {
-    const swarmSize = 3 + Math.floor(Math.random() * 3);
+    const swarmSize = 4 + Math.floor(Math.random() * 3);
     const startAngle = Math.PI + (Math.random() * Math.PI * 0.7 + 0.15 * Math.PI);
     const startDist = 380;
     const leaderX = BASE.x + Math.cos(startAngle) * startDist;
     const leaderY = BASE.y + Math.sin(startAngle) * startDist;
     const angleToBase = Math.atan2(BASE.y - leaderY, BASE.x - leaderX);
-    const speedMultiplier = 1.0 + Math.min(0.25, state.intercepted * 0.005);
-    const swarmSpeed = (1.25 + Math.random() * 0.25) * speedMultiplier;
+    const speedMultiplier = 1.0 + Math.min(0.40, state.intercepted * 0.010);
+    const swarmSpeed = (1.50 + Math.random() * 0.35) * speedMultiplier;
 
     state.swarmAlertText = `⚠️ HOSTILE DRONE SWARM DETECTED [${swarmSize}x UNITS]`;
     state.swarmAlertTimer = 180; // 3s
@@ -2678,7 +2678,7 @@ function initUavFlightGame() {
     // Fast automatic missile reload
     if (state.missileCount < state.maxMissiles) {
       state.reloadTimer++;
-      if (state.reloadTimer >= 55) { // 0.9s reload
+      if (state.reloadTimer >= 48) { // 0.8s reload for fast tactical response
         state.missileCount++;
         state.reloadTimer = 0;
         updateTelemetryUI();
@@ -2687,15 +2687,15 @@ function initUavFlightGame() {
 
     if (state.eccmActiveTimer > 0) state.eccmActiveTimer--;
 
-    // Mild, smooth threat spawn progression (starts at ~2.25s, scales gently to a 1.0s floor)
-    const spawnRate = Math.max(60, 135 - Math.floor(state.intercepted * 1.2));
+    // Tactical threat spawn progression (starts at ~1.75s, scales down to an intense 0.70s floor)
+    const spawnRate = Math.max(42, 105 - Math.floor(state.intercepted * 1.5));
     if (state.frameCount % spawnRate === 0) {
       spawnThreat();
     }
 
-    // Drone Swarms unlock after 5 intercepts and spawn at gentle 12s-10s intervals
-    if (state.intercepted >= 5) {
-      const swarmInterval = Math.max(540, 720 - Math.floor(state.intercepted * 3));
+    // Drone Swarms unlock after 3 intercepts and spawn at 9s-6.5s intervals
+    if (state.intercepted >= 3) {
+      const swarmInterval = Math.max(420, 580 - Math.floor(state.intercepted * 4));
       if (state.frameCount % swarmInterval === 0) {
         spawnDroneSwarm();
       }
