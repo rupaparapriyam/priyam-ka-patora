@@ -92,17 +92,55 @@
   <!-- Fonts: Bebas Neue (display) + Inter (body) + Space Mono (labels/code) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <!-- High-Priority Asset Preloads for 0ms Instant Rendering & Smooth Playback -->
+  <!-- High-Priority Asset Preloads for 0ms Instant Rendering (Hero Viewport Only) -->
   <link rel="preload" as="image" href="assets/avatar-priyam-casual.webp" type="image/webp" fetchpriority="high" />
-  <link rel="preload" as="image" href="assets/avatar-priyam-casual-blink.webp" type="image/webp" fetchpriority="high" />
-  <link rel="preload" as="image" href="assets/surge/bottle_frames/bottle_000.webp" type="image/webp" fetchpriority="high" />
-  <link rel="preload" as="image" href="assets/surge/bottle_frames/bottle_020.webp" type="image/webp" />
-  <link rel="preload" as="image" href="assets/surge/bottle_frames/bottle_040.webp" type="image/webp" />
-  <link rel="preload" as="image" href="assets/surge/bottle_frames/bottle_060.webp" type="image/webp" />
+  <link rel="preload" as="image" href="assets/surge/bottle_frames/bottle_000.webp" type="image/webp" />
 
-  <link rel="stylesheet" href="styles.css?v=20260903_01" />
+  <link rel="stylesheet" href="styles.css?v=20260903_02" />
 </head>
-<body>
+<body class="preloader-active">
+
+  <!-- ===================== EDITORIAL MINIMALIST PRELOADER ===================== -->
+  <div id="site-preloader" class="site-preloader" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Loading site">
+    <!-- Top Metadata Bar -->
+    <div class="preloader-meta-bar">
+      <div class="preloader-meta-left">
+        <span class="preloader-brand">PRIYAM RUPAPARA</span>
+        <span class="preloader-slash">/</span>
+        <span class="preloader-tag">SYSTEMS BUILDER</span>
+      </div>
+      <div class="preloader-meta-right">
+        <span class="preloader-coord">22.30°N 70.80°E</span>
+        <span class="preloader-sep">•</span>
+        <span class="preloader-edition">ED. 2026</span>
+      </div>
+    </div>
+
+    <!-- Centerpiece: Clean Bold Editorial Counter & Hairline Progress -->
+    <div class="preloader-center-editorial">
+      <div class="preloader-num-row">
+        <span class="preloader-huge-num" id="preloader-pct">000</span>
+        <span class="preloader-unit">%</span>
+      </div>
+
+      <div class="preloader-rule-track">
+        <div class="preloader-rule-fill" id="preloader-bar" style="width: 0%;"></div>
+      </div>
+
+      <div class="preloader-detail-row">
+        <span class="preloader-step-label" id="preloader-status-msg">INITIALIZING ASSETS</span>
+        <span class="preloader-ratio" id="preloader-ratio">000 / 100</span>
+      </div>
+    </div>
+
+    <!-- Bottom Footer Bar -->
+    <div class="preloader-footer-bar">
+      <span class="preloader-copyright">INDEX // PORTFOLIO INITIALIZATION</span>
+      <button type="button" class="preloader-skip-minimal" id="preloader-skip-btn">
+        <span>SKIP [↵]</span>
+      </button>
+    </div>
+  </div>
 
   <!-- Top Scroll Progress Bar -->
   <div id="scroll-progress" class="top-scroll-progress" aria-hidden="true"></div>
@@ -629,86 +667,230 @@
           <p class="section-lead">A playable real-time tactical air defence simulator extracted directly from Priyam's Autonomous Defence AI companion avionics track. Real canvas physics, Kalman trajectory prediction, kinetic interceptors, drone swarms, and authentic telemetry.</p>
         </header>
 
-        <!-- Tactical Air Defence AI & Missile Interception C2 -->
-        <div class="game-card-wrapper game-card--dark">
-          <div class="game-header-bar">
-            <div class="gh-title-block">
-              <span class="mono-label">[SYS.C2 // KALMAN MULTI-TARGET INTERCEPTION RADAR]</span>
-              <h3 class="game-title">Air Defence Tactical Console</h3>
-            </div>
-            <div class="flight-hud-pills">
-              <div class="hud-pill-badge"><span class="hud-pill-lbl">KILLS</span><span class="hud-pill-val" id="uav-hud-score">0</span></div>
-              <div class="hud-pill-badge hud-pill-badge--gold"><span class="hud-pill-lbl">RECORD</span><span class="hud-pill-val" id="uav-hud-high">111</span></div>
-              <button class="audio-toggle-btn" id="uav-pause-btn" onclick="window.toggleUavPause()" aria-label="Toggle Pause Simulation">PAUSE [P]</button>
-              <button class="audio-toggle-btn" id="uav-audio-toggle" onclick="window.toggleUavAudio()" aria-label="Toggle Sound Effects">AUDIO: ON</button>
-            </div>
-          </div>
+        <!-- Retro CRT TV & Tactile Gamepad Arcade Terminal -->
+        <div class="retro-arcade-terminal" id="tactical-c2-console">
 
-          <!-- Tactical Defence Telemetry Bar -->
-          <div class="uav-telemetry-bar">
-            <div class="uav-tele-item"><span class="mono-label">RADAR TRACKING</span><span class="uav-tval" id="uav-state-val" style="color:var(--green);">ONLINE // 360°</span></div>
-            <div class="uav-tele-item"><span class="mono-label">INTERCEPTORS READY</span><span class="uav-tval" id="uav-missiles-val" style="color:var(--cyan);">6 / 6 KINETIC</span></div>
-            <div class="uav-tele-item"><span class="mono-label">THREATS IN AIRSPACE</span><span class="uav-tval" id="uav-threats-val" style="color:var(--amber);">0 TRACKED</span></div>
-            <div class="uav-tele-item"><span class="mono-label">BASE INTEGRITY</span><span class="uav-tval" id="uav-shield-val">100% NOMINAL</span></div>
-          </div>
-
-          <!-- Playable Radar C2 Canvas Viewport -->
-          <div class="uav-canvas-container">
-            <canvas id="drone-game-canvas" width="800" height="400"></canvas>
-            
-            <!-- Ready to Play / Start Mission Overlay -->
-            <div class="uav-overlay" id="uav-start-overlay">
-              <div class="uav-overlay-box">
-                <span class="mono-label" style="color:var(--cyan);">[TACTICAL C2 // AIRSPACE DEFENCE PROTOCOL]</span>
-                <h4 class="uav-overlay-title">DEFEND AIRSPACE</h4>
-                <p class="uav-overlay-desc">Eliminate incoming hypersonic cruise missiles &amp; drone swarms before perimeter breach. Tap radar grid to fire kinetic interceptors or use weapons deck below.</p>
-                <button class="uav-btn-primary" onclick="window.startUavGame()">[ INITIATE AIR DEFENCE PROTOCOL ▶ ]</button>
-              </div>
+          <!-- ==================== 1. VCR COMBO CRT TELEVISION SET ==================== -->
+          <div class="vcr-tv-cabinet">
+            <!-- Top Molded Cooling Grille Slats -->
+            <div class="tv-top-grille" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
             </div>
 
-            <!-- In-Canvas Overlay for Airspace Compromise / Reset / Submit -->
-            <div class="uav-overlay hidden" id="uav-overlay">
-              <div class="uav-overlay-box">
-                <h4 class="uav-overlay-title" id="uav-overlay-title">AIRSPACE SECTOR COMPROMISED</h4>
-                <p class="uav-overlay-desc" id="uav-overlay-desc">Hostile cruise missiles breached base perimeter.</p>
+            <!-- Top White Vintage Inventory Sticker [CRT-071] -->
+            <div class="tv-sticker-crt">[ CRT-071 ]</div>
+
+            <!-- TV Screen Bezel Housing -->
+            <div class="tv-screen-section">
+              <!-- Curved Recessed CRT Glass Viewport -->
+              <div class="tv-crt-viewport">
+                <div class="crt-scanlines"></div>
+                <div class="crt-glare"></div>
+                <div class="crt-vignette"></div>
+
+                <canvas id="drone-game-canvas" width="800" height="500"></canvas>
                 
-                <!-- High-Tech Tactical Pilot Dossier Card (Only shown if score qualifies for Top 3 Hall of Fame) -->
-                <div class="uav-score-submit-card hidden" id="uav-score-submit-card" style="display:none;">
-                  <div class="uav-dossier-header">
-                    <span class="uav-dossier-tag mono-label">[ SORTIE DEBRIEF // TOP 3 QUALIFIER ]</span>
+                <!-- Ready to Play / Start Mission Overlay (Compact Retro CRT OSD) -->
+                <div class="uav-overlay" id="uav-start-overlay">
+                  <div class="uav-overlay-box">
+                    <span class="mono-label uav-overlay-tag">[CH · 03 // AIR DEFENCE C2]</span>
+                    <h4 class="uav-overlay-title">TACTICAL RADAR C2</h4>
+                    <p class="uav-overlay-desc">Eliminate incoming cruise missiles &amp; drone swarms. Tap gamepad controls below or the screen.</p>
+                    <button class="uav-btn-primary" onclick="window.startUavGame()">[ ENGAGE DEFENCE ▶ ]</button>
                   </div>
-
-                  <div class="uav-submit-inputs">
-                    <input type="text" id="uav-pilot-name" class="uav-callsign-input" placeholder="ENTER YOUR CALLSIGN" maxlength="25" autocomplete="off" />
-                    <button class="uav-btn-submit" id="uav-submit-score-btn" onclick="window.submitRadarLeaderboardScore()">[ TRANSMIT TO TOP 3 HALL OF FAME ]</button>
-                  </div>
-                  <p class="uav-submit-status" id="uav-submit-status"></p>
                 </div>
 
-                <div class="uav-action-btns">
-                  <button class="uav-btn-primary" onclick="window.startUavGame()">[ ↺ RE-ENGAGE DEFENCE ]</button>
-                  <button class="uav-btn-secondary" onclick="window.scrollToLeaderboard()">[ VIEW TOP 3 ROSTER ]</button>
+                <!-- Game Over Overlay (Compact Retro CRT OSD - Fits 100% Without Scrolling) -->
+                <div class="uav-overlay hidden" id="uav-overlay">
+                  <div class="uav-overlay-box">
+                    <span class="mono-label uav-overlay-tag" style="color:#EF4444;">[ PERIMETER BREACH ]</span>
+                    <h4 class="uav-overlay-title" id="uav-overlay-title">AIRSPACE BREACHED</h4>
+                    <p class="uav-overlay-desc" id="uav-overlay-desc">Base perimeter breached by hostile inbound.</p>
+                    
+                    <!-- Tactical Pilot Dossier Card (Only shown if score qualifies for Top 3 Hall of Fame) -->
+                    <div class="uav-score-submit-card hidden" id="uav-score-submit-card" style="display:none;">
+                      <div class="uav-dossier-header">
+                        <span class="uav-dossier-tag mono-label">[ TOP 3 QUALIFIER RECORD ]</span>
+                      </div>
+
+                      <div class="uav-submit-inputs">
+                        <input type="text" id="uav-pilot-name" class="uav-callsign-input" placeholder="ENTER CALLSIGN" maxlength="25" autocomplete="off" />
+                        <button class="uav-btn-submit" id="uav-submit-score-btn" onclick="window.submitRadarLeaderboardScore()">[ TRANSMIT ]</button>
+                      </div>
+                      <p class="uav-submit-status" id="uav-submit-status"></p>
+                    </div>
+
+                    <div class="uav-action-btns">
+                      <button class="uav-btn-primary" onclick="window.startUavGame()">[ ↺ DEFEND AGAIN ]</button>
+                      <button class="uav-btn-secondary" onclick="window.scrollToLeaderboard()">[ TOP 3 ROSTER ]</button>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
+
+            <!-- TV Center Brand Script (Like Symphonic in reference image) -->
+            <div class="tv-brand-center">
+              <span class="tv-script-logo">Priyam-Vision</span>
+            </div>
+
+            <!-- Built-In VCR Cassette Slot (18 MICRON 4 HEAD // VHS HQ) -->
+            <div class="tv-vcr-slot">
+              <div class="vcr-door">
+                <span class="vcr-arrow">◀</span>
+                <span class="vcr-head-label">18 MICRON 4 HEAD // VHS HQ</span>
+                <span class="vcr-arrow">▶</span>
+              </div>
+              <button class="vcr-eject-btn" type="button" title="Tape Eject" onclick="window.showToast?.('VHS: No cassette loaded')">⏏</button>
+            </div>
+
+            <!-- Front AV Composite Panel & Buttons (Yellow/White RCA Jacks like reference image) -->
+            <div class="tv-front-av-panel">
+              <!-- Left: Speaker Slats + RCA Video/Audio Jacks -->
+              <div class="tv-av-inputs">
+                <div class="tv-speaker-slats left"><span></span><span></span><span></span></div>
+                <div class="rca-jack-group">
+                  <div class="rca-jack" title="Video Input (Yellow)">
+                    <span class="rca-port yellow"></span>
+                    <span class="rca-lbl">VIDEO</span>
+                  </div>
+                  <div class="rca-jack" title="Audio Input (White)">
+                    <span class="rca-port white"></span>
+                    <span class="rca-lbl">AUDIO</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Center: Physical TV Deck Buttons -->
+              <div class="tv-deck-buttons">
+                <button class="tv-mini-btn" onclick="window.toggleUavPause()"><span class="btn-dot"></span>PWR</button>
+                <button class="tv-mini-btn" onclick="window.cycleRadarLock()">CH ▲</button>
+                <button class="tv-mini-btn" onclick="window.cycleRadarLock()">CH ▼</button>
+                <button class="tv-mini-btn" onclick="window.toggleUavAudio()">VOL ▲</button>
+                <button class="tv-mini-btn" onclick="window.toggleUavAudio()">VOL ▼</button>
+              </div>
+
+              <!-- Right: Speaker Slats -->
+              <div class="tv-speaker-slats right"><span></span><span></span><span></span></div>
+            </div>
+
+            <!-- TV Bottom Telemetry Strip -->
+            <div class="tv-telemetry-strip">
+              <div class="tv-tele-cell"><span class="mono-label">RADAR</span><span class="tv-tele-val" id="uav-state-val">ONLINE</span></div>
+              <div class="tv-tele-cell"><span class="mono-label">MISSILES</span><span class="tv-tele-val" id="uav-missiles-val">8 / 8</span></div>
+              <div class="tv-tele-cell"><span class="mono-label">INBOUND</span><span class="tv-tele-val" id="uav-threats-val">0</span></div>
+              <div class="tv-tele-cell"><span class="mono-label">SHIELD</span><span class="tv-tele-val" id="uav-shield-val">100%</span></div>
+              <div class="tv-tele-cell tv-tele-cell--kills"><span class="mono-label">KILLS</span><span class="tv-tele-val" id="uav-hud-score">0</span></div>
+              <div class="tv-tele-cell tv-tele-cell--record"><span class="mono-label">RECORD</span><span class="tv-tele-val" id="uav-hud-high">111</span></div>
             </div>
           </div>
 
-          <!-- Controls Guidance / Tactical Button Deck -->
-          <div class="uav-controls-bar">
-            <div class="uav-key-hints mono-label">
-              <span>[SPACE] INTERCEPT</span> · <span>[S] SALVO</span> · <span>[F] FLAK</span> · <span>[R] RAILGUN</span> · <span>[D] DRONES</span> · <span>[E] ECCM</span> · <span>[P] PAUSE</span>
+          <!-- ==================== 2. ICONIC SNES / SUPER FAMICOM CONTROLLER ==================== -->
+          <div class="snes-controller-deck">
+            <!-- Cable leading up from controller to the TV AV Jacks -->
+            <div class="snes-cable-junction">
+              <span class="snes-cable-wire"></span>
+              <span class="snes-cable-plug"></span>
             </div>
-            <div class="uav-touch-controls">
-              <div class="uav-touch-row">
-                <button class="touch-ctrl-btn touch-ctrl-btn--primary" onpointerdown="window.triggerInterceptorLaunch()"><span class="ctrl-kbd">SPC</span> <span class="ctrl-txt">INTERCEPT</span></button>
-                <button class="touch-ctrl-btn" onpointerdown="window.triggerMultiSalvo()"><span class="ctrl-kbd">S</span> <span class="ctrl-txt">SALVO x6</span></button>
-                <button class="touch-ctrl-btn" onpointerdown="window.triggerAreaFlak()"><span class="ctrl-kbd">F</span> <span class="ctrl-txt">AREA FLAK</span></button>
-                <button class="touch-ctrl-btn" onpointerdown="window.triggerOrbitalRailgun()"><span class="ctrl-kbd">R</span> <span class="ctrl-txt">RAILGUN</span></button>
+
+            <!-- SNES Dog-Bone Controller Body -->
+            <div class="snes-chassis">
+              <!-- Top Edge: [L] and [R] Shoulder Buttons -->
+              <div class="snes-shoulder-row">
+                <button class="snes-shoulder-btn snes-shoulder--left gp-3d-btn" data-key="KeyD" onpointerdown="window.deployPatrolUav()">
+                  <span class="snes-sh-key">[D] KEY</span>
+                  <span class="snes-sh-title">L · DRONE SQUAD</span>
+                </button>
+                <button class="snes-shoulder-btn snes-shoulder--right gp-3d-btn" data-key="KeyE" onpointerdown="window.triggerEccmBurst()">
+                  <span class="snes-sh-key">[E] KEY</span>
+                  <span class="snes-sh-title">R · ECCM JAMMER</span>
+                </button>
               </div>
-              <div class="uav-touch-row">
-                <button class="touch-ctrl-btn" onpointerdown="window.deployPatrolUav()"><span class="ctrl-kbd">D</span> <span class="ctrl-txt">DRONES</span></button>
-                <button class="touch-ctrl-btn" onpointerdown="window.triggerEccmBurst()"><span class="ctrl-kbd">E</span> <span class="ctrl-txt">ECCM JAM</span></button>
-                <button class="touch-ctrl-btn" onpointerdown="window.toggleUavPause()"><span class="ctrl-kbd">P</span> <span class="ctrl-txt">PAUSE</span></button>
+
+              <!-- Main Controller Faceplate -->
+              <div class="snes-faceplate">
+                <!-- Left Wing: Directional Cross D-Pad in Circular Well -->
+                <div class="snes-dpad-section">
+                  <div class="snes-dpad-well">
+                    <div class="snes-cross-dpad">
+                      <button class="snes-dpad-arm snes-dpad--up" onpointerdown="window.cycleRadarLock()" aria-label="Target Up">▲</button>
+                      <div class="snes-dpad-mid">
+                        <button class="snes-dpad-arm snes-dpad--left" onpointerdown="window.cycleRadarLock()" aria-label="Target Left">◀</button>
+                        <div class="snes-dpad-center"></div>
+                        <button class="snes-dpad-arm snes-dpad--right" onpointerdown="window.cycleRadarLock()" aria-label="Target Right">▶</button>
+                      </div>
+                      <button class="snes-dpad-arm snes-dpad--down" onpointerdown="window.cycleRadarLock()" aria-label="Target Down">▼</button>
+                    </div>
+                  </div>
+                  <span class="snes-ctrl-hint mono-label">[TAB / ARROWS] TARGET</span>
+                </div>
+
+                <!-- Center Section: Brand Script + SELECT / START Angled Rubber Pills -->
+                <div class="snes-center-section">
+                  <div class="snes-logo-wrap">
+                    <span class="snes-brand-script">priyam</span>
+                  </div>
+                  <div class="snes-pills-wrap">
+                    <div class="snes-pill-group">
+                      <button class="snes-rubber-pill" id="uav-pause-btn" onclick="window.toggleUavPause()" aria-label="Pause or Resume"></button>
+                      <span class="snes-pill-lbl">SELECT<br><strong id="uav-pause-lbl">[P] PAUSE</strong></span>
+                    </div>
+                    <div class="snes-pill-group">
+                      <button class="snes-rubber-pill" id="uav-audio-toggle" onclick="window.toggleUavAudio()" aria-label="Toggle Audio"></button>
+                      <span class="snes-pill-lbl">START<br><strong id="uav-audio-lbl">[A] AUDIO</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Wing: Dark Grey Circular Bezel with 4 Colorful 3D Buttons (X, Y, A, B) -->
+                <div class="snes-action-section">
+                  <div class="snes-buttons-bezel">
+                    <!-- Top Blue Button (X) = RAILGUN [R] -->
+                    <div class="snes-btn-slot slot-x">
+                      <button class="snes-round-btn btn-blue gp-3d-btn" data-key="KeyR" onpointerdown="window.triggerOrbitalRailgun()" title="X: Railgun">
+                        <span class="snes-btn-cap">X</span>
+                      </button>
+                      <div class="snes-btn-info">
+                        <span class="snes-key-tag">[R]</span>
+                        <span class="snes-pwr-name">RAILGUN</span>
+                      </div>
+                    </div>
+
+                    <!-- Left Green Button (Y) = AREA FLAK [F] -->
+                    <div class="snes-btn-slot slot-y">
+                      <button class="snes-round-btn btn-green gp-3d-btn" data-key="KeyF" onpointerdown="window.triggerAreaFlak()" title="Y: Area Flak">
+                        <span class="snes-btn-cap">Y</span>
+                      </button>
+                      <div class="snes-btn-info">
+                        <span class="snes-key-tag">[F]</span>
+                        <span class="snes-pwr-name">AREA FLAK</span>
+                      </div>
+                    </div>
+
+                    <!-- Right Red Button (A) = INTERCEPT [SPACE] -->
+                    <div class="snes-btn-slot slot-a">
+                      <button class="snes-round-btn btn-red gp-3d-btn" data-key="Space" onpointerdown="window.triggerInterceptorLaunch()" title="A: Intercept">
+                        <span class="snes-btn-cap">A</span>
+                      </button>
+                      <div class="snes-btn-info">
+                        <span class="snes-key-tag">[SPACE]</span>
+                        <span class="snes-pwr-name">INTERCEPT</span>
+                      </div>
+                    </div>
+
+                    <!-- Bottom Yellow Button (B) = SALVO x6 [S] -->
+                    <div class="snes-btn-slot slot-b">
+                      <button class="snes-round-btn btn-yellow gp-3d-btn" data-key="KeyS" onpointerdown="window.triggerMultiSalvo()" title="B: Salvo x6">
+                        <span class="snes-btn-cap">B</span>
+                      </button>
+                      <div class="snes-btn-info">
+                        <span class="snes-key-tag">[S]</span>
+                        <span class="snes-pwr-name">SALVO x6</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
             </div>
           </div>
@@ -1026,7 +1208,7 @@
     </div>
   </div>
 
-  <script src="avatar-data.js?v=20260903_01"></script>
-  <script src="app.js?v=20260903_01"></script>
+  <script src="avatar-data.js?v=20260903_02"></script>
+  <script src="app.js?v=20260903_02"></script>
 </body>
 </html>

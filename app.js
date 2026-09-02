@@ -2134,8 +2134,8 @@ function initUavFlightGame() {
 
   window.toggleUavAudio = () => {
     isAudioMuted = !isAudioMuted;
-    const btn = document.getElementById('uav-audio-toggle');
-    if (btn) btn.textContent = isAudioMuted ? '🔇 RADAR AUDIO: OFF' : '🔊 RADAR AUDIO: ON';
+    const lbl = document.getElementById('uav-audio-lbl');
+    if (lbl) lbl.textContent = isAudioMuted ? '[A] MUTED' : '[A] AUDIO';
   };
 
   let highScore = parseInt(localStorage.getItem('priyam_c2_highscore') || '111', 10);
@@ -2144,7 +2144,7 @@ function initUavFlightGame() {
   const bestEl = document.getElementById('uav-hud-high');
   if (bestEl) bestEl.textContent = `BEST: ${highScore}`;
 
-  const BASE = { x: 400, y: 370 };
+  const BASE = { x: 400, y: 460 };
   let threats = [];
   let missiles = [];
   let patrolUavs = [];
@@ -2169,7 +2169,7 @@ function initUavFlightGame() {
     isPaused: false,
     isUserPaused: false,
     selectedTargetId: null,
-    aimPos: { x: 400, y: 150 },
+    aimPos: { x: 400, y: 220 },
     sweepAngle: 0,
     eccmActiveTimer: 0,
     frameCount: 0,
@@ -2196,7 +2196,7 @@ function initUavFlightGame() {
 
     const template = availableTypes[Math.floor(Math.random() * availableTypes.length)];
     const startAngle = Math.PI + (Math.random() * Math.PI * 0.8 + 0.1 * Math.PI);
-    const startDist = 370 + Math.random() * 40;
+    const startDist = 450 + Math.random() * 40;
     const startX = BASE.x + Math.cos(startAngle) * startDist;
     const startY = BASE.y + Math.sin(startAngle) * startDist;
 
@@ -2232,7 +2232,7 @@ function initUavFlightGame() {
   function spawnDroneSwarm() {
     const swarmSize = 5 + Math.floor(Math.random() * 3);
     const startAngle = Math.PI + (Math.random() * Math.PI * 0.7 + 0.15 * Math.PI);
-    const startDist = 380;
+    const startDist = 450;
     const leaderX = BASE.x + Math.cos(startAngle) * startDist;
     const leaderY = BASE.y + Math.sin(startAngle) * startDist;
     const angleToBase = Math.atan2(BASE.y - leaderY, BASE.x - leaderX);
@@ -2559,6 +2559,11 @@ function initUavFlightGame() {
     if (!window.isFunZoneActive?.()) return;
     if (['INPUT', 'TEXTAREA'].includes(document.activeElement?.tagName) || document.activeElement?.isContentEditable) return;
 
+    // Visual button depress on the physical gamepad controller
+    const activeBtn = document.querySelector(`.gp-3d-btn[data-key="${e.code}"], .gp-action-btn[data-key="${e.code}"]`) || 
+                      (e.code === 'Enter' ? document.querySelector(`.gp-3d-btn[data-key="Space"], .gp-action-btn[data-key="Space"]`) : null);
+    if (activeBtn) activeBtn.classList.add('gp-btn-active');
+
     if (e.code === 'KeyP') {
       window.toggleUavPause();
       e.preventDefault();
@@ -2599,6 +2604,12 @@ function initUavFlightGame() {
       window.cycleRadarLock();
       e.preventDefault();
     }
+  });
+
+  window.addEventListener('keyup', (e) => {
+    const activeBtn = document.querySelector(`.gp-3d-btn[data-key="${e.code}"], .gp-action-btn[data-key="${e.code}"]`) || 
+                      (e.code === 'Enter' ? document.querySelector(`.gp-3d-btn[data-key="Space"], .gp-action-btn[data-key="Space"]`) : null);
+    if (activeBtn) activeBtn.classList.remove('gp-btn-active');
   });
 
   // ==================== COMPANION LIVE GAMEPLAY REACTION ENGINE ====================
@@ -3059,6 +3070,7 @@ function initUavFlightGame() {
     if (scoreEl) scoreEl.textContent = `INTERCEPTED: ${state.intercepted}`;
   }
 
+  window.triggerDefeat = triggerDefeat;
   function triggerDefeat(reason) {
     state.isGameOver = true;
     state.hasStarted = false;
@@ -3099,7 +3111,7 @@ function initUavFlightGame() {
         title.innerHTML = `🏆 TOP 3 RECORD: <span style="color:#FFE600;">${finalScore} KILLS</span>`;
       }
       if (desc) {
-        desc.textContent = `Sensational combat sortie! Enter your callsign below to claim your Top 3 Hall of Fame podium spot.`;
+        desc.innerHTML = `SORTIE RECORD LOGGED // ENTER CALLSIGN:`;
       }
       if (callsignInput) {
         callsignInput.value = localStorage.getItem('priyam_c2_pilot_name') || '';
@@ -3107,10 +3119,10 @@ function initUavFlightGame() {
       }
       if (submitBtn) {
         submitBtn.disabled = false;
-        submitBtn.textContent = '[ 🚀 SAVE TO TOP 3 HALL OF FAME ]';
+        submitBtn.textContent = '[ TRANSMIT TO ROSTER ]';
       }
       if (submitStatus) {
-        submitStatus.textContent = '⭐ Enter your callsign to log your score in the Top 3.';
+        submitStatus.textContent = '⭐ Enter callsign to claim Hall of Fame spot.';
         submitStatus.style.color = '#FFE600';
       }
     } else {
@@ -3120,10 +3132,10 @@ function initUavFlightGame() {
         submitCard.style.display = 'none';
       }
       if (title) {
-        title.textContent = `SECTOR COMPROMISED · ${reason}`;
+        title.innerHTML = `SECTOR BREACHED // <span style="color:#EF4444;">${finalScore} KILLS</span>`;
       }
       if (desc) {
-        desc.textContent = `Tactical Air Defence intercepted ${finalScore} incoming hypersonic threats. Top 3 Hall of Fame threshold is ${top3Cutoff + 1} kills. Re-arm batteries and defend again!`;
+        desc.innerHTML = `INTERCEPTED: <strong>${finalScore}</strong> · TOP 3 CUTOFF: <strong>${top3Cutoff + 1}</strong>`;
       }
     }
 
@@ -3181,7 +3193,7 @@ function initUavFlightGame() {
     }
 
     // Range Rings from Base (SAM Battery)
-    const RANGES = [60, 120, 180, 240, 300, 360];
+    const RANGES = [75, 150, 225, 300, 375, 450];
     const LABELS = ['5km', '10km', '15km', '20km', '25km', '30km'];
     ctx.strokeStyle = 'rgba(16, 185, 129, 0.2)';
     ctx.lineWidth = 1;
@@ -3201,12 +3213,12 @@ function initUavFlightGame() {
       const rad = (deg * Math.PI) / 180;
       ctx.beginPath();
       ctx.moveTo(BASE.x, BASE.y);
-      ctx.lineTo(BASE.x + Math.cos(rad) * 380, BASE.y + Math.sin(rad) * 380);
+      ctx.lineTo(BASE.x + Math.cos(rad) * 450, BASE.y + Math.sin(rad) * 450);
       ctx.stroke();
     }
 
     // Rotating Doppler Radar Sweep Sector
-    const sweepRadius = 380;
+    const sweepRadius = 450;
     const sweepGrad = ctx.createRadialGradient(BASE.x, BASE.y, 10, BASE.x, BASE.y, sweepRadius);
     sweepGrad.addColorStop(0, 'rgba(16, 185, 129, 0.35)');
     sweepGrad.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
@@ -3462,22 +3474,20 @@ function initUavFlightGame() {
     state.isPaused = true;
     if (animId) cancelAnimationFrame(animId);
     animId = null;
+    const lbl = document.getElementById('uav-pause-lbl');
+    if (lbl) lbl.textContent = '[P] RESUME';
     const btn = document.getElementById('uav-pause-btn');
-    if (btn) {
-      btn.textContent = '▶️ RESUME [P]';
-      btn.classList.add('btn--paused');
-    }
+    if (btn) btn.classList.add('btn--paused');
     draw();
   };
 
   window.resumeUavGame = (isAuto = false) => {
     state.isUserPaused = false;
     state.isPaused = false;
+    const lbl = document.getElementById('uav-pause-lbl');
+    if (lbl) lbl.textContent = '[P] PAUSE';
     const btn = document.getElementById('uav-pause-btn');
-    if (btn) {
-      btn.textContent = '⏸️ PAUSE [P]';
-      btn.classList.remove('btn--paused');
-    }
+    if (btn) btn.classList.remove('btn--paused');
     if (!animId && !state.isGameOver) {
       animId = requestAnimationFrame(loop);
     }
@@ -6761,12 +6771,12 @@ function initRoamingPriyamAvatar() {
       const mobileRailX = w - avW - 12;
       
       // 1. In Fun Zone / Radar Game / Leaderboard: NEVER occlude the game canvas, controls, or leaderboard!
-      const isFunZoneActive = funRect.top < h * 0.85 && funRect.bottom > 20;
+      const isFunZoneActive = funRect.top < h * 0.90 && funRect.bottom > 20;
       if (isFunZoneActive) {
         if (bubble?.classList.contains('active')) {
           bubble.classList.remove('active');
         }
-        return { x: mobileRailX, y: 68, isFixed: true };
+        return { x: w + 90, y: 100, isFixed: true, isOffscreen: true };
       }
 
       // 2. In Contact / Footer: Dock right above AI trigger (ONLY when genuinely past fun-zone)
@@ -6839,14 +6849,13 @@ function initRoamingPriyamAvatar() {
       return { x: rightRailX, y: 220, isRight: true };
     }
 
-    // Phase 5: Fun Zone / Radar / Defence Section (Strictly Right Rail outside console)
-    const isFunZoneActiveDesktop = funRect.top < h * 0.85 && funRect.bottom > 30;
+    // Phase 5: Fun Zone / Radar / Defence Section (Completely off-screen so zero occlusion)
+    const isFunZoneActiveDesktop = funRect.top < h * 0.90 && funRect.bottom > 30;
     if (isFunZoneActiveDesktop) {
       if (bubble?.classList.contains('active')) {
         bubble.classList.remove('active');
       }
-      const safeRightX = Math.max(rightRailX, (w + 980) / 2 + 16);
-      return { x: Math.min(w - avW - 8, safeRightX), y: 130, isRight: true };
+      return { x: w + 90, y: 160, isRight: true, isOffscreen: true };
     }
 
     if (contactRect.top > h * 0.60) {
@@ -7325,6 +7334,210 @@ function initRoamingPriyamAvatar() {
     }, 1800);
   }
 }
+
+/* ==========================================================================
+   PROGRESSIVE BACKGROUND ASSET STREAMER
+   Preloads 3D bottle frames and costume sprites in idle time WHILE user browses
+   ========================================================================== */
+function startBackgroundAssetStreamer() {
+  const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 80));
+
+  idle(() => {
+    // 1. Preload secondary hero assets & avatar sprites
+    const extraSprites = [
+      'assets/avatar-priyam-casual-blink.webp',
+      'assets/avatar-priyam-hd.png'
+    ];
+    if (window.AVATAR_SPRITES) {
+      Object.values(window.AVATAR_SPRITES).forEach(url => {
+        if (!extraSprites.includes(url)) extraSprites.push(url);
+      });
+    }
+
+    let sIdx = 0;
+    function streamNextSprite() {
+      if (sIdx >= extraSprites.length) return;
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = extraSprites[sIdx++];
+      if (img.decode) img.decode().catch(() => {});
+      if (sIdx < extraSprites.length) {
+        setTimeout(streamNextSprite, 30);
+      }
+    }
+    streamNextSprite();
+
+    // 2. Stream all 80 SURGE bottle frames progressively in idle batches of 8
+    let frameIdx = 0;
+    const TOTAL_BOTTLE_FRAMES = 80;
+    function streamNextBottleBatch() {
+      const batchEnd = Math.min(frameIdx + 8, TOTAL_BOTTLE_FRAMES);
+      for (let i = frameIdx; i < batchEnd; i++) {
+        const bImg = new Image();
+        bImg.decoding = 'async';
+        bImg.src = `assets/surge/bottle_frames/bottle_${String(i).padStart(3, '0')}.webp?v=20260902_45`;
+        if (bImg.decode) bImg.decode().catch(() => {});
+      }
+      frameIdx = batchEnd;
+      if (frameIdx < TOTAL_BOTTLE_FRAMES) {
+        idle(streamNextBottleBatch, { timeout: 1000 });
+      }
+    }
+    setTimeout(streamNextBottleBatch, 100);
+  }, { timeout: 1200 });
+}
+
+/* ==========================================================================
+   EDITORIAL MINIMALIST PRELOADER ENGINE
+   Gates ONLY on essential hero viewport (fonts + hero avatar) for instant entry (~250ms),
+   then hands off full asset streaming to the background while user browses.
+   ========================================================================== */
+function initSitePreloader() {
+  const preloader = document.getElementById('site-preloader');
+  if (!preloader) {
+    startBackgroundAssetStreamer();
+    return;
+  }
+
+  const pctEl = document.getElementById('preloader-pct');
+  const ratioEl = document.getElementById('preloader-ratio');
+  const barEl = document.getElementById('preloader-bar');
+  const msgEl = document.getElementById('preloader-status-msg');
+  const skipBtn = document.getElementById('preloader-skip-btn');
+
+  let currentVisualPct = 0;
+  let targetPct = 35; // Immediate initial jump
+  let isDismissed = false;
+  const startTime = performance.now();
+  const MIN_ANIMATION_MS = 180; // Ultra-snappy pacing (~180ms)
+  const MAX_TIMEOUT_MS = 900;   // Immediate fail-safe
+
+  // Gated ONLY on Essential First-View Assets (Just enough for above the fold)
+  const essentialImages = [
+    'assets/avatar-priyam-casual.webp'
+  ];
+
+  const totalTasks = essentialImages.length + 2; // +1 fonts, +1 document/window
+  let completedTasks = 0;
+  let allEssentialDone = false;
+
+  function onTaskDone() {
+    completedTasks++;
+    const ratio = Math.min(1, completedTasks / totalTasks);
+    const assetProgress = Math.floor(ratio * 96);
+    targetPct = Math.max(targetPct, assetProgress);
+
+    if (completedTasks >= totalTasks) {
+      allEssentialDone = true;
+    }
+  }
+
+  // 1. Essential Fonts
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(onTaskDone).catch(onTaskDone);
+  } else {
+    onTaskDone();
+  }
+
+  // 2. Essential Hero Avatar
+  essentialImages.forEach(url => {
+    const img = new Image();
+    img.src = url;
+    if (img.decode) {
+      img.decode().then(onTaskDone).catch(onTaskDone);
+    } else {
+      img.onload = onTaskDone;
+      img.onerror = onTaskDone;
+    }
+  });
+
+  // 3. Document readiness
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    onTaskDone();
+  } else {
+    window.addEventListener('DOMContentLoaded', onTaskDone, { once: true });
+  }
+
+  // Dismiss and kick off progressive background streamer
+  function finishPreloader() {
+    if (isDismissed) return;
+    isDismissed = true;
+
+    currentVisualPct = 100;
+    if (pctEl) pctEl.textContent = '100';
+    if (ratioEl) ratioEl.textContent = '100 / 100';
+    if (barEl) barEl.style.width = '100%';
+    if (msgEl) msgEl.textContent = 'READY';
+
+    // Kick off progressive background streaming immediately
+    startBackgroundAssetStreamer();
+
+    // Instant slide-up reveal
+    setTimeout(() => {
+      preloader.classList.add('loaded');
+      document.body.classList.remove('preloader-active');
+
+      setTimeout(() => {
+        try { preloader.remove(); } catch (e) {}
+      }, 420);
+    }, 40);
+  }
+
+  // High-speed frame animation ticker
+  function tick(timestamp) {
+    if (isDismissed) return;
+
+    const elapsed = timestamp - startTime;
+
+    if ((allEssentialDone && elapsed >= MIN_ANIMATION_MS) || elapsed >= MAX_TIMEOUT_MS) {
+      targetPct = 100;
+    }
+
+    const diff = targetPct - currentVisualPct;
+    if (targetPct === 100) {
+      currentVisualPct += Math.max(3.2, diff * 0.45);
+    } else {
+      currentVisualPct += Math.max(1.8, diff * 0.32);
+    }
+
+    if (currentVisualPct >= 99.4 && targetPct === 100) {
+      finishPreloader();
+      return;
+    }
+
+    const rounded = Math.min(99, Math.floor(currentVisualPct));
+    const pad = String(rounded).padStart(3, '0');
+    if (pctEl) pctEl.textContent = pad;
+    if (ratioEl) ratioEl.textContent = `${pad} / 100`;
+    if (barEl) barEl.style.width = `${currentVisualPct}%`;
+
+    requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+
+  // Skip handlers
+  if (skipBtn) {
+    skipBtn.addEventListener('click', () => {
+      targetPct = 100;
+      finishPreloader();
+    });
+  }
+
+  function handleKeySkip(e) {
+    if (isDismissed) return;
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      targetPct = 100;
+      finishPreloader();
+      window.removeEventListener('keydown', handleKeySkip);
+    }
+  }
+  window.addEventListener('keydown', handleKeySkip);
+}
+
+// Start preloader immediately
+try { initSitePreloader(); } catch (e) { console.error('initSitePreloader:', e); }
 
 /* ==========================================================================
    INITIALIZATION LAUNCHPAD (EXECUTES AFTER ALL MODULES & DATA LOADED)
