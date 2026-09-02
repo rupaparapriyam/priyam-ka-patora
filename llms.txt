@@ -1,0 +1,38 @@
+# Priyam Rupapara
+
+> Systems Builder, Engineer, and Founder based in Rajkot and Delhi, India. Specializing in operational automation, diagnostic lab infrastructure, Indian D2C unit economics, and edge autonomous systems.
+
+- Website: https://priyamrupapara.com
+- Contact: rupaparapriyam@gmail.com
+- Instagram: https://www.instagram.com/priyamm_r
+- GitHub: https://github.com/rupaparapriyam
+
+## Overview
+
+Priyam Rupapara builds software for messy, physical, real-world operations where generic SaaS fails. Focuses on vibe coding, agentic workflows, and rapid 0-to-1 shipping across healthcare, commerce, and autonomous edge hardware.
+
+## Core Projects
+
+### 1. PathLab Ops Assistant (Healthcare Operations)
+- Working MVP deployed in active diagnostic pathology laboratories.
+- Real-time ASTM E1394 serial machine protocol bridging to ingest automated blood and serum analyzers (CBC, Biochemistry, Electrolytes) without manual data entry.
+- Automated QC validation, range checking, delta checks, and instant report distribution via WhatsApp and PDF.
+- Offline-first local desktop/LAN architecture.
+
+### 2. Ecommerce Hub (Indian D2C Truth Layer)
+- Financial analytics and real-time reconciliation engine tailored for Indian e-commerce.
+- Solves attribution gaps across Razorpay, Cash on Delivery (COD), Return to Origin (RTO) freight penalties, and multi-channel marketing CAC.
+- Real-time unit margin calculation factoring NDR (Non-Delivery Report) workflows and reverse logistics costs.
+
+### 3. SURGE Case Study & Post-Mortem
+- Deep operational analysis and post-mortem of an Indian D2C men's grooming brand.
+- Financial teardown of blended CAC, gross margin compression, COD delivery friction, and inventory churn dynamics in the Indian consumer market.
+
+### 4. Autonomous Defence AI & Drone Telemetry
+- MAVLink and PX4 SITL avionics telemetry simulator.
+- Real-time edge compute, 3D radar/horizon tracking, and automated target interception simulation.
+
+## Technical Skills & Philosophy
+- **Philosophy:** Vibe coding, agentic orchestration, pragmatic operational systems, zero fluff.
+- **Languages:** Python, TypeScript, JavaScript, Rust, C++, SQL, HTML5/CSS3.
+- **Frameworks & Tools:** Next.js, React, Node.js, Prisma, TailwindCSS, WebSockets, Canvas 2D/3D, MAVLink, ASTM Protocols.
