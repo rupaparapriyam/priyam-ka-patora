@@ -100,7 +100,7 @@
   <link rel="preload" as="image" href="assets/surge/bottle_frames/bottle_040.webp" type="image/webp" />
   <link rel="preload" as="image" href="assets/surge/bottle_frames/bottle_060.webp" type="image/webp" />
 
-  <link rel="stylesheet" href="styles.css?v=20260902_51" />
+  <link rel="stylesheet" href="styles.css?v=20260903_01" />
 </head>
 <body>
 
@@ -633,23 +633,23 @@
         <div class="game-card-wrapper game-card--dark">
           <div class="game-header-bar">
             <div class="gh-title-block">
-              <span class="mono-label">[SYS.C2 · KALMAN TRAJECTORY PREDICTION &amp; MISSILE INTERCEPTION]</span>
-              <h3 class="game-title">Tactical Air Defence C2</h3>
+              <span class="mono-label">[SYS.C2 // KALMAN MULTI-TARGET INTERCEPTION RADAR]</span>
+              <h3 class="game-title">Air Defence Tactical Console</h3>
             </div>
             <div class="flight-hud-pills">
-              <span class="game-score-badge" id="uav-hud-score">[ KILLS: 0 ]</span>
-              <span class="game-score-badge" id="uav-hud-high">[ BEST: 111 ]</span>
-              <button class="audio-toggle-btn" id="uav-pause-btn" onclick="window.toggleUavPause()" aria-label="Toggle Pause Simulation">[ ⏸️ PAUSE ]</button>
-              <button class="audio-toggle-btn" id="uav-audio-toggle" onclick="window.toggleUavAudio()" aria-label="Toggle Sound Effects">[ 🔊 AUDIO: ON ]</button>
+              <div class="hud-pill-badge"><span class="hud-pill-lbl">KILLS</span><span class="hud-pill-val" id="uav-hud-score">0</span></div>
+              <div class="hud-pill-badge hud-pill-badge--gold"><span class="hud-pill-lbl">RECORD</span><span class="hud-pill-val" id="uav-hud-high">111</span></div>
+              <button class="audio-toggle-btn" id="uav-pause-btn" onclick="window.toggleUavPause()" aria-label="Toggle Pause Simulation">PAUSE [P]</button>
+              <button class="audio-toggle-btn" id="uav-audio-toggle" onclick="window.toggleUavAudio()" aria-label="Toggle Sound Effects">AUDIO: ON</button>
             </div>
           </div>
 
           <!-- Tactical Defence Telemetry Bar -->
           <div class="uav-telemetry-bar">
-            <div class="uav-tele-item"><span class="mono-label">RADAR TRACKING</span><span class="uav-tval" id="uav-state-val" style="color:var(--green);">ONLINE</span></div>
+            <div class="uav-tele-item"><span class="mono-label">RADAR TRACKING</span><span class="uav-tval" id="uav-state-val" style="color:var(--green);">ONLINE // 360°</span></div>
             <div class="uav-tele-item"><span class="mono-label">INTERCEPTORS READY</span><span class="uav-tval" id="uav-missiles-val" style="color:var(--cyan);">6 / 6 KINETIC</span></div>
             <div class="uav-tele-item"><span class="mono-label">THREATS IN AIRSPACE</span><span class="uav-tval" id="uav-threats-val" style="color:var(--amber);">0 TRACKED</span></div>
-            <div class="uav-tele-item"><span class="mono-label">BASE INTEGRITY</span><span class="uav-tval" id="uav-shield-val">100%</span></div>
+            <div class="uav-tele-item"><span class="mono-label">BASE INTEGRITY</span><span class="uav-tval" id="uav-shield-val">100% NOMINAL</span></div>
           </div>
 
           <!-- Playable Radar C2 Canvas Viewport -->
@@ -659,10 +659,10 @@
             <!-- Ready to Play / Start Mission Overlay -->
             <div class="uav-overlay" id="uav-start-overlay">
               <div class="uav-overlay-box">
-                <span class="mono-label" style="color:var(--cyan);">[TACTICAL C2 DEFENCE SIMULATOR]</span>
+                <span class="mono-label" style="color:var(--cyan);">[TACTICAL C2 // AIRSPACE DEFENCE PROTOCOL]</span>
                 <h4 class="uav-overlay-title">DEFEND AIRSPACE</h4>
-                <p class="uav-overlay-desc">Tap radar or fire interceptor missiles to shoot down incoming hypersonic cruise missiles &amp; drone swarms.</p>
-                <button class="uav-btn-primary" onclick="window.startUavGame()">[ 🎮 START SIMULATION ▶ ]</button>
+                <p class="uav-overlay-desc">Eliminate incoming hypersonic cruise missiles &amp; drone swarms before perimeter breach. Tap radar grid to fire kinetic interceptors or use weapons deck below.</p>
+                <button class="uav-btn-primary" onclick="window.startUavGame()">[ INITIATE AIR DEFENCE PROTOCOL ▶ ]</button>
               </div>
             </div>
 
@@ -680,14 +680,14 @@
 
                   <div class="uav-submit-inputs">
                     <input type="text" id="uav-pilot-name" class="uav-callsign-input" placeholder="ENTER YOUR CALLSIGN" maxlength="25" autocomplete="off" />
-                    <button class="uav-btn-submit" id="uav-submit-score-btn" onclick="window.submitRadarLeaderboardScore()">[ 🚀 SAVE TO TOP 3 HALL OF FAME ]</button>
+                    <button class="uav-btn-submit" id="uav-submit-score-btn" onclick="window.submitRadarLeaderboardScore()">[ TRANSMIT TO TOP 3 HALL OF FAME ]</button>
                   </div>
                   <p class="uav-submit-status" id="uav-submit-status"></p>
                 </div>
 
                 <div class="uav-action-btns">
-                  <button class="uav-btn-primary" onclick="window.startUavGame()">[ ↺ RE-ARM BATTERY ]</button>
-                  <button class="uav-btn-secondary" onclick="window.scrollToLeaderboard()">[ 🏆 TOP 3 ROSTER ]</button>
+                  <button class="uav-btn-primary" onclick="window.startUavGame()">[ ↺ RE-ENGAGE DEFENCE ]</button>
+                  <button class="uav-btn-secondary" onclick="window.scrollToLeaderboard()">[ VIEW TOP 3 ROSTER ]</button>
                 </div>
               </div>
             </div>
@@ -696,19 +696,19 @@
           <!-- Controls Guidance / Tactical Button Deck -->
           <div class="uav-controls-bar">
             <div class="uav-key-hints mono-label">
-              <span>[SPACE] FIRE</span> · <span>[S] 🚀 SALVO</span> · <span>[F] 💥 FLAK</span> · <span>[R] ⚡ RAILGUN</span> · <span>[D] 🤖 DRONES</span> · <span>[E] 📡 ECCM</span> · <span>[P] ⏸️ PAUSE</span>
+              <span>[SPACE] INTERCEPT</span> · <span>[S] SALVO</span> · <span>[F] FLAK</span> · <span>[R] RAILGUN</span> · <span>[D] DRONES</span> · <span>[E] ECCM</span> · <span>[P] PAUSE</span>
             </div>
             <div class="uav-touch-controls">
               <div class="uav-touch-row">
-                <button class="touch-ctrl-btn touch-ctrl-btn--primary" onpointerdown="window.triggerInterceptorLaunch()">[ 🚀 MISSILE ]</button>
-                <button class="touch-ctrl-btn" onpointerdown="window.triggerMultiSalvo()">[ 🚀 SALVO x6 ]</button>
-                <button class="touch-ctrl-btn" onpointerdown="window.triggerAreaFlak()">[ 💥 FLAK ]</button>
-                <button class="touch-ctrl-btn" onpointerdown="window.triggerOrbitalRailgun()">[ ⚡ RAILGUN ]</button>
+                <button class="touch-ctrl-btn touch-ctrl-btn--primary" onpointerdown="window.triggerInterceptorLaunch()"><span class="ctrl-kbd">SPC</span> <span class="ctrl-txt">INTERCEPT</span></button>
+                <button class="touch-ctrl-btn" onpointerdown="window.triggerMultiSalvo()"><span class="ctrl-kbd">S</span> <span class="ctrl-txt">SALVO x6</span></button>
+                <button class="touch-ctrl-btn" onpointerdown="window.triggerAreaFlak()"><span class="ctrl-kbd">F</span> <span class="ctrl-txt">AREA FLAK</span></button>
+                <button class="touch-ctrl-btn" onpointerdown="window.triggerOrbitalRailgun()"><span class="ctrl-kbd">R</span> <span class="ctrl-txt">RAILGUN</span></button>
               </div>
               <div class="uav-touch-row">
-                <button class="touch-ctrl-btn" onpointerdown="window.deployPatrolUav()">[ 🤖 DRONES ]</button>
-                <button class="touch-ctrl-btn" onpointerdown="window.triggerEccmBurst()">[ 📡 ECCM ]</button>
-                <button class="touch-ctrl-btn" onpointerdown="window.toggleUavPause()">[ ⏸️ PAUSE ]</button>
+                <button class="touch-ctrl-btn" onpointerdown="window.deployPatrolUav()"><span class="ctrl-kbd">D</span> <span class="ctrl-txt">DRONES</span></button>
+                <button class="touch-ctrl-btn" onpointerdown="window.triggerEccmBurst()"><span class="ctrl-kbd">E</span> <span class="ctrl-txt">ECCM JAM</span></button>
+                <button class="touch-ctrl-btn" onpointerdown="window.toggleUavPause()"><span class="ctrl-kbd">P</span> <span class="ctrl-txt">PAUSE</span></button>
               </div>
             </div>
           </div>
@@ -719,8 +719,8 @@
         <div class="game-leaderboard-deck" id="radar-leaderboard-deck">
           <div class="glb-header">
             <div class="glb-title-group">
-              <span class="mono-label">[ ALL-TIME TOP 3 // HALL OF FAME ]</span>
-              <h3 class="glb-title">Top 3 Defenders</h3>
+              <span class="mono-label">[ ALL-TIME TOP 3 // GLOBAL AIR DEFENCE ]</span>
+              <h3 class="glb-title">Hall of Fame</h3>
             </div>
             <div class="glb-actions">
               <span class="glb-live-badge"><span class="glb-dot"></span> LIVE ROSTER</span>
@@ -1026,7 +1026,7 @@
     </div>
   </div>
 
-  <script src="avatar-data.js?v=20260902_51"></script>
-  <script src="app.js?v=20260902_51"></script>
+  <script src="avatar-data.js?v=20260903_01"></script>
+  <script src="app.js?v=20260903_01"></script>
 </body>
 </html>

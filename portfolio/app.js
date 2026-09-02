@@ -2689,6 +2689,7 @@ function initUavFlightGame() {
     state.selectedTargetId = null;
     document.getElementById('uav-start-overlay')?.classList.add('hidden');
     document.getElementById('uav-overlay')?.classList.add('hidden');
+    document.getElementById('roaming-avatar-container')?.classList.add('avatar-in-combat');
     window.resumeUavGame(false);
     updateTelemetryUI();
     spawnThreat();
@@ -3086,6 +3087,7 @@ function initUavFlightGame() {
     const rankBadgeEl = document.getElementById('uav-dossier-rank-badge');
 
     overlay?.classList.remove('hidden');
+    document.getElementById('roaming-avatar-container')?.classList.remove('avatar-in-combat');
 
     if (qualifiesForTop3) {
       // QUALIFIED FOR TOP 3 HALL OF FAME
@@ -5215,19 +5217,23 @@ function initPriyamAiClone() {
 
   // Toggle Drawer Open / Close
   window.togglePriyamChat = (forceOpen) => {
-    if (!drawer) return;
-    const isCurrentlyHidden = drawer.classList.contains('hidden');
+    const d = document.getElementById('priyam-ai-drawer');
+    const tr = document.getElementById('priyam-ai-trigger');
+    const inp = document.getElementById('priyam-ai-input');
+    if (!d) return;
+
+    const isCurrentlyHidden = d.classList.contains('hidden');
     const shouldOpen = (typeof forceOpen === 'boolean') ? forceOpen : isCurrentlyHidden;
 
     if (shouldOpen) {
-      drawer.classList.remove('hidden');
-      drawer.classList.add('active');
-      trigger?.classList.add('active');
-      setTimeout(() => input?.focus(), 120);
+      d.classList.remove('hidden');
+      d.classList.add('active');
+      tr?.classList.add('active');
+      setTimeout(() => inp?.focus(), 120);
     } else {
-      drawer.classList.add('hidden');
-      drawer.classList.remove('active');
-      trigger?.classList.remove('active');
+      d.classList.add('hidden');
+      d.classList.remove('active');
+      tr?.classList.remove('active');
     }
     window.updateGameAutoLifecycle?.();
   };
@@ -5651,6 +5657,15 @@ function initPriyamAiClone() {
     const div = document.createElement('div');
     div.className = 'ai-msg ai-msg--user';
     div.innerHTML = `<p>${escapeHtml(txt)}</p>`;
+    msgs.appendChild(div);
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+
+  function appendBotMsg(txt) {
+    if (!msgs) return;
+    const div = document.createElement('div');
+    div.className = 'ai-msg ai-msg--bot';
+    div.innerHTML = `<p>${formatAiContent(txt)}</p>`;
     msgs.appendChild(div);
     msgs.scrollTop = msgs.scrollHeight;
   }
@@ -6745,31 +6760,35 @@ function initRoamingPriyamAvatar() {
       // Mobile: Keep avatar docked cleanly along the right edge rail so it NEVER cuts through text
       const mobileRailX = w - avW - 12;
       
-      // 1. In Contact / Footer: Dock right above the AI trigger button
-      if (contactRect.top <= h * 0.70) {
-        const cT = Math.max(0, Math.min(1, (h * 0.70 - contactRect.top) / Math.max(1, contactRect.height * 0.6)));
+      // 1. In Fun Zone / Radar Game / Leaderboard: NEVER occlude the game canvas, controls, or leaderboard!
+      const isFunZoneActive = funRect.top < h * 0.85 && funRect.bottom > 20;
+      if (isFunZoneActive) {
+        if (bubble?.classList.contains('active')) {
+          bubble.classList.remove('active');
+        }
+        return { x: mobileRailX, y: 68, isFixed: true };
+      }
+
+      // 2. In Contact / Footer: Dock right above AI trigger (ONLY when genuinely past fun-zone)
+      if (contactRect.top <= h * 0.60 && funRect.bottom <= 40) {
+        const cT = Math.max(0, Math.min(1, (h * 0.60 - contactRect.top) / Math.max(1, contactRect.height * 0.55)));
         const mX = mobileRailX + (dockTargetX - mobileRailX) * cT;
         const mY = 68 + (dockTargetY - 68) * cT;
         return { x: mX, y: mY, isFixed: false };
       }
       
-      // 2. In Hero Section: Perch in the top-right corner
+      // 3. In Hero Section: Perch in the top-right corner
       if (heroRect.top >= -50) {
         return { x: mobileRailX, y: 68 };
       }
 
-      // 3. In SURGE Section: Sit nicely beside the bottle at top-right
+      // 4. In SURGE Section: Sit nicely beside the bottle at top-right
       if (surgeEl) {
         const scrollBody = surgeEl.querySelector('.surge-scroll-body') || surgeEl;
         const rect = scrollBody.getBoundingClientRect();
         if (rect.top <= 120 && rect.bottom >= 120) {
           return { x: mobileRailX, y: 68, isFixed: true };
         }
-      }
-
-      // 4. In Fun Zone / Radar Game: Stay docked at bottom right above trigger button
-      if (funRect.top < h * 0.80 && funRect.bottom > h * 0.15) {
-        return { x: dockTargetX, y: dockTargetY, isFixed: true };
       }
 
       // 5. General Scrolling on Mobile: Smoothly glide along the right rail
@@ -6820,7 +6839,16 @@ function initRoamingPriyamAvatar() {
       return { x: rightRailX, y: 220, isRight: true };
     }
 
-    // Phase 5: Fun Zone / Radar / Defence Section (Strictly Right Rail)
+    // Phase 5: Fun Zone / Radar / Defence Section (Strictly Right Rail outside console)
+    const isFunZoneActiveDesktop = funRect.top < h * 0.85 && funRect.bottom > 30;
+    if (isFunZoneActiveDesktop) {
+      if (bubble?.classList.contains('active')) {
+        bubble.classList.remove('active');
+      }
+      const safeRightX = Math.max(rightRailX, (w + 980) / 2 + 16);
+      return { x: Math.min(w - avW - 8, safeRightX), y: 130, isRight: true };
+    }
+
     if (contactRect.top > h * 0.60) {
       return { x: rightRailX, y: 190, isRight: true };
     }
@@ -7191,6 +7219,12 @@ function initRoamingPriyamAvatar() {
     entries.forEach(entry => {
       if (entry.isIntersecting && entry.intersectionRatio > 0.25 && isAvatarEnabled) {
         const id = entry.target.id;
+        if (id === 'contact') {
+          const funZoneEl = document.getElementById('fun-zone');
+          if (funZoneEl && funZoneEl.getBoundingClientRect().bottom > window.innerHeight * 0.35) {
+            return; // Still viewing the leaderboard in fun-zone, do not trigger contact dock speech
+          }
+        }
         if (id && SECTION_LORE[id] && id !== lastSection) {
           lastSection = id;
           const sectionData = SECTION_LORE[id];
@@ -7267,7 +7301,10 @@ function initRoamingPriyamAvatar() {
   ];
 
   function runThoughtCycle() {
-    if (!isDragging && Date.now() >= evasionUntil && !isReadingActive() && isAvatarEnabled && !bubble.classList.contains('active')) {
+    const funZoneEl = document.getElementById('fun-zone');
+    const isFunInView = funZoneEl && funZoneEl.getBoundingClientRect().top < window.innerHeight * 0.9 && funZoneEl.getBoundingClientRect().bottom > 30;
+
+    if (!isDragging && Date.now() >= evasionUntil && !isReadingActive() && isAvatarEnabled && !bubble.classList.contains('active') && !isFunInView) {
       const quotePool = is18PlusMode ? RANDOM_18PLUS_QUOTES : RANDOM_FOUNDER_QUOTES;
       const quote = quotePool[Math.floor(Math.random() * quotePool.length)];
       window.showAvatarThought(quote.msg, quote.tag, quote.mood, 3400);
