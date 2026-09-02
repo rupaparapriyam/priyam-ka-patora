@@ -1357,6 +1357,22 @@ function buildModalHTML(d, id) {
     `);
   }
 
+  // Bottom Interactive Action Bar
+  const cleanHeadline = (d.headline || '').replace(/[\n\r]+/g, ' ').replace(/'/g, "\\'");
+  parts.push(`
+    <div class="pm-divider"></div>
+    <div class="pm-action-row">
+      <button class="pm-chat-cta" onclick="window.closeProjectDetail(); setTimeout(() => window.askPriyamAI('Explain the architecture and numbers behind ${cleanHeadline}'), 250);">
+        <span class="pm-chat-cta-dot"></span>
+        <span class="pm-chat-cta-icon">💬</span>
+        <span>Discuss with Priyuum AI</span>
+      </button>
+      <button class="pm-bottom-close" onclick="window.closeProjectDetail()">
+        <span>✕ Exit Deep Dive</span>
+      </button>
+    </div>
+  `);
+
   return parts.join('\n');
 }
 
