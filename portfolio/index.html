@@ -21,7 +21,7 @@
   <link rel="preload" as="image" href="assets/avatar-priyam-casual.webp" type="image/webp" fetchpriority="high" />
   <link rel="preload" as="image" href="assets/surge/bottle_frames/bottle_000.webp" type="image/webp" />
 
-  <link rel="stylesheet" href="styles.css?v=20260902_45" />
+  <link rel="stylesheet" href="styles.css?v=20260902_49" />
 </head>
 <body>
 
@@ -785,15 +785,22 @@
   </div>
 
   <!-- ===================== PROJECT DETAIL MODAL ===================== -->
-  <div id="project-modal" class="project-modal hidden" role="dialog" aria-modal="true">
-    <div class="pm-backdrop" onclick="window.closeProjectDetail()"></div>
-    <div class="pm-panel">
+  <div id="project-modal" class="project-modal hidden" role="dialog" aria-modal="true" aria-labelledby="pm-modal-badge">
+    <div class="pm-backdrop" onclick="window.closeProjectDetail()" aria-hidden="true"></div>
+    <div class="pm-panel" id="pm-panel">
       <div class="pm-panel-header">
-        <span class="mono-label pm-modal-badge">[PROJECT DEEP DIVE &amp; ARCHITECTURE]</span>
-        <button class="pm-close" onclick="window.closeProjectDetail()" aria-label="Close">[CLOSE × / ESC]</button>
+        <div class="pm-header-meta">
+          <span class="mono-label pm-modal-badge" id="pm-modal-badge">[PROJECT DEEP DIVE · ARCHITECTURE]</span>
+          <span class="pm-esc-hint">Press <kbd>ESC</kbd> or click outside to exit</span>
+        </div>
+        <button class="pm-close-btn" onclick="window.closeProjectDetail()" aria-label="Close Project Modal" title="Close (ESC)">
+          <span class="pm-close-icon">✕</span>
+          <span class="pm-close-text">CLOSE</span>
+          <kbd class="pm-close-kbd">ESC</kbd>
+        </button>
       </div>
       <div class="pm-content" id="pm-content">
-        <!-- JS dynamically populates with rich graphs, tables, before/after, and patora notes -->
+        <!-- JS dynamically populates with rich graphs, tables, before/after, and notes -->
       </div>
     </div>
   </div>
@@ -853,7 +860,7 @@
     </div>
   </div>
 
-  <script src="avatar-data.js?v=20260902_48"></script>
-  <script src="app.js?v=20260902_48"></script>
+  <script src="avatar-data.js?v=20260902_49"></script>
+  <script src="app.js?v=20260902_49"></script>
 </body>
 </html>
