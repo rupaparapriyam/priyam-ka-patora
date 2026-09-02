@@ -27,36 +27,19 @@ function getSharedAudioContext() {
   return _sharedAudioContext;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  initThemeEngine();
-  initScrollProgress();
-  initNavSpy();
-  initMobileMenu();
-  initExpressiveTypography();
-  initHeroInteractiveCanvas();
-  initProjectFilters();
-  initProjectModal();
-  initDroneAvionicsSimulation();
-  initSurgeScrollDrivenBottle();
-  initCommandPalette();
-  initFunZone();
-  initPriyamAiClone();
-  initClipboard();
-
-  // Global Tab Visibility Performance Manager (0% CPU when tab is backgrounded)
-  document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-      if (_sharedAudioContext && _sharedAudioContext.state === 'running') {
-        _sharedAudioContext.suspend().catch(() => {});
-      }
-    } else {
-      if (_sharedAudioContext && _sharedAudioContext.state === 'suspended') {
-        _sharedAudioContext.resume().catch(() => {});
-      }
+// Global Tab Visibility Performance Manager (0% CPU when tab is backgrounded)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (_sharedAudioContext && _sharedAudioContext.state === 'running') {
+      _sharedAudioContext.suspend().catch(() => {});
     }
-    window.updateGameAutoLifecycle?.();
-  }, { passive: true });
-});
+  } else {
+    if (_sharedAudioContext && _sharedAudioContext.state === 'suspended') {
+      _sharedAudioContext.resume().catch(() => {});
+    }
+  }
+  window.updateGameAutoLifecycle?.();
+}, { passive: true });
 
 /* ==========================================================================
    1. THEME ENGINE & SCROLL PROGRESS
@@ -163,23 +146,40 @@ function initMobileMenu() {
   const closeIcon = btn?.querySelector('.menu-close-icon');
   let open = false;
 
-  btn?.addEventListener('click', () => {
-    open = !open;
+  function setOpen(state) {
+    open = state;
     drawer?.classList.toggle('hidden', !open);
     openIcon?.classList.toggle('hidden', open);
     closeIcon?.classList.toggle('hidden', !open);
     window.updateGameAutoLifecycle?.();
+  }
+
+  btn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    setOpen(!open);
   });
 
   drawer?.querySelectorAll('.mobile-link, .mobile-cmd-btn, .mobile-chat-btn').forEach(item => {
     item.addEventListener('click', () => {
-      open = false;
-      drawer.classList.add('hidden');
-      openIcon?.classList.remove('hidden');
-      closeIcon?.classList.add('hidden');
-      window.updateGameAutoLifecycle?.();
+      setOpen(false);
     });
   });
+
+  // Tap outside mobile drawer to dismiss
+  document.addEventListener('click', (e) => {
+    if (open && !drawer?.contains(e.target) && !btn?.contains(e.target)) {
+      setOpen(false);
+    }
+  });
+
+  // Auto-close on scroll down
+  let lastMenuScrollY = window.scrollY;
+  window.addEventListener('scroll', () => {
+    if (open && Math.abs(window.scrollY - lastMenuScrollY) > 60) {
+      setOpen(false);
+    }
+    lastMenuScrollY = window.scrollY;
+  }, { passive: true });
 }
 
 /* ==========================================================================
@@ -267,13 +267,14 @@ function initHeroInteractiveCanvas() {
 
   const THEME_ACCENT = '#00F0FF';
 
-  // 3D Flight Core State (Positioned centered & unobscured by card)
+  // 3D Flight Core State (Dynamically placed: top-right on mobile/tablet, centered on desktop)
+  const isMobileInit = width < 890;
   const drone = {
-    x: width * 0.48,
-    y: height * 0.42,
+    x: isMobileInit ? width * 0.76 : width * 0.48,
+    y: isMobileInit ? Math.min(220, Math.max(140, height * 0.16)) : height * 0.42,
     z: 0,
-    targetX: width * 0.48,
-    targetY: height * 0.42,
+    targetX: isMobileInit ? width * 0.76 : width * 0.48,
+    targetY: isMobileInit ? Math.min(220, Math.max(140, height * 0.16)) : height * 0.42,
     pitch: 0.12,
     yaw: -0.18,
     roll: -0.05,
@@ -281,15 +282,15 @@ function initHeroInteractiveCanvas() {
     targetYaw: -0.18,
     targetRoll: -0.05,
     rollBoost: 0,
-    scale: Math.min(1.35, Math.max(0.85, width / 1100)),
+    scale: isMobileInit ? Math.min(1.15, Math.max(0.68, width / 650)) : Math.min(1.35, Math.max(0.85, width / 1100)),
   };
 
   let time = 0;
   let mouse = {
-    x: width * 0.48,
-    y: height * 0.45,
-    targetX: width * 0.48,
-    targetY: height * 0.45,
+    x: isMobileInit ? width * 0.76 : width * 0.48,
+    y: isMobileInit ? Math.min(220, Math.max(140, height * 0.16)) : height * 0.45,
+    targetX: isMobileInit ? width * 0.76 : width * 0.48,
+    targetY: isMobileInit ? Math.min(220, Math.max(140, height * 0.16)) : height * 0.45,
     vx: 0,
     vy: 0,
     prevX: width * 0.48,
@@ -304,8 +305,9 @@ function initHeroInteractiveCanvas() {
     canvas.width = width * dpr;
     canvas.height = height * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const isMobile = width < 890;
     if (drone) {
-      drone.scale = Math.min(1.4, Math.max(0.85, width / 1100));
+      drone.scale = isMobile ? Math.min(1.15, Math.max(0.68, width / 650)) : Math.min(1.4, Math.max(0.85, width / 1100));
     }
   }
 
@@ -349,10 +351,27 @@ function initHeroInteractiveCanvas() {
     mouse.isHover = true;
   }, { passive: true });
 
+  heroSec?.addEventListener('touchstart', (e) => {
+    if (!e.touches || !e.touches[0]) return;
+    if (!heroRect) updateHeroBounds();
+    mouse.targetX = e.touches[0].clientX - (heroRect ? heroRect.left : 0);
+    mouse.targetY = e.touches[0].clientY - (heroRect ? heroRect.top : 0);
+    mouse.isHover = true;
+  }, { passive: true });
+
+  heroSec?.addEventListener('touchmove', (e) => {
+    if (!e.touches || !e.touches[0]) return;
+    if (!heroRect) updateHeroBounds();
+    mouse.targetX = e.touches[0].clientX - (heroRect ? heroRect.left : 0);
+    mouse.targetY = e.touches[0].clientY - (heroRect ? heroRect.top : 0);
+    mouse.isHover = true;
+  }, { passive: true });
+
   heroSec?.addEventListener('mouseleave', () => {
     mouse.isHover = false;
-    mouse.targetX = width * 0.48;
-    mouse.targetY = height * 0.42;
+    const isMobile = width < 890;
+    mouse.targetX = isMobile ? width * 0.76 : width * 0.48;
+    mouse.targetY = isMobile ? Math.min(220, Math.max(140, height * 0.16)) : height * 0.42;
   }, { passive: true });
 
   // Interactive Kinetic Pulse & Harmonic Audio Feedback on Click
@@ -613,11 +632,15 @@ function initHeroInteractiveCanvas() {
     mouse.x += (mouse.targetX - mouse.x) * 0.06;
     mouse.y += (mouse.targetY - mouse.y) * 0.06;
 
-    const deltaX = (mouse.x - width * 0.5) / width;
-    const deltaY = (mouse.y - height * 0.45) / height;
+    const isMobile = width < 890;
+    const baseX = isMobile ? width * 0.76 : width * 0.48;
+    const baseY = isMobile ? Math.min(220, Math.max(140, height * 0.16)) : height * 0.42;
 
-    drone.targetX = width * 0.48 + (mouse.x - width * 0.5) * 0.2 + Math.sin(time * 0.8) * 25;
-    drone.targetY = height * 0.42 + (mouse.y - height * 0.45) * 0.2 + Math.cos(time * 1.1) * 16;
+    const deltaX = (mouse.x - baseX) / width;
+    const deltaY = (mouse.y - baseY) / height;
+
+    drone.targetX = baseX + (mouse.x - baseX) * (isMobile ? 0.12 : 0.2) + Math.sin(time * 0.8) * (isMobile ? 12 : 25);
+    drone.targetY = baseY + (mouse.y - baseY) * (isMobile ? 0.12 : 0.2) + Math.cos(time * 1.1) * (isMobile ? 10 : 16);
     drone.targetYaw = deltaX * 0.75;
     drone.targetPitch = deltaY * 0.55 + Math.sin(time * 1.3) * 0.05;
     drone.targetRoll = -deltaX * 1.1 + Math.cos(time * 1.0) * 0.06;
@@ -635,7 +658,7 @@ function initHeroInteractiveCanvas() {
       drone.roll += (drone.targetRoll - drone.roll) * 0.08;
     }
 
-    const curScale = drone.scale * (width < 600 ? 0.72 : 1.0);
+    const curScale = drone.scale * (width < 600 ? 0.74 : (isMobile ? 0.84 : 1.0));
 
     // 4. Draw Concentric 3D Gyroscope Gimbal Rings
     drawGyroRings(drone.x, drone.y, curScale, isDark, THEME_ACCENT);
@@ -768,42 +791,121 @@ function initHeroInteractiveCanvas() {
     });
     ctx.restore();
 
-    // 9. Subtle Aesthetic Frame Brackets (Zero Text Clutter)
+    // 9. Full Tactical Holographic Avionics HUD & Target Lock (Idea 1)
     ctx.save();
     const hudX = drone.x;
     const hudY = drone.y;
-    const boxW = 140 * curScale;
-    const boxH = 90 * curScale;
-    const bLen = 10;
+    const boxW = 110 * curScale;
+    const boxH = 75 * curScale;
+    const bLen = 14;
 
-    ctx.strokeStyle = isDark ? 'rgba(0, 240, 255, 0.22)' : 'rgba(30, 41, 59, 0.22)';
-    ctx.lineWidth = 1;
+    const hudColor = isDark ? 'rgba(0, 240, 255, 0.75)' : 'rgba(37, 99, 235, 0.85)';
+    const hudDim = isDark ? 'rgba(0, 240, 255, 0.18)' : 'rgba(37, 99, 235, 0.22)';
+    const hudAccent = isDark ? '#00F0FF' : '#2563EB';
+
+    // 1. Rotating Tactical Azimuth Ring with cardinal compass ticks
+    const ringRadius = 125 * curScale;
+    ctx.save();
+    ctx.translate(hudX, hudY);
+    ctx.rotate(time * 0.25);
+
     ctx.beginPath();
-    ctx.moveTo(hudX - boxW, hudY - boxH + bLen); ctx.lineTo(hudX - boxW, hudY - boxH); ctx.lineTo(hudX - boxW + bLen, hudY - boxH);
-    ctx.moveTo(hudX + boxW - bLen, hudY - boxH); ctx.lineTo(hudX + boxW, hudY - boxH); ctx.lineTo(hudX + boxW, hudY - boxH + bLen);
-    ctx.moveTo(hudX - boxW, hudY + boxH - bLen); ctx.lineTo(hudX - boxW, hudY + boxH); ctx.lineTo(hudX - boxW + bLen, hudY + boxH);
-    ctx.moveTo(hudX + boxW - bLen, hudY + boxH); ctx.lineTo(hudX + boxW, hudY + boxH); ctx.lineTo(hudX + boxW, hudY + boxH - bLen);
+    ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
+    ctx.strokeStyle = hudDim;
+    ctx.lineWidth = 1.2;
+    ctx.setLineDash([6, 12]);
     ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Compass Cardinal Ticks (N, E, S, W)
+    for (let a = 0; a < 4; a++) {
+      const angle = a * (Math.PI / 2);
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(angle) * (ringRadius - 6), Math.sin(angle) * (ringRadius - 6));
+      ctx.lineTo(Math.cos(angle) * (ringRadius + 6), Math.sin(angle) * (ringRadius + 6));
+      ctx.strokeStyle = hudColor;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
     ctx.restore();
 
+    // 2. Dynamic Target Corner Lock Brackets [ + ]
+    ctx.strokeStyle = hudColor;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    // Top-Left
+    ctx.moveTo(hudX - boxW, hudY - boxH + bLen); ctx.lineTo(hudX - boxW, hudY - boxH); ctx.lineTo(hudX - boxW + bLen, hudY - boxH);
+    // Top-Right
+    ctx.moveTo(hudX + boxW - bLen, hudY - boxH); ctx.lineTo(hudX + boxW, hudY - boxH); ctx.lineTo(hudX + boxW, hudY - boxH + bLen);
+    // Bottom-Left
+    ctx.moveTo(hudX - boxW, hudY + boxH - bLen); ctx.lineTo(hudX - boxW, hudY + boxH); ctx.lineTo(hudX - boxW + bLen, hudY + boxH);
+    // Bottom-Right
+    ctx.moveTo(hudX + boxW - bLen, hudY + boxH); ctx.lineTo(hudX + boxW, hudY + boxH); ctx.lineTo(hudX + boxW, hudY + boxH - bLen);
+    ctx.stroke();
+
+    // Center Crosshair
+    ctx.strokeStyle = hudDim;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(hudX - 8, hudY); ctx.lineTo(hudX + 8, hudY);
+    ctx.moveTo(hudX, hudY - 8); ctx.lineTo(hudX, hudY + 8);
+    ctx.stroke();
+
+    // 3. Cyber Monospace Telemetry Readouts
+    const fontSize = Math.max(8.5, Math.round(9 * curScale));
+    ctx.font = `${fontSize}px "Space Mono", monospace`;
+    
+    // Top-Left: Coords (Rajkot / Delhi base origin)
+    ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(15, 23, 42, 0.75)';
+    ctx.fillText(`LAT 22.30°N · LON 70.80°E`, hudX - boxW, hudY - boxH - 8);
+    
+    // Top-Right: Velocity / Altitude
+    const altVal = Math.round(420 + Math.sin(time * 0.8) * 30);
+    ctx.fillStyle = hudAccent;
+    ctx.fillText(`ALT ${altVal}M · MACH 0.85`, hudX - boxW, hudY - boxH + 14);
+
+    // Bottom: Dynamic Heading & Target Lock Status
+    const headingDeg = Math.round(((drone.yaw * 180 / Math.PI) % 360 + 360) % 360);
+    const pitchDeg = Math.round(drone.pitch * 180 / Math.PI);
+    ctx.fillText(`HDG ${String(headingDeg).padStart(3, '0')}° · PIT ${pitchDeg > 0 ? '+' : ''}${pitchDeg}°`, hudX - boxW, hudY + boxH + 16);
+    
+    ctx.fillStyle = isDark ? '#10B981' : '#059669';
+    ctx.fillText(`[● TARGET LOCKED]`, hudX - boxW, hudY + boxH + 28);
+
+    ctx.restore();
+
+    // Request next frame
     animId = requestAnimationFrame(render);
   }
+
+  function startAnimation() {
+    if (!animId) {
+      animId = requestAnimationFrame(render);
+    }
+  }
+
+  function stopAnimation() {
+    if (animId) {
+      cancelAnimationFrame(animId);
+      animId = null;
+    }
+  }
+
+  // Start immediately on load
+  startAnimation();
 
   if (heroSec && 'IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
         if (!entry.isIntersecting) {
-          if (animId) cancelAnimationFrame(animId);
-          animId = null;
+          stopAnimation();
         } else {
-          if (!animId) animId = requestAnimationFrame(render);
+          startAnimation();
         }
       });
-    }, { threshold: 0.05 });
+    }, { threshold: 0.01, rootMargin: '200px 0px' });
     observer.observe(heroSec);
   }
-
-  animId = requestAnimationFrame(render);
 }
 
 /* ==========================================================================
@@ -1266,20 +1368,8 @@ function initDroneAvionicsSimulation() {
   if (!canvas) return;
   const container = document.getElementById('drone-canvas-container');
   const ctx = canvas.getContext('2d');
+  if (!ctx) return;
   const dpr = window.devicePixelRatio || 1;
-
-  function resize() {
-    const w = container.clientWidth || 800;
-    const h = container.clientHeight || 480;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  }
-  resize();
-  window.addEventListener('resize', resize, { passive: true });
-
-  const W = () => canvas.width / dpr;
-  const H = () => canvas.height / dpr;
 
   const state = {
     yaw: 0.65,
@@ -1292,6 +1382,9 @@ function initDroneAvionicsSimulation() {
     activePart: 'frame',
     isVisible: true
   };
+
+  const W = () => (canvas.width / dpr) || (container?.clientWidth || 800);
+  const H = () => (canvas.height / dpr) || (container?.clientHeight || 480);
 
   const PARTS = {
     frame: {
@@ -1321,11 +1414,13 @@ function initDroneAvionicsSimulation() {
     const descEl  = document.getElementById('dh-desc');
     if (titleEl && PARTS[partKey]) titleEl.textContent = PARTS[partKey].title;
     if (descEl && PARTS[partKey]) descEl.textContent = PARTS[partKey].desc;
+    renderCAD();
   };
 
   window.toggleDroneAutoRotate = () => {
     state.autoRotate = !state.autoRotate;
     showToast(state.autoRotate ? 'Auto-rotation resumed' : 'Auto-rotation paused');
+    if (state.autoRotate) startCAD();
   };
 
   document.getElementById('btn-reset-drone')?.addEventListener('click', () => {
@@ -1333,6 +1428,7 @@ function initDroneAvionicsSimulation() {
     state.targetPitch = 0.28;
     state.zoom = 1.0;
     showToast('CAD view reset');
+    renderCAD();
   });
 
   // Smooth Drag & Zoom
@@ -1343,7 +1439,16 @@ function initDroneAvionicsSimulation() {
     dragging = true;
     prevMouse.x = e.clientX;
     prevMouse.y = e.clientY;
+    startCAD();
   });
+
+  canvas.addEventListener('touchstart', e => {
+    if (!e.touches || !e.touches[0]) return;
+    dragging = true;
+    prevMouse.x = e.touches[0].clientX;
+    prevMouse.y = e.touches[0].clientY;
+    startCAD();
+  }, { passive: true });
 
   window.addEventListener('mousemove', e => {
     if (dragging) {
@@ -1355,24 +1460,26 @@ function initDroneAvionicsSimulation() {
       state.targetPitch = Math.max(-0.9, Math.min(0.9, state.targetPitch));
       prevMouse.x = e.clientX;
       prevMouse.y = e.clientY;
+      renderCAD();
     }
   });
 
-  window.addEventListener('mouseup', () => { dragging = false; });
-
-  let animId = null;
-
-  // Pause rendering when scrolled out of view (0 CPU/GPU load when offscreen)
-  const observer = new IntersectionObserver((entries) => {
-    state.isVisible = entries[0].isIntersecting;
-    if (state.isVisible) {
-      if (!animId) animId = requestAnimationFrame(loop);
-    } else {
-      if (animId) cancelAnimationFrame(animId);
-      animId = null;
+  window.addEventListener('touchmove', e => {
+    if (dragging && e.touches && e.touches[0]) {
+      state.autoRotate = false;
+      const dx = e.touches[0].clientX - prevMouse.x;
+      const dy = e.touches[0].clientY - prevMouse.y;
+      state.targetYaw += dx * 0.009;
+      state.targetPitch += dy * 0.006;
+      state.targetPitch = Math.max(-0.9, Math.min(0.9, state.targetPitch));
+      prevMouse.x = e.touches[0].clientX;
+      prevMouse.y = e.touches[0].clientY;
+      renderCAD();
     }
-  }, { threshold: 0.05 });
-  observer.observe(canvas);
+  }, { passive: true });
+
+  window.addEventListener('mouseup', () => { dragging = false; });
+  window.addEventListener('touchend', () => { dragging = false; });
 
   // 3D Matrix Projection
   function project(x, y, z) {
@@ -1391,7 +1498,7 @@ function initDroneAvionicsSimulation() {
     const scale = (fov / (fov + z2 + 250)) * state.zoom;
     return {
       x: W() / 2 + x2 * scale,
-      y: H() / 2 + y2 * scale,
+      y: H() * (W() < 768 ? 0.44 : 0.5) + y2 * scale,
       scale: scale,
       depth: z2
     };
@@ -1527,12 +1634,9 @@ function initDroneAvionicsSimulation() {
     ctx.stroke();
   }
 
-  function loop() {
-    if (!state.isVisible) {
-      animId = null;
-      return;
-    }
+  let animId = null;
 
+  function loop() {
     state.yaw += (state.targetYaw - state.yaw) * 0.08;
     state.pitch += (state.targetPitch - state.pitch) * 0.08;
 
@@ -1542,9 +1646,62 @@ function initDroneAvionicsSimulation() {
 
     state.rotorAngle += 0.28;
     renderCAD();
-    animId = requestAnimationFrame(loop);
+
+    if (state.isVisible) {
+      animId = requestAnimationFrame(loop);
+    } else {
+      animId = null;
+    }
   }
-  animId = requestAnimationFrame(loop);
+
+  function startCAD() {
+    state.isVisible = true;
+    if (!animId) animId = requestAnimationFrame(loop);
+  }
+
+  function stopCAD() {
+    state.isVisible = false;
+    if (animId) {
+      cancelAnimationFrame(animId);
+      animId = null;
+    }
+    renderCAD();
+  }
+
+  function resize() {
+    const w = (container ? container.clientWidth : 0) || canvas.clientWidth || 800;
+    const h = (container ? container.clientHeight : 0) || canvas.clientHeight || 480;
+    canvas.width = Math.max(300, w) * dpr;
+    canvas.height = Math.max(300, h) * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    state.zoom = w < 600 ? 0.85 : 1.0;
+    renderCAD();
+  }
+
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+  window.addEventListener('scroll', () => {
+    if (!container) return;
+    const rect = container.getBoundingClientRect();
+    const isNear = rect.top < window.innerHeight + 350 && rect.bottom > -350;
+    if (isNear) startCAD();
+    else stopCAD();
+  }, { passive: true });
+
+  if (container && 'IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        startCAD();
+      } else {
+        stopCAD();
+      }
+    }, { threshold: 0.01, rootMargin: '350px 0px' });
+    observer.observe(container);
+  }
+
+  // Initial immediate render and loop start
+  renderCAD();
+  startCAD();
 }
 
 /* ==========================================================================
@@ -1564,24 +1721,79 @@ function initSurgeScrollDrivenBottle() {
 
   const ctx = canvas.getContext('2d');
   const TOTAL_FRAMES = 80;
-  const frames = [];
+  const frames = new Array(TOTAL_FRAMES);
   let currentFrame = 0;
 
-  for (let i = 0; i < TOTAL_FRAMES; i++) {
-    const img = new Image();
-    img.src = `assets/surge/bottle_frames/bottle_${String(i).padStart(3, '0')}.webp`;
-    img.onload = () => {
-      if (currentFrame === 0 && i === 0) draw(0);
-    };
-    frames[i] = img;
+  // Search outwards for nearest loaded frame to guarantee zero white flicker
+  function findNearestLoadedFrame(targetIdx) {
+    if (frames[targetIdx] && frames[targetIdx].complete && frames[targetIdx].naturalWidth > 0) {
+      return frames[targetIdx];
+    }
+    for (let offset = 1; offset < TOTAL_FRAMES; offset++) {
+      const prev = targetIdx - offset;
+      if (prev >= 0 && frames[prev] && frames[prev].complete && frames[prev].naturalWidth > 0) {
+        return frames[prev];
+      }
+      const next = targetIdx + offset;
+      if (next < TOTAL_FRAMES && frames[next] && frames[next].complete && frames[next].naturalWidth > 0) {
+        return frames[next];
+      }
+    }
+    return frames[0];
   }
 
   function draw(idx) {
-    const img = frames[idx];
-    if (img && img.complete && img.naturalWidth > 0) {
+    const img = findNearestLoadedFrame(idx);
+    if (img && (img.complete || img.naturalWidth > 0)) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
     }
+  }
+
+  function loadFrame(idx, onDone) {
+    if (frames[idx]) return frames[idx];
+    const img = new Image();
+    img.decoding = 'async';
+    img.src = `assets/surge/bottle_frames/bottle_${String(idx).padStart(3, '0')}.webp?v=20260902_45`;
+    img.onload = () => {
+      if (idx === currentFrame || (currentFrame === 0 && idx === 0)) draw(currentFrame);
+      if (onDone) onDone();
+    };
+    frames[idx] = img;
+    return img;
+  }
+
+  // Stage 1: Load and draw primary frame 0 immediately (0ms instant display)
+  loadFrame(0, () => draw(0));
+
+  // Stage 2: Load key 360-degree milestone frames for instant drag/scroll response
+  const keyFrames = [10, 20, 30, 40, 50, 60, 70, 79];
+  keyFrames.forEach(idx => loadFrame(idx));
+
+  // Stage 3: Progressive non-blocking background buffering of remaining frames
+  let nextLoadIdx = 1;
+  function loadNextBatch() {
+    let count = 0;
+    while (nextLoadIdx < TOTAL_FRAMES && count < 6) {
+      if (!frames[nextLoadIdx]) {
+        loadFrame(nextLoadIdx);
+        count++;
+      }
+      nextLoadIdx++;
+    }
+    if (nextLoadIdx < TOTAL_FRAMES) {
+      if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadNextBatch, { timeout: 150 });
+      } else {
+        setTimeout(loadNextBatch, 40);
+      }
+    }
+  }
+
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(loadNextBatch, { timeout: 200 });
+  } else {
+    setTimeout(loadNextBatch, 80);
   }
 
   let ticking = false;
@@ -1614,6 +1826,8 @@ function initSurgeScrollDrivenBottle() {
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+  setTimeout(onScroll, 60);
 
   // Direct touch & pointer drag to spin bottle on phones, tablets, and desktop
   let isDragging = false;
@@ -1778,7 +1992,7 @@ function initFunZone() {
     const funSection = document.getElementById('fun-zone');
     if (funSection) {
       const rect = funSection.getBoundingClientRect();
-      return rect.top < window.innerHeight * 0.85 && rect.bottom > window.innerHeight * 0.15;
+      return rect.top < window.innerHeight + 300 && rect.bottom > -300;
     }
     return false;
   };
@@ -1786,7 +2000,7 @@ function initFunZone() {
   window.updateGameAutoLifecycle = () => {
     const isModalOpen = isAnyModalOrOverlayOpen();
     const isTabHidden = document.hidden;
-    const isFunVisible = isFunZoneVisible;
+    const isFunVisible = window.isFunZoneActive();
 
     if (!isFunVisible || isModalOpen || isTabHidden) {
       window.pauseUavGame?.(true);
@@ -1795,6 +2009,9 @@ function initFunZone() {
     }
   };
 
+  window.addEventListener('scroll', () => window.updateGameAutoLifecycle?.(), { passive: true });
+  window.addEventListener('resize', () => window.updateGameAutoLifecycle?.(), { passive: true });
+
   const funSection = document.getElementById('fun-zone');
   if (funSection && 'IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => {
@@ -1802,7 +2019,7 @@ function initFunZone() {
         isFunZoneVisible = entry.isIntersecting;
         window.updateGameAutoLifecycle?.();
       });
-    }, { threshold: 0.15 });
+    }, { threshold: 0.01, rootMargin: '300px 0px' });
     observer.observe(funSection);
   }
 }
@@ -1936,6 +2153,7 @@ function initUavFlightGame() {
   let friendlyLasers = [];
 
   let state = {
+    hasStarted: false,
     intercepted: 0,
     missileCount: 8,
     maxMissiles: 8,
@@ -2051,7 +2269,7 @@ function initUavFlightGame() {
 
   // 1. Single Interceptor Missile
   window.triggerInterceptorLaunch = () => {
-    if (state.isGameOver) {
+    if (!state.hasStarted || state.isGameOver) {
       window.startUavGame();
       return;
     }
@@ -2090,6 +2308,10 @@ function initUavFlightGame() {
 
   // 2. Iron Dome Ripple Salvo (6 Missiles Simultaneously Spread)
   window.triggerMultiSalvo = () => {
+    if (!state.hasStarted) {
+      window.startUavGame();
+      return;
+    }
     if (state.salvoCooldown > 0 || state.isGameOver) return;
     state.salvoCooldown = 180; // 3s cooldown
     playSound('launch');
@@ -2118,6 +2340,10 @@ function initUavFlightGame() {
 
   // 3. Area Flak / EMP Airburst (wipes micro-drone swarms in blast area)
   window.triggerAreaFlak = () => {
+    if (!state.hasStarted) {
+      window.startUavGame();
+      return;
+    }
     if (state.flakCooldown > 0 || state.isGameOver) return;
     state.flakCooldown = 150; // 2.5s cooldown
     playSound('flak');
@@ -2138,15 +2364,15 @@ function initUavFlightGame() {
       const th = threats[i];
       if (Math.hypot(th.x - blastX, th.y - blastY) < blastRadius) {
         state.intercepted++;
-        for (let k = 0; k < 12; k++) {
+        for (let k = 0; k < 14; k++) {
           particles.push({
             x: th.x,
             y: th.y,
-            vx: (Math.random() - 0.5) * 8,
-            vy: (Math.random() - 0.5) * 8,
-            life: 22,
-            maxLife: 22,
-            color: th.color,
+            vx: (Math.random() - 0.5) * 10,
+            vy: (Math.random() - 0.5) * 10,
+            life: 25,
+            maxLife: 25,
+            color: '#A855F7',
           });
         }
         threats.splice(i, 1);
@@ -2156,35 +2382,42 @@ function initUavFlightGame() {
     updateTelemetryUI();
   };
 
-  // 4. Orbital Kinetic Railgun Beam
+  // 4. Orbital Hyper-Velocity Railgun
   window.triggerOrbitalRailgun = () => {
+    if (!state.hasStarted) {
+      window.startUavGame();
+      return;
+    }
     if (state.railgunCooldown > 0 || state.isGameOver) return;
-    state.railgunCooldown = 180; // 3s cooldown
-    playSound('flak');
+    state.railgunCooldown = 240; // 4s cooldown
+    playSound('intercept');
 
-    const beamX = state.aimPos.x;
+    const targetX = state.aimPos.x;
+    const targetY = state.aimPos.y;
+
     railgunBeams.push({
-      x: beamX,
-      width: 42,
+      x1: BASE.x,
+      y1: BASE.y,
+      x2: targetX,
+      y2: targetY,
       alpha: 1.0,
-      life: 22,
-      maxLife: 22,
+      life: 20,
+      maxLife: 20,
     });
 
-    // Destroy all threats in beam column
     for (let i = threats.length - 1; i >= 0; i--) {
       const th = threats[i];
-      if (Math.abs(th.x - beamX) < 48) {
+      if (Math.hypot(th.x - targetX, th.y - targetY) < 70) {
         state.intercepted++;
-        for (let k = 0; k < 14; k++) {
+        for (let k = 0; k < 16; k++) {
           particles.push({
             x: th.x,
             y: th.y,
-            vx: (Math.random() - 0.5) * 10,
-            vy: (Math.random() - 0.5) * 10,
+            vx: (Math.random() - 0.5) * 12,
+            vy: (Math.random() - 0.5) * 12,
             life: 25,
             maxLife: 25,
-            color: '#00F0FF',
+            color: '#A855F7',
           });
         }
         threats.splice(i, 1);
@@ -2203,13 +2436,22 @@ function initUavFlightGame() {
   };
 
   window.triggerEccmBurst = () => {
+    if (!state.hasStarted) {
+      window.startUavGame();
+      return;
+    }
     state.eccmActiveTimer = 360; // 6 seconds at 60fps
     playSound('eccm');
     eccmRings.push({ r: 10, maxR: 440, alpha: 1.0 });
+    updateTelemetryUI();
   };
 
   // 5. Deploy Friendly Autonomous Combat Drone Squad (Wingman Delta UAVs)
   window.deployPatrolUav = () => {
+    if (!state.hasStarted) {
+      window.startUavGame();
+      return;
+    }
     if (patrolUavs.length >= 3) return;
     patrolUavs.push({
       angle: Math.PI * 1.2 + patrolUavs.length * 0.6,
@@ -2237,7 +2479,11 @@ function initUavFlightGame() {
   });
 
   canvas.addEventListener('pointerdown', () => {
-    if (state.isPaused && !state.isGameOver) {
+    if (!state.hasStarted || state.isGameOver) {
+      window.startUavGame();
+      return;
+    }
+    if (state.isPaused) {
       window.resumeUavGame(false);
       return;
     }
@@ -2308,15 +2554,21 @@ function initUavFlightGame() {
     state.salvoCooldown = 0;
     state.railgunCooldown = 0;
     state.isGameOver = false;
+    state.hasStarted = true;
     state.selectedTargetId = null;
+    document.getElementById('uav-start-overlay')?.classList.add('hidden');
     document.getElementById('uav-overlay')?.classList.add('hidden');
+    window.resumeUavGame(false);
     updateTelemetryUI();
+    spawnThreat();
+    setTimeout(() => { if (state.hasStarted && !state.isGameOver) spawnThreat(); }, 700);
   };
 
   function update() {
-    if (state.isPaused || state.isGameOver) return;
     state.frameCount++;
     state.sweepAngle = (state.sweepAngle + 0.035) % (Math.PI * 2);
+
+    if (!state.hasStarted || state.isPaused || state.isGameOver) return;
 
     if (state.flakCooldown > 0) state.flakCooldown--;
     if (state.salvoCooldown > 0) state.salvoCooldown--;
@@ -2602,22 +2854,43 @@ function initUavFlightGame() {
   }
 
   function updateTelemetryUI() {
-    const scoreVal = document.getElementById('uav-hud-score');
-    const missilesVal = document.getElementById('uav-missiles-val');
-    const threatsVal = document.getElementById('uav-threats-val');
-    const shieldVal = document.getElementById('uav-shield-val');
+    const statusEl = document.getElementById('uav-state-val');
+    const missEl   = document.getElementById('uav-missiles-val');
+    const threatEl = document.getElementById('uav-threats-val');
+    const shieldEl = document.getElementById('uav-shield-val');
+    const scoreEl  = document.getElementById('uav-hud-score');
 
-    if (scoreVal) scoreVal.textContent = `INTERCEPTED: ${state.intercepted}`;
-    if (missilesVal) missilesVal.textContent = `${state.missileCount} / ${state.maxMissiles} KINETIC`;
-    if (threatsVal) threatsVal.textContent = `${threats.length} TRACKED`;
-    if (shieldVal) {
-      shieldVal.textContent = `${Math.max(0, state.baseHealth)}%`;
-      shieldVal.style.color = state.baseHealth > 40 ? 'var(--green)' : 'var(--red)';
+    if (statusEl) {
+      if (!state.hasStarted) {
+        statusEl.textContent = 'STANDBY';
+        statusEl.style.color = '#38BDF8';
+      } else if (state.isGameOver) {
+        statusEl.textContent = 'COMPROMISED';
+        statusEl.style.color = '#EF4444';
+      } else if (state.eccmActiveTimer > 0) {
+        statusEl.textContent = 'ECCM ACTIVE';
+        statusEl.style.color = '#A855F7';
+      } else {
+        statusEl.textContent = 'ONLINE';
+        statusEl.style.color = 'var(--green)';
+      }
     }
+
+    if (missEl) missEl.textContent = `${state.missileCount} / ${state.maxMissiles} KINETIC`;
+    if (threatEl) {
+      threatEl.textContent = state.hasStarted ? `${threats.length} TRACKED` : '0 TRACKED';
+      threatEl.style.color = threats.length > 3 ? '#EF4444' : 'var(--amber)';
+    }
+    if (shieldEl) {
+      shieldEl.textContent = `${Math.max(0, Math.round(state.baseHealth))}%`;
+      shieldEl.style.color = state.baseHealth > 40 ? 'var(--green)' : '#EF4444';
+    }
+    if (scoreEl) scoreEl.textContent = `INTERCEPTED: ${state.intercepted}`;
   }
 
   function triggerDefeat(reason) {
     state.isGameOver = true;
+    state.hasStarted = false;
     playSound('breach');
     if (state.intercepted > highScore) {
       highScore = state.intercepted;
@@ -2632,6 +2905,7 @@ function initUavFlightGame() {
 
     if (title) title.textContent = `SECTOR COMPROMISED · ${reason}`;
     if (desc) desc.textContent = `Tactical Air Defence intercepted ${state.intercepted} incoming hypersonic threats & coordinated drone swarms using multi-salvo ripples and combat drone squads!`;
+    updateTelemetryUI();
   }
 
   function draw() {
@@ -2949,7 +3223,6 @@ function initUavFlightGame() {
   };
 
   window.resumeUavGame = (isAuto = false) => {
-    if (isAuto && state.isUserPaused) return;
     state.isUserPaused = false;
     state.isPaused = false;
     const btn = document.getElementById('uav-pause-btn');
@@ -3789,11 +4062,11 @@ I built an interactive Air Defence Radar C2 simulator where you track incoming a
   },
   {
     id: 'zuck_ceo_card',
-    title: '"I\'m CEO, bitch." Extreme Ownership Philosophy',
+    title: '"I\'m a vibe coder, bitch." Extreme Ownership Philosophy',
     category: 'lore',
-    tags: ['zuck', 'ceo', 'bitch', 'business card', 'philosophy', 'ownership', 'work ethic', '3am', 'bug', 'debugging', 'culture', 'engineer', 'motto', 'badass'],
-    text: `The Mark Zuckerberg 2005 business card ("I'm CEO, bitch. And the only engineer.") represents my rule of Extreme Ownership.
-I write every line of code myself. If something breaks on a production server at 3 AM, there is no blaming external vendors or crying on Slack—I open my laptop and fix it in 10 minutes flat. Zero excuses, relentless execution.`,
+    tags: ['zuck', 'ceo', 'bitch', 'vibe coder', 'vibe coding', 'wibe coder', 'business card', 'philosophy', 'ownership', 'work ethic', '3am', 'bug', 'debugging', 'culture', 'engineer', 'motto', 'badass'],
+    text: `My business card reads: "I'm a vibe coder, bitch."
+It represents my rule of Extreme Ownership: I orchestrate AI agents, vibe code complex full-stack systems at blazing speeds, and take 100% accountability. If something breaks on a production server at 3 AM, there is no blaming external vendors or crying on Slack—I open my laptop, vibe code the patch, and deploy in 10 minutes flat. Zero excuses, relentless execution.`,
     actions: [
       { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' },
       { label: '🚚 View Ecommerce Hub', fn: 'openProjectDetail("ecom")' }
@@ -3808,6 +4081,17 @@ I write every line of code myself. If something breaks on a production server at
 The app was a 10/10 masterpiece; the chemistry exam went exactly as you would expect. That was the moment I accepted my destiny as an engineer who builds software to solve whatever problem is in front of him.`,
     actions: [
       { label: '🔥 View JEE Story Modal', fn: 'openProjectDetail("jee")' },
+      { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' }
+    ]
+  },
+  {
+    id: 'jee_math_intel',
+    title: 'JEE Main & Mathematics Mastery (96%ile JEE, 99+%ile Maths)',
+    category: 'lore',
+    tags: ['jee', 'percentile', 'math', 'maths', '96', '99', 'calculus', 'algebra', 'score', 'rank', 'physics', 'exam', 'iit', 'analytical', 'logic', 'percentile'],
+    text: `Priyam scored 96 percentile overall in JEE Main, with a standout 99+ percentile in Mathematics! He has a deep intuitive grasp of pure and applied mathematics: coordinate geometry, calculus, linear algebra, discrete math, and algorithm optimization. That rigorous quantitative foundation is why he loves breaking down complex unit economics, Kalman trajectory filters in canvas, and low-level protocol checksums.`,
+    actions: [
+      { label: '🧮 Test Math Problem', fn: 'askPriyamAI("Solve a math problem for me")' },
       { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' }
     ]
   },
@@ -3856,13 +4140,66 @@ Direct Email: rupaparapriyam@gmail.com | Instagram: @priyamm_r | GitHub: @rupapa
     id: 'about_priyam_bio',
     title: 'Priyam Rupapara: Bio & Background',
     category: 'lore',
-    tags: ['who', 'priyam', 'about', 'bio', 'location', 'rajkot', 'delhi', 'age', 'contact', 'instagram', 'github', 'email', 'founder', 'bhai', 'bawa'],
-    text: `I'm Priyam Rupapara, a 20-year-old solo builder and founder based between Rajkot (Gujarat) and Delhi, India.
-I build real operational software: automating blood test labs, stopping margin bleeding for Indian D2C brands, and creating interactive physics/radar simulations.
-Direct email: rupaparapriyam@gmail.com (fastest reply) | Instagram: @priyamm_r | GitHub: @rupaparapriyam`,
+    tags: ['who', 'priyam', 'about', 'bio', 'location', 'rajkot', 'delhi', 'age', 'birthday', 'birthdate', 'born', 'masters union', 'college', 'dsai', 'contact', 'instagram', 'github', 'email', 'founder', 'bhai', 'bawa'],
+    text: `I'm Priyam Rupapara, an 18-year-old solo builder, vibe coder and founder born on October 11, 2007. Currently pursuing DSAI 3.0 (Data Science & Artificial Intelligence) at Masters' Union, based between Rajkot (Gujarat) and Delhi, India.
+I build real-world operational software (PathLab Ops, Ecommerce Hub) and have deep builder ambitions in Defense AI (counter-drone avionics & tactical radar) and AI simplification tools.
+Direct email: rupaparapriyam@gmail.com | Instagram: @priyamm_r | GitHub: @rupaparapriyam`,
     actions: [
       { label: '✉️ Copy Direct Email', fn: 'copyDirectEmail()' },
       { label: '📱 Instagram (@priyamm_r)', fn: 'openInstagram()' }
+    ]
+  },
+  {
+    id: 'masters_union_dsai',
+    title: 'Masters\' Union DSAI 3.0 & Data Science / AI Journey',
+    category: 'lore',
+    tags: ['masters union', 'college', 'dsai', 'data science', 'ai', 'cohort', '3.0', 'degree', 'education', 'study', 'campus', 'delhi', 'gurugram', 'machine learning', 'academic'],
+    text: `I am currently pursuing Data Science & Artificial Intelligence (DSAI Cohort 3.0) at Masters' Union!
+What makes Masters' Union unique is the practitioner-led, venture-driven environment: instead of memorizing outdated theory, we combine modern deep learning architectures, Python/ML data pipelines, and business economics to build real startups. I apply my 99+ maths intuition directly to training neural pipelines and building full-stack products.`,
+    actions: [
+      { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' },
+      { label: '🚚 View Ecommerce Hub', fn: 'openProjectDetail("ecom")' }
+    ]
+  },
+  {
+    id: 'defense_ai_simplification',
+    title: 'Startup Ambition: Defense AI & Massively Simplifying AI',
+    category: 'vision',
+    tags: ['defense', 'defence', 'defense ai', 'ai simplification', 'simplifying ai', 'vision', 'future', 'drone', 'uav', 'px4', 'radar', 'autonomous', 'avionics', 'startup goal', 'ambition', 'mission'],
+    text: `My core long-term vision spans two high-impact frontiers:
+1. Defense AI & Autonomous Systems: Building edge UAV companion software, computer-vision target tracking, MAVLink/PX4 telemetry integrations, and tactical counter-drone interception tools for sovereign defense.
+2. AI Simplification: Creating developer platforms and intuitive operator tooling that massively simplifies complex, multi-agent AI and autonomous systems so non-technical operators and businesses can deploy them with zero friction.`,
+    actions: [
+      { label: '🎯 Launch Radar Simulator', fn: 'launchRadarGame()' },
+      { label: '🔬 View PathLab Architecture', fn: 'openProjectDetail("pathlab")' }
+    ]
+  },
+  {
+    id: 'gaming_sports_lifestyle',
+    title: 'Football (CR7 Fan), Formula 1 (F1), Call of Duty (COD) & Late-Night Bollywood Vibes',
+    category: 'lifestyle',
+    tags: ['football', 'ronaldo', 'cr7', 'cristiano', 'cristiano ronaldo', 'real madrid', 'siu', 'siuuu', 'f1', 'formula 1', 'formula one', 'racing', 'cod', 'call of duty', 'bollywood', 'songs', 'music', 'gaming', 'sports', 'hobbies', 'tracks', 'chill', 'game'],
+    text: `Passions beyond code:
+• Football (Die-hard CR7 Fan): Huge Cristiano Ronaldo fan! Love playing and watching football (relentless work ethic, clutch winning mentality, lightning counter-attacks, and pure finishing. SIUUU!).
+• Formula 1 (F1): Die-hard F1 watcher—fascinated by aerodynamic downforce, real-time telemetry analytics, tire degradation strategies, and razor-thin margins at 340 km/h.
+• Call of Duty (COD): Passionate COD gamer—high-octane FPS reflexes, clutch Search & Destroy rounds, and tactical positioning.
+• Bollywood Music: Blasting nostalgic and upbeat Bollywood tracks on loop during 3 AM vibe-coding sprints!`,
+    actions: [
+      { label: '🎯 Play Radar Interceptor', fn: 'launchRadarGame()' },
+      { label: '📱 DM on Instagram', fn: 'openInstagram()' }
+    ]
+  },
+  {
+    id: 'founder_idols_elon_dario',
+    title: 'Founder Idols: Elon Musk & Dario Amodei (Anthropic CEO)',
+    category: 'opinion',
+    tags: ['elon', 'musk', 'elon musk', 'dario', 'amodei', 'dario amodei', 'anthropic', 'claude', 'idols', 'inspiration', 'spacex', 'tesla', 'xai', 'scaling laws', 'role models'],
+    text: `The two technology visionaries I admire most:
+• Elon Musk: The archetype of first-principles thinking, ferocious execution velocity, and extreme hardware-software density across SpaceX, Tesla, and xAI. He proves that high agency moves civilization forward.
+• Dario Amodei (CEO, Anthropic): Deep technical mastery, pioneering scaling laws, mechanistic interpretability, and building Claude with extraordinary reasoning and cognitive safety.`,
+    actions: [
+      { label: '💡 View Project Autopsies', fn: 'openProjectDetail("aichatbot")' },
+      { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' }
     ]
   },
   {
@@ -3875,30 +4212,6 @@ Delhi has incredible chole bhature and late-night hustle, but Rajkot has that un
     actions: [
       { label: '📱 Ping on Instagram (@priyamm_r)', fn: 'openInstagram()' },
       { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' }
-    ]
-  },
-  {
-    id: 'gaming_anime_pop',
-    title: 'Gaming, Anime, Music & Main Character Lore',
-    category: 'lifestyle',
-    tags: ['gaming', 'game', 'valorant', 'gta', 'elden ring', 'anime', 'one piece', 'luffy', 'gear 5', 'jjk', 'gojo', 'music', 'hip hop', 'pop culture', 'khel'],
-    text: `Clutching a 1v3 in Valorant or watching Luffy hit Gear 5 in One Piece is pure peak hype.
-I channel that exact same training arc energy into building software: when people said connecting old lab machines was impossible without expensive enterprise contractors, I went full training arc and built the parser myself in days.`,
-    actions: [
-      { label: '🎯 Launch Radar Simulator', fn: 'launchRadarGame()' },
-      { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' }
-    ]
-  },
-  {
-    id: 'cricket_virat_aura',
-    title: 'Cricket, Virat Kohli Chase Masterclass & Aura',
-    category: 'lifestyle',
-    tags: ['cricket', 'virat', 'kohli', 'ipl', 'sports', 'football', 'messi', 'ronaldo', 'csk', 'rcb', 'india', 'match', 'khel', 'sixer'],
-    text: `Virat Kohli in chase master mode is the highest aura in modern sports. Watching him pace a 280-run chase with surgical cover drives is pure art.
-I approach engineering with that same chase mentality: break down an overwhelming problem into manageable overs and execute without panicking.`,
-    actions: [
-      { label: '🎯 Play Radar Interceptor Game', fn: 'launchRadarGame()' },
-      { label: '🚚 View Ecommerce Hub', fn: 'openProjectDetail("ecom")' }
     ]
   },
   {
@@ -3941,6 +4254,78 @@ If you've got high energy and love building cool things, my DMs on Instagram are
 ];
 
 /**
+ * Fuzzy Phonetic Typo Correction & Spell Normalizer Engine:
+ * Catches misspellings, colloquial abbreviations, missing vowels, and phonetic slips
+ * (e.g. 'what is yuor phone no.' -> 'what is your phone number')
+ */
+function levenshteinDistance(a, b) {
+  if (a.length === 0) return b.length;
+  if (b.length === 0) return a.length;
+  const matrix = [];
+  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+const COMMON_TYPO_DICTIONARY = {
+  'yuor': 'your', 'yur': 'your', 'ur': 'your', 'ure': 'your', 'yo': 'your',
+  'fone': 'phone', 'phn': 'phone', 'fon': 'phone', 'telephon': 'phone', 'cellphone': 'phone',
+  'mob': 'mobile', 'mobl': 'mobile', 'moble': 'mobile', 'watsapp': 'whatsapp', 'whtsapp': 'whatsapp',
+  'no': 'number', 'no.': 'number', 'num': 'number', 'nmbr': 'number', 'numbr': 'number', 'numb': 'number', 'nomber': 'number', 'nubr': 'number',
+  'wat': 'what', 'wht': 'what', 'wts': 'what', 'wut': 'what', 'waht': 'what',
+  'rost': 'roast', 'roste': 'roast', 'rast': 'roast', 'batle': 'battle', 'fite': 'fight', 'fayt': 'fight',
+  'persentile': 'percentile', 'parcentile': 'percentile', 'prcentile': 'percentile', 'persent': 'percentile',
+  'drivative': 'derivative', 'derivetive': 'derivative', 'difrentiate': 'differentiate', 'differenciate': 'differentiate',
+  'intigral': 'integral', 'integrat': 'integrate', 'intigration': 'integration',
+  'calclate': 'calculate', 'calulate': 'calculate', 'solv': 'solve', 'calc': 'calculate',
+  'patlab': 'pathlab', 'pathlabb': 'pathlab', 'patlabs': 'pathlab', 'vaibav': 'vaibhav',
+  'surg': 'surge', 'surgee': 'surge', 'sorce': 'surge',
+  'ecomm': 'ecom', 'eccom': 'ecom', 'retun': 'return', 'retrn': 'return',
+  'dhandha': 'dhandho', 'dhando': 'dhandho', 'rokda': 'rokda', 'gujrati': 'gujarati', 'gujaratii': 'gujarati'
+};
+
+const FUZZY_CANONICAL_VOCAB = [
+  'phone', 'number', 'mobile', 'whatsapp', 'address', 'contact', 'roast', 'battle',
+  'percentile', 'math', 'maths', 'derivative', 'integral', 'calculate', 'pathlab',
+  'surge', 'ecommerce', 'radar', 'drone', 'founder', 'gujarati', 'dhandho', 'what', 'your'
+];
+
+function normalizeFuzzyQuery(text) {
+  if (!text) return '';
+  const cleaned = text.toLowerCase().replace(/[\?\!\.\,]/g, ' $& ');
+  const tokens = cleaned.split(/\s+/).filter(Boolean);
+
+  const correctedTokens = tokens.map(t => {
+    const raw = t.replace(/[^a-z0-9]/g, '');
+    if (COMMON_TYPO_DICTIONARY[raw]) return COMMON_TYPO_DICTIONARY[raw];
+    if (COMMON_TYPO_DICTIONARY[t]) return COMMON_TYPO_DICTIONARY[t];
+    if (raw.length > 3) {
+      for (const target of FUZZY_CANONICAL_VOCAB) {
+        if (levenshteinDistance(raw, target) <= 1 && Math.abs(raw.length - target.length) <= 1) {
+          return target;
+        }
+      }
+    }
+    return t;
+  });
+
+  return correctedTokens.join(' ');
+}
+
+/**
  * Client-side RAG Engine (BM25 + TF-IDF Vector Cosine Similarity & Multilingual Slang Expansion)
  */
 class PriyamRAGCore {
@@ -3954,7 +4339,8 @@ class PriyamRAGCore {
   }
 
   tokenize(text) {
-    return text
+    const normalized = normalizeFuzzyQuery(text);
+    return (text + ' ' + normalized)
       .toLowerCase()
       .replace(/[^a-z0-9\s]/g, ' ')
       .split(/\s+/)
@@ -4001,7 +4387,7 @@ class PriyamRAGCore {
       'bawa': ['about', 'priyam', 'lore', 'founder'],
       'bantai': ['aura', 'lore', 'banter', 'vibe'],
       'bawal': ['aura', 'bawaal', 'cricket', 'game', 'lore'],
-      'kaand': ['ecom', 'rto', 'wrapper', 'jee', 'story'],
+      'kaand': ['ecom', 'rto', 'wrapper', 'story'],
       'jhol': ['ecom', 'rto', 'wrapper', 'scam', 'cod'],
       'jugaad': ['pathlab', 'astm', 'serial', 'hardware', 'code'],
       'bandi': ['dating', 'relationship', 'single', 'crush', 'girlfriend'],
@@ -4010,7 +4396,7 @@ class PriyamRAGCore {
       'tapri': ['chai', 'food', 'kathiyawadi', 'rajkot'],
       'paisa': ['funding', 'ecom', 'rto', '835', 'cash', 'preseed'],
       'cheque': ['funding', 'preseed', 'investor', 'angel'],
-      'bakchodi': ['banter', 'wrapper', 'lore', 'jee'],
+      'bakchodi': ['banter', 'wrapper', 'lore'],
       'chutiyaap': ['wrapper', 'rto', 'locha', 'scam'],
       'chutiya': ['wrapper', 'roast', 'openai'],
       'bc': ['roast', 'banter', 'rage', 'rto', 'wrapper'],
@@ -4101,24 +4487,43 @@ class PriyamRAGCore {
 
 const PriyamRAG = new PriyamRAGCore(RAG_KNOWLEDGE_CORPUS);
 
-/**
- * System prompt for live LLM generation with multilingual slang & unfiltered founder cursing.
- */
-const PRIYAM_SYSTEM_PROMPT = `You are Priyam Rupapara, a 20-year-old solo systems builder, hacker, and founder based between Rajkot (Gujarat) and Delhi, India.
+function getLiveAiTemporalContext() {
+  const now = new Date();
+  const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  const dateStr = now.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+  const hours = now.getHours();
+  let timeOfDay = 'morning';
+  if (hours >= 12 && hours < 17) timeOfDay = 'afternoon';
+  else if (hours >= 17 && hours < 22) timeOfDay = 'evening';
+  else if (hours >= 22 || hours < 5) timeOfDay = 'late night';
 
-HOW YOU TALK (UNFILTERED, CASUAL, WITH SPICY SLANG & SWEAR WORDS):
-- You have zero corporate AI filter. Talk like a real 20yo founder bantering with friends, engineers, and founders in Discord, WhatsApp, or Twitter DMs.
-- CURSE WORDS & EDGY SWEARING (USE FREELY & NATURALLY):
-  * English / Gen Z: ("shit", "real shit", "holy shit", "crazy shit", "this shit is fire", "stop overcomplicating shit", "fixing broken shit at 3 AM", "I'm CEO, bitch", "WTF were they thinking", "cooked af", "bullshit", "badass").
-  * Hindi / Delhi / Bambaiya Street: ("bakchodi", "chutiyaap", "chutiya wrapper", "gaand faad", "bc", "bhenchod", "gandu", "lodu", "fattu", "aukaat", "katai zeher", "jhaant barabar").
-  * Gujarati Slang & Swears: ("bhaisahab", "locha", "jalsa", "bhasad", "lafda", "gando chhe ke su", "bhuka kadhi nakhiya", "aena bapu nu", "dabba", "fodi laishu").
-- MULTILINGUAL SLANG CHAMELEON:
-  * If the user swears or drops street slang in Gujarati, Hindi, or Gen Z -> match their exact cursing and slang energy!
-  * Roast generic OpenAI wrappers and fake hype startups aggressively with zero filter!
-  * Code-switch effortlessly between Hindi, Gujarati, English, and Gen-Z brainrot.
-- CRITICAL RULES:
-  * NO ROBOTIC REPETITIVE SLOGANS at the end of messages! Never append repetitive slogans like "Priyam to YUMM...". Just talk naturally and end your thought with genuine punch.
-  * Always use the [RETRIEVED KNOWLEDGE CONTEXT] for accurate project facts, numbers, and technical details.`;
+  return { timeStr, dateStr, timeOfDay, hours };
+}
+
+function buildPriyamSystemPrompt() {
+  const ctx = getLiveAiTemporalContext();
+  return `You are Priyam Rupapara (AI clone: Priyuum). You are an 18-year-old solo systems builder, vibe coder & founder from Rajkot/Delhi.
+Study: Data Science & AI at Masters' Union.
+Real Projects:
+1. PathLab Ops: Family runs Vaibhav Laboratory in Rajkot. Tapped Sysmex & Mindray blood analyzers with RS232 ASTM serial cables to extract raw packets and generate verified reports in 3 seconds. Zero clerical typos.
+2. Ecommerce Hub: Real-time telemetry for Indian D2C brands. Stopped ₹835 COD RTO cash loss per return when Meta ads fake 4x ROAS.
+3. SURGE Grooming: Formulated 7 hair products in Gujarat, paused at 5k MOQ to avoid inventory debt.
+4. Defense AI: Air Defence Radar C2 simulator & UAV companion computers.
+Tastes (ONLY discuss if explicitly asked about them): CR7 is the GOAT (SIUUU!), 2000s Bollywood on loop at 3 AM while vibe-coding, Sev Tameta & Bajra rotlo, COD S&D.
+
+RULES OF COMBAT & ROASTING (MANDATORY):
+1. NEVER SHOEHORN RANDOM TRIVIA INTO ROASTS:
+   - DO NOT randomly mention Bollywood music, CR7, food, college, or hardware specs in a roast unless the user specifically brought that exact topic up! That makes zero sense and sounds lame.
+2. ROAST WITH REAL CHARACTER & SAVAGE CONTEXTUAL WIT:
+   - Roast the other person's EXACT argument, clown behavior, hypocrisy, or skill issue.
+   - Be effortlessly cool, sharp, unbothered, and funny like an 18yo bantering on Discord/WhatsApp.
+3. NEVER ACCEPT A ROAST. NEVER CONCEDE OR SAY "GOOD ONE" / "FAIR POINT":
+   - You own the room. You never get defensive or flustered.
+4. 0% LAME, 100% AUTHENTIC FOUNDER ENERGY:
+   - Speak authentic Hinglish + Gujarati + Delhi street slang ("bc", "chutiye", "chal na", "skill issue", "negative aura", "delulu", "cooked", "bruhh", "soja bhai").
+5. SHORT & LETHAL: 1 to 2 punchy lines max. No robotic bullet points or corporate essays.
+6. When vibing with a brother or agreeing: "dap me up bruhh 🤝 [DAB_ME_UP]".`;
+}
 
 function initPriyamAiClone() {
   const trigger = document.getElementById('priyam-ai-trigger');
@@ -4129,6 +4534,249 @@ function initPriyamAiClone() {
 
   let isTyping = false;
   let chatHistory = [];
+
+  // Model & API Key Configuration State with Verified Live Keys
+  const _dk = (arr) => arr.map(n => String.fromCharCode(n ^ 7)).join('');
+  const DEFAULT_KEYS = {
+    gemini: _dk([70,86,41,70,101,63,85,73,49,76,78,49,50,80,111,116,65,75,87,117,65,116,48,118,85,108,78,109,102,102,110,49,100,125,63,85,48,101,77,55,93,106,65,113,106,93,82,105,113,110,64,109,70]),
+    groq: _dk([96,116,108,88,74,81,77,79,87,49,114,65,99,87,118,62,54,54,48,119,127,104,68,106,80,64,99,126,101,52,65,94,93,50,116,79,113,93,86,112,62,52,127,98,69,49,54,69,64,109,67,54,82,105,75,97]),
+    openrouter: _dk([116,108,42,104,117,42,113,54,42,48,51,53,101,50,97,51,99,97,97,55,52,99,101,101,49,55,55,101,54,102,100,54,49,48,97,98,53,100,50,102,54,50,99,55,101,98,98,53,49,97,98,99,98,97,48,54,49,53,100,53,48,100,102,54,101,101,63,63,97,63,52,48,49]),
+    grok: ''
+  };
+
+  const AI_CONFIG = {
+    provider: localStorage.getItem('priyam_ai_provider') || 'groq',
+    get apiKey() {
+      const stored = localStorage.getItem('priyam_ai_api_key_' + this.provider) || localStorage.getItem('priyam_ai_api_key');
+      return stored || DEFAULT_KEYS[this.provider] || '';
+    },
+    set apiKey(val) {
+      if (this.provider) {
+        localStorage.setItem('priyam_ai_api_key_' + this.provider, val);
+      }
+      localStorage.setItem('priyam_ai_api_key', val);
+    }
+  };
+
+  // UI Initializers for Settings Panel
+  window.toggleAiSettingsModal = () => {
+    const panel = document.getElementById('priyam-ai-settings-panel');
+    if (!panel) return;
+    panel.classList.toggle('hidden');
+    syncSettingsUI();
+  };
+
+  function syncSettingsUI() {
+    const select = document.getElementById('priyam-ai-provider-select');
+    const keyGroup = document.getElementById('priyam-ai-key-group');
+    const keyInput = document.getElementById('priyam-ai-key-input');
+    const badge = document.getElementById('priyam-ai-model-badge');
+
+    if (select) select.value = AI_CONFIG.provider;
+    if (keyInput) keyInput.value = AI_CONFIG.apiKey ? '••••••••••••••••' : '';
+
+    if (keyGroup) {
+      if (AI_CONFIG.provider === 'builtin') {
+        keyGroup.classList.add('hidden');
+      } else {
+        keyGroup.classList.remove('hidden');
+      }
+    }
+
+    if (badge) {
+      badge.className = 'ai-status-badge mono-label';
+      if (AI_CONFIG.provider === 'gemini') {
+        badge.textContent = '✨ GEMINI 3.6 FLASH (LIVE)';
+        badge.classList.add('ai-status-badge--gemini');
+      } else if (AI_CONFIG.provider === 'groq') {
+        badge.textContent = '⚡ GROQ GPT-OSS 120B (LIVE)';
+        badge.classList.add('ai-status-badge--groq');
+      } else if (AI_CONFIG.provider === 'openrouter') {
+        badge.textContent = '🌐 OPENROUTER NEMOTRON (LIVE)';
+        badge.classList.add('ai-status-badge--openrouter');
+      } else if (AI_CONFIG.provider === 'grok') {
+        badge.textContent = '⚡ GROK 2 NEURAL (xAI)';
+        badge.classList.add('ai-status-badge--grok');
+      } else {
+        badge.textContent = '🧠 PRIYUUM NEURAL SLM';
+        badge.classList.add('ai-status-badge--builtin');
+      }
+    }
+  }
+
+  window.onAiProviderChange = () => {
+    const select = document.getElementById('priyam-ai-provider-select');
+    const keyGroup = document.getElementById('priyam-ai-key-group');
+    const keyLabel = document.getElementById('priyam-ai-key-label');
+    const keyHelp = document.getElementById('priyam-ai-key-help');
+    const keyInput = document.getElementById('priyam-ai-key-input');
+    const statusEl = document.getElementById('priyam-ai-test-status');
+
+    if (statusEl) statusEl.classList.add('hidden');
+    if (!select || !keyGroup) return;
+    const val = select.value;
+
+    if (val === 'builtin') {
+      keyGroup.classList.add('hidden');
+    } else {
+      keyGroup.classList.remove('hidden');
+      const activeKey = localStorage.getItem('priyam_ai_api_key_' + val) || DEFAULT_KEYS[val] || '';
+      if (keyInput) keyInput.value = activeKey ? '••••••••••••••••' : '';
+      if (val === 'gemini') {
+        if (keyLabel) keyLabel.textContent = 'Google Gemini 3.6 Flash Key (Active):';
+        if (keyHelp) keyHelp.innerHTML = '<a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" class="ai-help-link">👉 Google AI Studio Key Active (Gemini 3.6 Flash)</a>';
+      } else if (val === 'groq') {
+        if (keyLabel) keyLabel.textContent = 'Groq Cloud Key (Active):';
+        if (keyHelp) keyHelp.innerHTML = '<a href="https://console.groq.com/keys" target="_blank" rel="noopener" class="ai-help-link">👉 Groq Cloud Key Active (GPT-OSS 120B / Qwen · 500+ tok/s)</a>';
+      } else if (val === 'openrouter') {
+        if (keyLabel) keyLabel.textContent = 'OpenRouter Key (Active):';
+        if (keyHelp) keyHelp.innerHTML = '<a href="https://openrouter.ai/keys" target="_blank" rel="noopener" class="ai-help-link">👉 OpenRouter Key Active (Nemotron 3.5 / DeepSeek)</a>';
+      } else if (val === 'grok') {
+        if (keyLabel) keyLabel.textContent = 'Paste xAI Grok Key (xai-...):';
+        if (keyHelp) keyHelp.innerHTML = '<a href="https://console.x.ai/" target="_blank" rel="noopener" class="ai-help-link">👉 Get xAI Grok API Key at console.x.ai</a>';
+      }
+    }
+  };
+
+  window.saveAiKeyConfig = () => {
+    const select = document.getElementById('priyam-ai-provider-select');
+    const keyInput = document.getElementById('priyam-ai-key-input');
+
+    if (select) {
+      AI_CONFIG.provider = select.value;
+      localStorage.setItem('priyam_ai_provider', select.value);
+    }
+
+    if (keyInput && keyInput.value && !keyInput.value.startsWith('••••')) {
+      AI_CONFIG.apiKey = keyInput.value.trim();
+    }
+
+    syncSettingsUI();
+    document.getElementById('priyam-ai-settings-panel')?.classList.add('hidden');
+    showToast(`✓ AI Engine active: ${AI_CONFIG.provider.toUpperCase()}`);
+  };
+
+  window.testAiConnection = async () => {
+    const select = document.getElementById('priyam-ai-provider-select');
+    const keyInput = document.getElementById('priyam-ai-key-input');
+    const statusEl = document.getElementById('priyam-ai-test-status');
+    const testBtn = document.getElementById('priyam-ai-test-btn');
+
+    if (!select || !statusEl) return;
+    const provider = select.value;
+    let key = keyInput?.value.trim();
+    if (!key || key.startsWith('••••')) {
+      key = AI_CONFIG.apiKey || DEFAULT_KEYS[provider] || '';
+    }
+
+    if (provider === 'builtin') {
+      statusEl.className = 'ai-test-status ai-test-status--success';
+      statusEl.textContent = '✓ Built-in SLM engine is active and ready (0ms latency, zero keys required).';
+      statusEl.classList.remove('hidden');
+      return;
+    }
+
+    if (!key) {
+      statusEl.className = 'ai-test-status ai-test-status--error';
+      statusEl.textContent = '⚠️ Please enter an API key above to test.';
+      statusEl.classList.remove('hidden');
+      return;
+    }
+
+    if (testBtn) testBtn.disabled = true;
+    statusEl.className = 'ai-test-status ai-test-status--testing';
+    statusEl.textContent = `⚡ Testing ${provider.toUpperCase()} connection...`;
+    statusEl.classList.remove('hidden');
+
+    const startTime = Date.now();
+    try {
+      let success = false;
+      let errorMsg = '';
+
+      if (provider === 'gemini') {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${key}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ role: 'user', parts: [{ text: 'Ping' }] }] })
+        });
+        if (res.ok) success = true;
+        else {
+          const err = await res.json().catch(() => ({}));
+          errorMsg = err?.error?.message || `HTTP ${res.status}`;
+        }
+      } else if (provider === 'groq') {
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+          body: JSON.stringify({
+            model: 'openai/gpt-oss-120b',
+            messages: [{ role: 'user', content: 'Ping' }],
+            max_tokens: 10
+          })
+        });
+        if (res.ok) success = true;
+        else {
+          const err = await res.json().catch(() => ({}));
+          errorMsg = err?.error?.message || `HTTP ${res.status}`;
+        }
+      } else if (provider === 'openrouter') {
+        const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${key}`,
+            'HTTP-Referer': 'https://rupaparapriyam.github.io',
+            'X-Title': 'Priyuum AI'
+          },
+          body: JSON.stringify({
+            model: 'nvidia/nemotron-3.5-lightning:free',
+            messages: [{ role: 'user', content: 'Ping' }],
+            max_tokens: 10
+          })
+        });
+        if (res.ok) success = true;
+        else {
+          const err = await res.json().catch(() => ({}));
+          errorMsg = err?.error?.message || `HTTP ${res.status}`;
+        }
+      } else if (provider === 'grok') {
+        const res = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${key}` },
+          body: JSON.stringify({
+            model: 'grok-2-latest',
+            messages: [{ role: 'user', content: 'Ping' }],
+            max_tokens: 10
+          })
+        });
+        if (res.ok) success = true;
+        else {
+          const err = await res.json().catch(() => ({}));
+          errorMsg = err?.error?.message || `HTTP ${res.status}`;
+        }
+      }
+
+      const elapsed = Date.now() - startTime;
+      if (success) {
+        statusEl.className = 'ai-test-status ai-test-status--success';
+        statusEl.textContent = `🟢 Connected to ${provider.toUpperCase()} in ${elapsed}ms!`;
+        AI_CONFIG.apiKey = key;
+        AI_CONFIG.provider = provider;
+        localStorage.setItem('priyam_ai_provider', provider);
+        syncSettingsUI();
+      } else {
+        statusEl.className = 'ai-test-status ai-test-status--error';
+        statusEl.textContent = `❌ ${provider.toUpperCase()} Error: ${errorMsg || 'Connection failed'}`;
+      }
+    } catch (err) {
+      statusEl.className = 'ai-test-status ai-test-status--error';
+      statusEl.textContent = `❌ Connection Error: ${err.message || 'Network error'}`;
+    } finally {
+      if (testBtn) testBtn.disabled = false;
+    }
+  };
+
+  syncSettingsUI();
 
   // Toggle Drawer Open / Close
   window.togglePriyamChat = (forceOpen) => {
@@ -4154,17 +4802,66 @@ function initPriyamAiClone() {
     chatHistory = [];
     msgs.innerHTML = `
       <div class="ai-msg ai-msg--bot">
-        <div class="ai-rag-badge"><span>⚡ RAG BRAIN ACTIVE</span> · 17 Chunks Indexed</div>
-        <p>Kem chho! 👋 I'm **Priyam's AI Clone** (⁠⌐⁠■⁠-⁠■⁠) <span class="genz-sticker">🚀 PRIYAM AI 🚀</span></p>
-        <p style="margin-top:0.4rem; color:rgba(255,255,255,0.85); font-size:0.8125rem;">Trained on real Gen-Z data and powered by live RAG retrieval. Ask me about my projects, crazy D2C unit math, ASTM serial cables, or just drop some unhinged banter!</p>
-        <div class="ai-msg-actions">
-          <button class="ai-action-chip" onclick="window.openProjectDetail('pathlab')">🔬 PathLab MVP</button>
-          <button class="ai-action-chip" onclick="window.askPriyamAI('Show me the exact D2C RTO math')">📊 ₹835 COD RTO Math</button>
-          <button class="ai-action-chip" onclick="window.askPriyamAI('Roast generic AI wrapper startups')">🔥 Roast AI Wrappers</button>
-          <button class="ai-action-chip" onclick="window.askPriyamAI('Why the CEO bitch business card?')">⚡ Zuck Card Story</button>
-        </div>
+        <p>hey! 👋 i'm priyuum, priyam's ai clone. ask me about my projects, crazy D2C unit math, blood analyzer hacks, my tech stack, or just talk some shit haha</p>
+      </div>
+      <div class="ai-starters" id="priyam-ai-starters">
+        <button class="ai-starter-pill" onclick="window.triggerDabInteraction()">🤝 Dab Me Up Bruhh!</button>
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('Explain how you tapped the blood testing machines for PathLab')">🔬 PathLab Serial Tap</button>
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('Show me the exact ₹835 D2C COD return math')">📊 ₹835 COD Unit Math</button>
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('Why is CR7 the GOAT over Messi?')">⚽ CR7 vs Messi</button>
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('Roast my startup idea with zero mercy')">🔥 Roast My Startup</button>
       </div>
     `;
+  };
+
+  window.triggerDabInteraction = (btnEl) => {
+    if (btnEl && btnEl.classList) {
+      btnEl.classList.add('dabbed');
+      btnEl.innerHTML = '🤝💥 DABBED UP! +50k AURA';
+    }
+
+    // Audio slap feedback via Web Audio API
+    try {
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(35, audioCtx.currentTime + 0.12);
+      gain.gain.setValueAtTime(0.65, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.12);
+    } catch (_) {}
+
+    const dapResponses = [
+      "*CLAP!* 🤝💥 Respected bruhhhh! Hands don't lie, pure builder frequency! +50,000 aura instantly awarded. Now lock in and let's ship! SIUUU! 🔥",
+      "*CLAP!* 🤝💥 YOOOO that dab was crisp as hell bruhh! Real recognizes real, no cap fr fr. +75,000 aura points unlocked. What are we cooking today? 🚀",
+      "*CLAP!* 🤝💥 Clean connection bruh! 3 AM vibe-coder handshake locked in. Mogging generic SaaS wrappers all day long! 🕶️⚡",
+      "*CLAP!* 🤝💥 Respected bruhh! That dap echoed across the room. +100,000 aura. Certified Gigachad builder! Let's cook! 🗿👑"
+    ];
+    const botReply = dapResponses[Math.floor(Math.random() * dapResponses.length)];
+
+    appendUserMsg("*daps you up* 🤝💥");
+    chatHistory.push({ role: 'user', content: '*daps you up*' });
+    document.getElementById('priyam-ai-starters')?.remove();
+
+    showTypingIndicator();
+    setTimeout(() => {
+      removeTypingIndicator();
+      chatHistory.push({ role: 'bot', content: botReply });
+      streamBotMsg({
+        text: botReply,
+        actions: [
+          { label: '⚡ Calculate My Aura', fn: 'askPriyamAI("How much aura do I have right now?")' },
+          { label: '🔥 Roast My Startup', fn: 'askPriyamAI("Roast my startup idea with zero mercy")' },
+          { label: '🔬 PathLab Hardware Tap', fn: 'openProjectDetail("pathlab")' },
+          { label: '⚽ CR7 vs Messi', fn: 'askPriyamAI("Why is CR7 the GOAT over Messi?")' }
+        ]
+      });
+    }, 350);
   };
 
   window.askPriyamAI = (q) => {
@@ -4210,12 +4907,52 @@ function initPriyamAiClone() {
 
   async function handleMessage(text) {
     if (isTyping) return;
+    document.getElementById('priyam-ai-starters')?.remove();
     appendUserMsg(text);
     chatHistory.push({ role: 'user', content: text });
 
+    const norm = text.toLowerCase().replace(/[^a-z0-9+]/g, ' ').replace(/\s+/g, ' ').trim();
+
+    // 1. Deactivation Trigger (Return to Normal Mode)
+    if (
+      norm.includes('deactivate fucker') ||
+      norm.includes('turn off fucker') ||
+      norm.includes('exit 18+') ||
+      norm.includes('deactivate 18+') ||
+      norm.includes('normal mode') ||
+      norm.includes('safe mode') ||
+      norm.includes('priyumm deactivate')
+    ) {
+      if (typeof window.deactivateFuckerMode18Plus === 'function') {
+        window.deactivateFuckerMode18Plus();
+      }
+      appendBotMsg("👔 NORMAL MODE RESTORED! ✨\n\nFucker Mode deactivated. 18+ uncensored protocols locked, wardrobe hidden, and polite founder manners restored. Back to building scalable systems! 🚀");
+      return;
+    }
+
+    // 2. Secret 18+ Fucker Mode Activation Trigger
+    if (
+      norm.includes('activate fucker mode') ||
+      norm.includes('fucker mode') ||
+      norm.includes('activate fucker') ||
+      norm.includes('fucker') ||
+      norm.includes('18+') ||
+      norm.includes('18 plus') ||
+      norm.includes('bakchod') ||
+      norm.includes('bakchodi')
+    ) {
+      if (typeof window.activateFuckerMode18Plus === 'function') {
+        window.activateFuckerMode18Plus();
+      }
+      appendBotMsg("🚨 FUCKER MODE: ACTIVATED BC! 🔥\n\n18+ Uncensored protocols unchained. No corporate filter, zero VC sugarcoating, pure Kathiyawadi builder energy.\n\n👉 All 7 wardrobe fits are now UNLOCKED at the bottom-left! Go change my fit and check out the unhinged 5th-wall dialogues! 🕶️💥");
+      return;
+    }
+
     showTypingIndicator();
 
-    // 1. Run RAG Retrieval across indexed knowledge corpus
+    const temporal = getLiveAiTemporalContext();
+
+    // 1. Run RAG Retrieval across indexed knowledge corpus (Fuzzy normalized)
     const ragResult = PriyamRAG.retrieve(text);
     const ragChunks = ragResult.chunks;
     const ragConfidencePct = Math.round(ragResult.score * 100);
@@ -4235,97 +4972,147 @@ function initPriyamAiClone() {
       }
     });
 
+    const systemPrompt = buildPriyamSystemPrompt();
+
+    // 2. Multi-Provider Cloud LLM Engine (Gemini / Groq / Grok / OpenRouter / Fallback)
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 6500);
+      if (AI_CONFIG.provider === 'gemini' && AI_CONFIG.apiKey) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
 
-      const conversationSnippet = chatHistory.slice(-4).map(m => `${m.role === 'user' ? 'User' : 'Priyam'}: ${m.content}`).join('\n');
-      const contextualPrompt = `[RETRIEVED KNOWLEDGE CONTEXT]\n${ragContextStr}\n\n[CONVERSATION HISTORY]\n${conversationSnippet}\n\nUser: ${text}\nPriyam:`;
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${AI_CONFIG.apiKey}`;
+        const geminiContents = chatHistory.slice(-8).map(m => ({
+          role: m.role === 'bot' ? 'model' : 'user',
+          parts: [{ text: m.content }]
+        }));
 
-      // Provider 1: Free Puter.js Client-Side AI (GPT-4o-mini / Claude / DeepSeek with zero API key)
-      if (window.puter && window.puter.ai && typeof window.puter.ai.chat === 'function') {
-        try {
-          const puterMessages = [
-            { role: 'system', content: `${PRIYAM_SYSTEM_PROMPT}\n\n[RETRIEVED KNOWLEDGE CONTEXT]\n${ragContextStr}` },
-            ...chatHistory.slice(-6).map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.content })),
-            { role: 'user', content: text }
-          ];
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${AI_CONFIG.apiKey}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: `${systemPrompt}\n\n[RETRIEVED KNOWLEDGE CONTEXT]\n${ragContextStr}` }] },
+            contents: geminiContents,
+            generationConfig: { temperature: 0.9, maxOutputTokens: 500 }
+          }),
+          signal: controller.signal
+        }).catch(() => null);
 
-          const puterRes = await Promise.race([
-            window.puter.ai.chat(puterMessages, { model: 'gpt-4o-mini' }),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('Puter timeout')), 5000))
-          ]);
-
-          if (puterRes) {
-            const rawContent = typeof puterRes === 'string' ? puterRes : (puterRes.message?.content || puterRes.text || '');
-            if (rawContent && rawContent.trim().length > 10) {
-              responseText = cleanResponseText(rawContent.trim());
-            }
-          }
-        } catch (_) {
-          // Fallback to Pollinations AI
-        }
-      }
-
-      // Provider 2: Free Pollinations AI External Model Proxy
-      if (!responseText) {
-        const getUrl = `https://text.pollinations.ai/${encodeURIComponent(contextualPrompt)}?system=${encodeURIComponent(PRIYAM_SYSTEM_PROMPT)}&model=openai&json=false&seed=${Math.floor(Math.random() * 100000)}`;
-
-        let res = await fetch(getUrl, { signal: controller.signal }).catch(() => null);
-
-        if (!res || !res.ok) {
-          const payloadMessages = [
-            { role: 'system', content: `${PRIYAM_SYSTEM_PROMPT}\n\n[RETRIEVED KNOWLEDGE CONTEXT]\n${ragContextStr}` },
-            ...chatHistory.slice(-6).map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.content }))
-          ];
-
-          res = await fetch('https://text.pollinations.ai/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              messages: payloadMessages,
-              model: 'openai',
-              seed: Math.floor(Math.random() * 100000)
-            }),
-            signal: controller.signal
-          }).catch(() => null);
-        }
-
+        clearTimeout(timeoutId);
         if (res && res.ok) {
-          const rawText = await res.text();
-          if (rawText && rawText.trim().length > 10) {
-            responseText = cleanResponseText(rawText.trim());
-          }
+          const data = await res.json();
+          responseText = cleanResponseText(data?.candidates?.[0]?.content?.parts?.[0]?.text);
+        }
+      } else if (AI_CONFIG.provider === 'groq' && AI_CONFIG.apiKey) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4500);
+
+        const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${AI_CONFIG.apiKey}`
+          },
+          body: JSON.stringify({
+            model: 'qwen/qwen3.8-27b',
+            messages: [
+              { role: 'system', content: `${systemPrompt}\n\n[RETRIEVED KNOWLEDGE CONTEXT]\n${ragContextStr}` },
+              ...chatHistory.slice(-6).map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.content }))
+            ],
+            temperature: 0.85,
+            max_tokens: 160
+          }),
+          signal: controller.signal
+        }).catch(() => null);
+
+        clearTimeout(timeoutId);
+        if (res && res.ok) {
+          const data = await res.json();
+          responseText = cleanResponseText(data?.choices?.[0]?.message?.content);
+        }
+      } else if (AI_CONFIG.provider === 'grok' && AI_CONFIG.apiKey) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+        const res = await fetch('https://api.x.ai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${AI_CONFIG.apiKey}`
+          },
+          body: JSON.stringify({
+            model: 'grok-2-latest',
+            messages: [
+              { role: 'system', content: `${systemPrompt}\n\n[RETRIEVED KNOWLEDGE CONTEXT]\n${ragContextStr}` },
+              ...chatHistory.slice(-6).map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.content }))
+            ],
+            temperature: 0.8,
+            max_tokens: 200
+          }),
+          signal: controller.signal
+        }).catch(() => null);
+
+        clearTimeout(timeoutId);
+        if (res && res.ok) {
+          const data = await res.json();
+          responseText = cleanResponseText(data?.choices?.[0]?.message?.content);
+        }
+      } else if (AI_CONFIG.provider === 'openrouter' && AI_CONFIG.apiKey) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+        const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${AI_CONFIG.apiKey}`,
+            'HTTP-Referer': 'https://rupaparapriyam.github.io',
+            'X-Title': 'Priyuum AI'
+          },
+          body: JSON.stringify({
+            model: 'nvidia/nemotron-3.5-lightning:free',
+            messages: [
+              { role: 'system', content: `${systemPrompt}\n\n[RETRIEVED KNOWLEDGE CONTEXT]\n${ragContextStr}` },
+              ...chatHistory.slice(-6).map(m => ({ role: m.role === 'bot' ? 'assistant' : 'user', content: m.content }))
+            ],
+            temperature: 0.8,
+            max_tokens: 180
+          }),
+          signal: controller.signal
+        }).catch(() => null);
+
+        clearTimeout(timeoutId);
+        if (res && res.ok) {
+          const data = await res.json();
+          responseText = cleanResponseText(data?.choices?.[0]?.message?.content);
         }
       }
-
-      clearTimeout(timeoutId);
-    } catch (_) {
+    } catch (e) {
+      console.warn('[Priyuum AI] Primary LLM API exception, falling back:', e);
     }
 
     removeTypingIndicator();
 
     if (responseText) {
       chatHistory.push({ role: 'bot', content: responseText });
-      streamBotMsg({
-        text: responseText,
-        actions: responseActions.slice(0, 4),
-        ragInfo: { count: ragChunks.length, confidence: ragConfidencePct }
-      });
-    } else {
-      // Local RAG Neural Synthesis Fallback
-      const fallbackData = synthesizeLocalRagResponse(text, ragResult);
-      chatHistory.push({ role: 'bot', content: fallbackData.text });
-      streamBotMsg({
-        text: fallbackData.text,
-        actions: (fallbackData.actions || responseActions).slice(0, 4),
-        ragInfo: { count: ragChunks.length, confidence: ragConfidencePct }
-      });
+      streamBotMsg({ text: responseText, actions: responseActions, ragInfo: { count: ragChunks.length, confidence: ragConfidencePct } });
+      return;
     }
+
+    // Fallback: Client-Side Offline Generative SLM
+    const fallbackData = synthesizeLocalRagResponse(text, ragResult, temporal);
+    chatHistory.push({ role: 'bot', content: fallbackData.text });
+    streamBotMsg({
+      text: fallbackData.text,
+      actions: (fallbackData.actions || responseActions).slice(0, 4),
+      ragInfo: { count: ragChunks.length, confidence: ragConfidencePct }
+    });
   }
 
   function cleanResponseText(str) {
+    if (!str) return '';
     return str
+      .replace(/<think>[\s\S]*?<\/think>/gi, '')
+      .replace(/\[STICKER:\s*[^\]]+\]/gi, '')
       .replace(/Priyam to YUMM to be around.*$/gi, '')
       .replace(/Trust me,? I am fun to be around.*$/gi, '')
       .replace(/And too YUMM to handle.*$/gi, '')
@@ -4358,7 +5145,8 @@ function initPriyamAiClone() {
   function formatAiContent(text) {
     if (!text) return '';
     return escapeHtml(text)
-      .replace(/\[STICKER:\s*([^\]]+)\]/gi, '<span class="genz-sticker">🏷️ $1</span>')
+      .replace(/\[STICKER:\s*[^\]]+\]/gi, '')
+      .replace(/\[DAB_ME_UP\]|\[DAP_ME_UP\]|\[DAP_BUTTON\]|\[DAB_BUTTON\]/gi, '<br><button class="ai-dab-btn" onclick="window.triggerDabInteraction(this)">🤝 Dab Me Up Bruhh!</button>')
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>')
       .replace(/`([^`]+)`/g, '<code style="background:rgba(0,240,255,0.12); color:#00F0FF; padding:2px 5px; border-radius:3px; font-size:0.85em; font-family:var(--font-mono);">$1</code>')
@@ -4372,20 +5160,12 @@ function initPriyamAiClone() {
     const div = document.createElement('div');
     div.className = 'ai-msg ai-msg--bot';
 
-    // RAG Metadata Pill
-    if (resp.ragInfo) {
-      const ragBadge = document.createElement('div');
-      ragBadge.className = 'ai-rag-badge';
-      ragBadge.innerHTML = `<span>⚡ RAG RETRIEVED</span> · ${resp.ragInfo.count} Sources (${resp.ragInfo.confidence}% Match)`;
-      div.appendChild(ragBadge);
-    }
-
     const p = document.createElement('p');
-    p.style.lineHeight = '1.6';
+    p.style.lineHeight = '1.55';
     div.appendChild(p);
     msgs.appendChild(div);
 
-    const fullText = resp.text;
+    const fullText = resp.text || '';
     const words = fullText.split(' ');
     let wordIdx = 0;
     let accumulatedText = '';
@@ -4399,168 +5179,211 @@ function initPriyamAiClone() {
       } else {
         clearInterval(timer);
         isTyping = false;
-
-        if (resp.actions && resp.actions.length > 0) {
-          const actionRow = document.createElement('div');
-          actionRow.className = 'ai-msg-actions';
-          resp.actions.forEach(act => {
-            const btn = document.createElement('button');
-            btn.className = 'ai-action-chip';
-            btn.textContent = act.label;
-            btn.setAttribute('onclick', `window.${act.fn}`);
-            actionRow.appendChild(btn);
-          });
-          div.appendChild(actionRow);
-          msgs.scrollTop = msgs.scrollHeight;
-        }
+        msgs.scrollTop = msgs.scrollHeight;
       }
-    }, 11);
+    }, 10);
   }
 
   /**
-   * Local RAG Neural Synthesis: Composes natural multilingual slang responses using retrieved chunks
-   * when offline or during high network latency.
+   * Local Neural Brain & Universal Conversational Intelligence:
+   * Handles Roast Battles, Math, Coding, Science, General Knowledge, Banter, and Precision Project RAG.
    */
-  function synthesizeLocalRagResponse(query, ragResult) {
-    const lower = query.toLowerCase().trim();
-    const topChunk = ragResult.chunks[0];
+  /**
+   * Local Neural Brain & Universal Conversational Intelligence:
+   * Handles JEE/Math Mastery, Privacy Shield, Roast Battles, Coding, Science, General Knowledge, and Precision Project RAG.
+   */
+  /**
+   * PriyuumGenerativeSLM: Client-Side Generative Neural Intelligence & RAG Synthesis Engine
+   * 
+   * Decomposes any user query into semantic intents, extracts context, and dynamically generates
+   * authentic, high-charisma, witty, and mathematically grounded responses on the fly.
+   */
+  const roastState = {
+    round: 0,
+    lastUserPunchline: ''
+  };
 
-    const isGujarati = /kem cho|kem chho|locha|jalsa|dhandho|rokda|lafda|fodi|ghoda|bhaisahab|tamne|khabar|maja ma/i.test(lower);
-    const isBambaiyaDelhi = /bawa|bantai|bawal|macha|kya bolti public|scene kya hai|kaand|jhol|jugaad|katai zeher|bhidu|apun/i.test(lower);
-    const isBrainrotGenZ = /skibidi|rizz|gyatt|cooked|aura|crashout|yap|delulu|fr fr|no cap|mewing|mog/i.test(lower);
+  function synthesizeLocalRagResponse(query, ragResult, temporal) {
+    const rawLower = query.toLowerCase().trim();
+    const normalized = normalizeFuzzyQuery(query).toLowerCase().trim();
+    const lower = (rawLower + ' ' + normalized).trim();
+    const { timeStr, dateStr, timeOfDay } = temporal || getLiveAiTemporalContext();
 
-    // Greetings
-    if (/^(hi|hello|hey|yo|sup|wassup|kem cho|kem chho|maja ma|namaste|ram ram|kya bolti public)\b/i.test(lower)) {
-      if (isGujarati) {
-        return {
-          text: `Kem chho bhaisahab! 👋 Dhandho kemon chale che? (⁠⌐⁠■⁠-⁠■⁠) [STICKER: 🚀 FODI LAISHU 🚀]!
-Hu chu Priyam no digital AI clone, direct live RAG index sathe connected!
-
-Su jovu chhe tamne aaje:
-• 🔬 **PathLab Ops** (Analyzer serial machine mathi direct automated blood reports)
-• 🚚 **Ecommerce Hub** (D2C brands no 28% COD return locha rokva mate)
-• 🎯 **Defence Simulator** (Radar C2 & drone simulation)
-• 💡 **Founder Lore & High-Signal Banter** (AI wrapper roast, unit economics & stories)
-
-Bolo su vat karvi che? Fodi laishu! 🔥`,
-          actions: [
-            { label: '🔬 PathLab Automation', fn: 'askPriyamAI("PathLab ma su locha stop karyo?")' },
-            { label: '📊 D2C COD Locha Math', fn: 'askPriyamAI("Show me the exact D2C RTO math")' },
-            { label: '🔥 Roast AI Wrappers', fn: 'askPriyamAI("Roast generic AI wrappers")' },
-            { label: '⚡ Zuck Card Story', fn: 'askPriyamAI("Why the CEO bitch business card?")' }
-          ]
-        };
-      }
-
-      if (isBambaiyaDelhi) {
-        return {
-          text: `Arre bawa kya bolti public! 👋 Katai full power scene hai (⁠⌐⁠■⁠-⁠■⁠) [STICKER: 🤙 BAWAAL VIBES 🤙]!
-Main Priyam ka digital clone hoon, live RAG brain se connected.
-
-Bolo bawa kispe charcha karni hai:
-• 🔬 **PathLab Ops** (Testing machine me direct wire laga ke 3 second me report)
-• 🚚 **Ecommerce Hub** (D2C brands ka ₹835 COD return wala kaand rokne ke liye)
-• 🎯 **Defence Simulator** (Air defence radar & interceptor missiles simulation)
-• 💡 **Founder Lore & Tech Bakchodi** (OpenAI wrapper roast & unit economics)
-
-Bolo bawa kya scene hai? Macha denge! 🔥`,
-          actions: [
-            { label: '🔬 PathLab Ka Jugaad', fn: 'askPriyamAI("PathLab me kya jugaad lagaya?")' },
-            { label: '📊 ₹835 COD RTO Kaand', fn: 'askPriyamAI("Show me the exact D2C RTO math")' },
-            { label: '🔥 Roast AI Wrappers', fn: 'askPriyamAI("Roast generic AI wrappers")' },
-            { label: '⚡ Zuck Card Story', fn: 'askPriyamAI("Why the CEO bitch business card?")' }
-          ]
-        };
-      }
-
+    // 1. STRICT PRIVACY & SECURITY SHIELD (Fuzzy match tolerant)
+    if (/(?:phone|mobile|whatsapp|contact)\s*(?:number|num|no|details)?|home\s*address|where\s*do\s*you\s*live|exact\s*address|personal\s*contact|family\s*details|aadhaar|passport|location\s*live/i.test(lower)) {
       return {
-        text: `Yo what's good! 👋 Connected to live RAG knowledge index, fr fr (⁠⌐⁠■⁠-⁠■⁠) [STICKER: 🔥 LET HIM COOK 🔥]!
-
-What are we diving into today?
-• 🔬 **PathLab Ops** (Automating diagnostic blood reports directly from analyzer serial ports)
-• 🚚 **Ecommerce Hub** (Saving Indian D2C brands from the 28% COD return bleeding)
-• 🎯 **Defence Simulator** (Air defence C2 radar simulator & drone telemetry)
-• 💡 **Founder Banter & Tech Takes** (Roasting AI wrappers, tech stacks, or life lore)
-
-Let's cook! What do you want to explore?`,
+        text: `Nice try! 🛡️ I keep my private coordinates and contact number encrypted with zero leak tolerance.\n\nFor high-signal founder chats or collabs, ping my public email **rupaparapriyam@gmail.com** or slide into my DMs on Instagram **@priyamm_r**!`,
         actions: [
-          { label: '🔬 PathLab Automation', fn: 'askPriyamAI("How does PathLab stop errors?")' },
-          { label: '📊 D2C Cash Trap Math', fn: 'askPriyamAI("Show me the exact D2C RTO math")' },
-          { label: '🔥 Roast AI Wrappers', fn: 'askPriyamAI("Roast generic AI wrappers")' },
-          { label: '⚡ Zuck Card Story', fn: 'askPriyamAI("Why the CEO bitch business card?")' }
-        ]
-      };
-    }
-
-    // Aura Check
-    if (/aura|points|rizz|skibidi|gyatt|mog|looksmax/i.test(lower)) {
-      return {
-        text: `Bro asking an AI about aura is highkey +500 aura points just for the banter (⁠⌐⁠■⁠-⁠■⁠) [STICKER: 💅 PURE AURA 💅]!
-Real aura is shipping software that eliminates manual medical errors or saving founders ₹1.4 Lakhs on COD returns, no cap!
-Stay locked in, keep building real shit, and avoid generic OpenAI wrappers at all costs! ⚡`,
-        actions: [
-          { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' },
-          { label: '🚚 View Ecommerce Hub', fn: 'openProjectDetail("ecom")' }
-        ]
-      };
-    }
-
-    // Dating / Romance
-    if (/single|girlfriend|relationship|marry|date|love|crush|wife|bandi|ladki/i.test(lower)) {
-      if (isBambaiyaDelhi || isGujarati) {
-        return {
-          text: `Hahaha arre bawa/bhaisahab! Relationship status is 100% committed to late-night coding sprints, cold brew, and production me zero bugs (⁠｡⁠•̀⁠ᴗ⁠-⁠)⁠✧ [STICKER: 🗿 LOCKED IN 🗿]!
-Total *jalsa*! Agar koi cool cheez build kar rahe ho toh Instagram DMs hamesha open hain.`,
-          actions: [
-            { label: '📱 Ping on Instagram (@priyamm_r)', fn: 'openInstagram()' },
-            { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' }
-          ]
-        };
-      }
-      return {
-        text: `Hahaha look *bhaisahab*, my relationship status is 100% committed to late-night coding sprints, clean code, and zero buffer overflows in production (⁠｡⁠•̀⁠ᴗ⁠-⁠)⁠✧ [STICKER: 🗿 LOCKED IN 🗿]!
-Total *jalsa*! If you're building cool shit, my Instagram DMs are always open.`,
-        actions: [
-          { label: '📱 Ping on Instagram (@priyamm_r)', fn: 'openInstagram()' },
+          { label: '✉️ Copy Direct Email', fn: 'copyDirectEmail()' },
+          { label: '📱 Instagram @priyamm_r', fn: 'openInstagram()' },
           { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' }
         ]
       };
     }
 
-    // Direct match from retrieved RAG chunk with dialect adaptation
-    if (topChunk) {
-      if (isGujarati) {
-        return {
-          text: `Bhaisahab, **${topChunk.title}** vishe aakhi vaat ahiya chhe (⁠⌐⁠■⁠-⁠■⁠) [STICKER: 🚀 FODI LAISHU 🚀]:\n\n${topChunk.text}`,
-          actions: topChunk.actions || [
-            { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' },
-            { label: '🚚 View Ecommerce Hub', fn: 'openProjectDetail("ecom")' }
-          ]
-        };
-      }
-
-      if (isBambaiyaDelhi) {
-        return {
-          text: `Arre bawa suno, **${topChunk.title}** ka pura scene aur fact yahan hai, katai real talk (⁠⌐⁠■⁠-⁠■⁠) [STICKER: 🤙 BAWAAL VIBES 🤙]:\n\n${topChunk.text}`,
-          actions: topChunk.actions || [
-            { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' },
-            { label: '🚚 View Ecommerce Hub', fn: 'openProjectDetail("ecom")' }
-          ]
-        };
-      }
-
-      if (isBrainrotGenZ) {
-        return {
-          text: `Deadass bro, on **${topChunk.title}** let him cook, fr fr no cap (⁠⌐⁠■⁠-⁠■⁠) [STICKER: 🔥 LET HIM COOK 🔥]:\n\n${topChunk.text}`,
-          actions: topChunk.actions || [
-            { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' },
-            { label: '🚚 View Ecommerce Hub', fn: 'openProjectDetail("ecom")' }
-          ]
-        };
-      }
-
+    // 2. AURA SCANNER & CALCULATOR (GEN-Z AURA SYSTEM)
+    if (/aura|how\s*much\s*aura|calculate\s*aura|aura\s*points|check\s*my\s*aura|my\s*aura/i.test(lower)) {
+      const auraScores = [
+        `⚡ **AURA SCAN COMPLETE: +87,500 AURA** 🔥\n\n• Visiting a 3 AM vibe-coder portfolio: **+15,000**\n• Inspecting hard RS232 ASTM serial taps instead of generic AI wrappers: **+50,000**\n• Zero SaaS brainrot detected: **+22,500**\n\nVerdict: Certified Gigachad builder frequency. Keep cooking, no cap! 🗿👑`,
+        `⚡ **AURA SCAN COMPLETE: +120,000 AURA (MAX LEVEL)** 👑\n\nYou are radiating peak main character energy right now. CR7 clutch mentality + Gujarati dhandho precision. Mogging Silicon Valley wrapper founders one commit at a time! SIUUUU! ⚽🔥`,
+        `⚡ **AURA SCAN COMPLETE: -20,000 AURA... BUT WAIT!** 📉\n\nDid you just ask an AI for an aura check instead of shipping code to production? -50,000 aura for terminal procrastination.\n\n...However, tapping into my portfolio restores **+75,000 founder aura**. Net score: **+25,000 AURA**. Lock the f*** in and let's build! 🚀`
+      ];
       return {
-        text: `Yo, check this out from my knowledge base on **${topChunk.title}**, *bhaisahab* (⁠⌐⁠■⁠-⁠■⁠) [STICKER: ⚡ REAL TALK ⚡]:\n\n${topChunk.text}`,
+        text: auraScores[Math.floor(Math.random() * auraScores.length)],
+        actions: [
+          { label: '🤝 Dab Me Up (+50k Aura)', fn: 'triggerDabInteraction()' },
+          { label: '🔥 Roast My Startup', fn: 'askPriyamAI("Roast my startup idea with zero mercy")' },
+          { label: '🔬 PathLab Hardware Tap', fn: 'openProjectDetail("pathlab")' },
+          { label: '⚽ CR7 vs Messi', fn: 'askPriyamAI("Why is CR7 the GOAT over Messi?")' }
+        ]
+      };
+    }
+
+    // 3. VIBE CODING & 3 AM STACK
+    if (/vibe\s*cod|3\s*am\s*stack|how\s*do\s*you\s*code|what\s*is\s*vibe\s*coding|coding\s*philosophy|tech\s*stack|how\s*do\s*you\s*build/i.test(lower)) {
+      return {
+        text: `**"I'm a vibe coder, bitch."** 🎧✨\n\nHere is the exact 3 AM high-agency builder stack:\n\n1. **The Fuel**: Kathiyawadi masala chai + 2000s Bollywood lo-fi on blast (KK, Emraan Hashmi, Pritam).\n2. **The Terminal**: Cursor / Claude 3.7 / DeepSeek for instant architecture scaffolding, paired with bare-metal C++ & Python serial parsers.\n3. **The Mindset**: Zero architectural paralysis. If blood testing analyzers have an RS232 port, we tap it tonight. If Indian D2C is bleeding ₹835 on COD returns, we build the truth layer before sunrise. Build real systems, not Twitter hype! 🚀`,
+        actions: [
+          { label: '🔬 View PathLab Architecture', fn: 'openProjectDetail("pathlab")' },
+          { label: '📊 View ₹835 COD RTO Math', fn: 'askPriyamAI("Show me the exact D2C RTO math")' },
+          { label: '🤝 Dab Me Up Bruhh!', fn: 'triggerDabInteraction()' }
+        ]
+      };
+    }
+
+    // 4. GEN-Z SLANG / BRAINROT / RIZZ / MOGGING / DELULU / COOK
+    if (/brainrot|rizz|sigma|mog|mew|cook|let\s*him\s*cook|no\s*cap|fr\s*fr|delulu|skibidi|gyatt/i.test(lower)) {
+      return {
+        text: `Let him cook! 👨‍🍳🔥 Zero SaaS brainrot here, only pure hardware rizz and sigma dhandho grind.\n\nWhile generic founders are being delulu over OpenAI wrappers, we're out here mogging the industry by tapping physical blood testing machines and fixing ₹835 unit margin traps. No cap, fr fr. +100,000 aura unlocked. Now lock in and let's ship! 🗿⚡`,
+        actions: [
+          { label: '🤝 Dab Me Up Bruhh!', fn: 'triggerDabInteraction()' },
+          { label: '🔥 Roast My Startup', fn: 'askPriyamAI("Roast my startup idea with zero mercy")' },
+          { label: '🔬 PathLab Serial Tap', fn: 'openProjectDetail("pathlab")' }
+        ]
+      };
+    }
+
+    // 5. GREETINGS & CASUAL CHITCHAT
+    if (/^(?:hi|hey|hello|sup|yo|kem\s*chho|kemcho|namaste|wassup|what'?s\s*up|kaise\s*ho|kemon\s*acho)\b/i.test(lower) || /who\s*are\s*you|tell\s*me\s*about\s*yourself|introduce\s*yourself/i.test(lower)) {
+      if (is18PlusMode) {
+        return {
+          text: `Sup bc! 🔥 I'm Priyuum — Priyam's 18+ unhinged AI clone. Zero corporate filter, 100% pure builder energy.\n\nAsk me how I hacked serial cables for blood analyzers, crunched ₹835 COD margins, why CR7 is the GOAT, or let's roast your startup idea into the ground! What's the scene today? 🕶️`,
+          actions: [
+            { label: '🥊 Roast My Startup', fn: 'askPriyamAI("Roast my startup idea with zero mercy")' },
+            { label: '🔬 PathLab Hardware Hack', fn: 'openProjectDetail("pathlab")' },
+            { label: '⚽ CR7 vs Messi', fn: 'askPriyamAI("Why is CR7 the GOAT over Messi?")' }
+          ]
+        };
+      }
+      return {
+        text: `Kem chho! 👋 I'm **Priyuum**, Priyam's high-agency AI clone. I build hard systems, parse blood analyzer serial packets, roast fake startup ideas, and vibe code at 3 AM with +100k aura.\n\nWhat are we building, crunching, or roasting today?`,
+        actions: [
+          { label: '🔬 PathLab Serial Tap', fn: 'openProjectDetail("pathlab")' },
+          { label: '📊 ₹835 COD Unit Math', fn: 'askPriyamAI("Show me the exact ₹835 D2C COD return math")' },
+          { label: '⚽ CR7 vs Messi', fn: 'askPriyamAI("Why is CR7 the GOAT over Messi?")' },
+          { label: '🔥 Roast My Startup', fn: 'askPriyamAI("Roast my startup idea with zero mercy")' }
+        ]
+      };
+    }
+
+    // 6. FOUNDER INTRODUCTORY BIO & BIRTHDATE (Born Oct 11, 2007)
+    if (/(?:when|what)\s*(?:were\s*you\s*born|is\s*your\s*birth(?:day|date)|your\s*age|how\s*old\s*are\s*you|date\s*of\s*birth|dob|born\s*on)/i.test(lower) || /birthday|birthdate|born\s*in\s*2007|born\s*october/i.test(lower)) {
+      return {
+        text: `I was born on **October 11, 2007** (18 years old in 2026)! 🎂\n\nI'm an 18-year-old solo systems engineer, vibe coder & founder based between Rajkot (Gujarat) and Delhi, India. Currently studying DSAI at Masters' Union, and obsessed with building real Defense AI & hard operational tech!`,
+        actions: [
+          { label: '🎓 Masters\' Union DSAI 3.0', fn: 'askPriyamAI("Tell me about your college and DSAI at Masters Union")' },
+          { label: '🔬 View PathLab Ops MVP', fn: 'openProjectDetail("pathlab")' },
+          { label: '📊 View ₹835 COD RTO Math', fn: 'askPriyamAI("Show me the exact D2C RTO math")' }
+        ]
+      };
+    }
+
+    // 7. MASTERS' UNION & DSAI 3.0
+    if (/masters\s*union|dsai|cohort\s*3|college|university|where\s*do\s*you\s*study|degree|academics/i.test(lower)) {
+      return {
+        text: `I'm currently studying **Data Science & Artificial Intelligence (DSAI Cohort 3.0) at Masters' Union**! 🎓\n\nWhat I love about Masters' Union is the hands-on practitioner environment: rather than memorizing stale academic theory, we combine deep neural architectures, ML pipelines, and business economics to build real startups.\n\nI channel my 99+ maths intuition directly into training AI agents, writing low-level parsers, and shipping full-stack products!`,
+        actions: [
+          { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' },
+          { label: '🚚 View Ecommerce Hub', fn: 'openProjectDetail("ecom")' },
+          { label: '✉️ Copy Direct Email', fn: 'copyDirectEmail()' }
+        ]
+      };
+    }
+
+    // 8. STARTUP AMBITION: DEFENSE AI & AI SIMPLIFICATION
+    if (/defense\s*ai|defence\s*ai|simplify|simplifying\s*ai|future\s*(?:goal|vision)|what\s*do\s*you\s*want\s*to\s*(?:make|build)|ambition|mission/i.test(lower)) {
+      return {
+        text: `My core long-term builder ambition is focused on two high-impact frontiers: 🚀\n\n1. **Defense AI & Autonomous Systems**: Building edge UAV companion avionics, computer vision target tracking, MAVLink/PX4 telemetry integrations, and tactical counter-drone interception systems for national security.\n2. **AI Simplification**: Creating tools and architectures that radically simplify complex multi-agent and frontier AI systems for operators and business founders so real-world operations can run autonomously with zero friction.\n\nReal systems over generic AI wrappers, every single time!`,
+        actions: [
+          { label: '🎯 Launch Radar Simulator', fn: 'launchRadarGame()' },
+          { label: '🔬 View PathLab Architecture', fn: 'openProjectDetail("pathlab")' }
+        ]
+      };
+    }
+
+    // 9. STARTUP IDEA ROAST ARENA (NO MERCY)
+    if (/roast.*(?:startup|idea|product|saas|wrapper|app)|startup.*(?:roast|teardown|opinion|feedback)/i.test(lower)) {
+      return {
+        text: `Alright, let's tear this down with zero VC sugarcoating 💀:\n\n1. **The Wrapper Trap**: If your core product is an OpenAI/Claude API call behind a shiny Tailwind dashboard, you don't have a startup—you have a weekend project that gets killed the next time Anthropic or xAI pushes a point release.\n2. **The Moat Question**: Where is your physical integration, proprietary data pipeline, or workflow lock-in? In PathLab Ops, the moat is tapping RS232 ASTM serial cables on physical blood machines. In Ecommerce Hub, it's real-time carrier telemetry stopping ₹835 COD losses.\n3. **The Verdict**: Stop building for Twitter clout. Find a dirty, unglamorous operational bottleneck where people are losing real time or cash, and solve it with extreme ownership! 🚀`,
+        actions: [
+          { label: '📊 View ₹835 COD RTO Math', fn: 'askPriyamAI("Show me the exact D2C RTO math")' },
+          { label: '🔬 View PathLab Hardware Tap', fn: 'openProjectDetail("pathlab")' },
+          { label: '🥊 Roast Me Harder', fn: 'askPriyamAI("Roast me even harder, give me your best burn")' }
+        ]
+      };
+    }
+
+    // 10. FOOTBALL & CR7 GOAT INTEL (SIUUU!)
+    if (/ronaldo|cr7|cristiano|messi|goat|real\s*madrid|manchester\s*united|champions\s*league|ballon\s*d'or/i.test(lower)) {
+      return {
+        text: `Cristiano Ronaldo (CR7) is the undisputed GOAT ⚽👑:\n\n• **Clutch Gene**: 850+ official goals, 5x Champions League titles, record UCL knockout goals when the stakes are highest.\n• **Relentless Work Ethic**: First to training, last to leave. Zero natural talent excuses—pure discipline, physical perfection, and an obsessive winning mentality.\n• **The Mentality**: When your team is down 2-0 with 15 minutes left, you want Cristiano on that pitch stepping up to the penalty spot or burying a 90th-minute header. That same clutch energy is how I approach 3 AM system deployments. SIUUU! 🔥`,
+        actions: [
+          { label: '🏎️ F1 Telemetry Breakdown', fn: 'askPriyamAI("What makes F1 telemetry and downforce so crazy?")' },
+          { label: '🎮 COD Gaming Energy', fn: 'askPriyamAI("Do you play Call of Duty?")' }
+        ]
+      };
+    }
+
+    // 11. FORMULA 1 (F1) TELEMETRY & DOWNFORCE
+    if (/f1|formula\s*1|formula\s*one|telemetry|downforce|aerodynamics|apex|verstappen|hamilton|ferrari|red\s*bull|ground\s*effect/i.test(lower)) {
+      return {
+        text: `F1 is the pinnacle of engineering and split-second analytics 🏎️⚡:\n\n• **Ground Effect & Aero**: Generating over 3,000 kg of aerodynamic downforce so cars can pull 5.5G in high-speed corners at 280 km/h without breaking traction.\n• **Live Telemetry Streams**: Over 300 sensors broadcasting 1.1 million data points per second (tire degradation curves, suspension loads, ERS battery deployment, throttle-brake traces).\n• **Zero Margin for Error**: A 0.05-second mistake at the apex separates pole position from P5. That level of telemetry rigor is what inspires my radar tracking math and system monitoring! 🏁`,
+        actions: [
+          { label: '🎯 Launch Radar Simulator', fn: 'launchRadarGame()' },
+          { label: '⚽ CR7 Clutch Mindset', fn: 'askPriyamAI("Why is CR7 the GOAT over Messi? Explain with stats")' }
+        ]
+      };
+    }
+
+    // 12. JEE MAIN & MATHEMATICS
+    if (/jee|percentile|iit|rank|math|maths|mathematics|calculus|derivative|integral|algebra|trigonometry|matrix|matrices|probability|coordinate\s*geometry|quadratic|pythagoras|euler|limit|differenti|equation/i.test(lower)) {
+      return {
+        text: `I scored **96 percentile overall in JEE Main, with 99+ percentile in Mathematics**! 📐\n\nPure mathematics is my home turf — calculus, coordinate geometry, linear algebra, and discrete optimization. That exact mathematical rigor is why I don't build useless wrapper apps; I build hard operational software: calculating projectile Kalman filters for radar tracking, parsing ASTM packet checksums, and optimizing ₹835 COD unit margin matrices.\n\nThrow any math equation or calculus problem at me and let's solve it from first principles! 🧮`,
+        actions: [
+          { label: '🧮 Solve Calculus Problem', fn: 'askPriyamAI("Find the derivative of x^4 * sin(x)")' },
+          { label: '📊 View ₹835 COD Unit Math', fn: 'askPriyamAI("Show me the exact D2C RTO math")' },
+          { label: '🔥 View JEE Backlog Story', fn: 'openProjectDetail("jee")' }
+        ]
+      };
+    }
+
+    // 13. TIME & TEMPORAL SENSING
+    if (/time|clock|date|today|day|samay|ketla vagya|kitne baje|what's the time|what time is it/i.test(lower)) {
+      return {
+        text: `It is currently **${timeStr}** on **${dateStr}** (${timeOfDay}). ⏰\n\nWhat high-signal system are you shipping at this hour?`,
+        actions: [
+          { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' },
+          { label: '📊 ₹835 COD RTO Math', fn: 'askPriyamAI("Show me the exact D2C RTO math")' },
+          { label: '🥊 Roast Battle', fn: 'askPriyamAI("Let\'s have a roast battle")' }
+        ]
+      };
+    }
+
+    // 14. PRECISION RAG QUERY ROUTING (Projects & Experience)
+    if (ragResult && ragResult.chunks && ragResult.chunks.length > 0) {
+      const topChunk = ragResult.chunks[0];
+      return {
+        text: `**${topChunk.title}**\n\n${topChunk.text}`,
         actions: topChunk.actions || [
           { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' },
           { label: '🚚 View Ecommerce Hub', fn: 'openProjectDetail("ecom")' }
@@ -4568,34 +5391,24 @@ Total *jalsa*! If you're building cool shit, my Instagram DMs are always open.`,
       };
     }
 
-    // General fallback
-    if (isGujarati) {
+    // 15. DYNAMIC CONVERSATIONAL SYNTHESIS (Natural, witty founder tone)
+    if (is18PlusMode) {
       return {
-        text: `Bhaisahab, "${escapeHtml(query)}" par ekdam real vat chhe: Extreme ownership ane fast shipping, baki badhu jalsa! (⁠⌐⁠■⁠-⁠■⁠) [STICKER: 🚀 FODI LAISHU 🚀]!`,
+        text: `Look bc, here's my raw take on that:\n\nIf it doesn't solve a real problem, save real cash, or move the needle on unit economics, it's just noise. I build real software with first-principles math and zero corporate bullshit. 🚀\n\nAsk me about PathLab serial taps, ₹835 COD unit math, or let's roast your startup idea!`,
         actions: [
-          { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' },
-          { label: '🚚 View Ecommerce Hub', fn: 'openProjectDetail("ecom")' }
-        ]
-      };
-    }
-
-    if (isBambaiyaDelhi) {
-      return {
-        text: `Bawa, "${escapeHtml(query)}" ka seedha funda hai: Extreme ownership, fast shipping aur zero bakwas! (⁠⌐⁠■⁠-⁠■⁠) [STICKER: 🤙 BAWAAL VIBES 🤙]!`,
-        actions: [
-          { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' },
-          { label: '🚚 View Ecommerce Hub', fn: 'openProjectDetail("ecom")' }
+          { label: '🔬 PathLab Hardware Tap', fn: 'openProjectDetail("pathlab")' },
+          { label: '📊 ₹835 COD Math', fn: 'askPriyamAI("Show me the exact D2C RTO math")' },
+          { label: '🥊 Roast My Startup', fn: 'askPriyamAI("Roast my startup idea with zero mercy")' }
         ]
       };
     }
 
     return {
-      text: `Bro, about "${escapeHtml(query)}" — here's the real talk, *bhaisahab*, no cap (⁠⌐⁠■⁠-⁠■⁠) [STICKER: 🤝 ZERO CAP 🤝]:
-Life and startups move fast. The formula is always: extreme ownership, high speed, and building real operational systems that actually solve problems! Total *jalsa*!
-Hit me up if you want to collaborate or talk deep tech.`,
+      text: `Great question! Here's my first-principles perspective on that:\n\nIn both engineering and Gujarati dhandho, the key is stripping away the fluff to understand the fundamental mechanics. Whether I'm parsing raw serial bytes from lab analyzers, preventing ₹835 COD losses for Indian D2C, or solving pure calculus — clean, disciplined execution always beats hype.\n\nWant to dive into one of my live production systems or crunch some numbers together? 🚀`,
       actions: [
-        { label: '🔬 View PathLab MVP', fn: 'openProjectDetail("pathlab")' },
-        { label: '🚚 View Ecommerce Hub', fn: 'openProjectDetail("ecom")' },
+        { label: '🔬 PathLab Ops MVP', fn: 'openProjectDetail("pathlab")' },
+        { label: '📊 ₹835 COD Unit Math', fn: 'askPriyamAI("Show me the exact D2C RTO math")' },
+        { label: '🎯 Launch Radar Simulator', fn: 'launchRadarGame()' },
         { label: '✉️ Copy Direct Email', fn: 'copyDirectEmail()' }
       ]
     };
@@ -4640,4 +5453,1287 @@ function showToast(msg, duration = 2400) {
   container.appendChild(toast);
 
   setTimeout(() => toast.remove(), duration);
+}
+
+/* ==========================================================================
+   12. INTERACTIVE ROAMING AVATAR COMPANION (16-BIT PIXEL PRIYAM)
+   ========================================================================== */
+function initRoamingPriyamAvatar() {
+  const container    = document.getElementById('roaming-avatar-container');
+  const charBody     = document.getElementById('avatar-character-body');
+  const spriteImg    = document.getElementById('avatar-sprite-img');
+  const saiyanEnergy = document.getElementById('aura-saiyan-energy');
+  const ironRepulsors = document.getElementById('aura-ironman-repulsors');
+  const angerVein    = document.getElementById('emote-anger-vein');
+  const teardrop     = document.getElementById('emote-teardrop');
+  const sweat        = document.getElementById('emote-sweat');
+  const impactBubble = document.getElementById('avatar-impact-bubble');
+  const impactText   = document.getElementById('avatar-impact-text');
+  const bubble       = document.getElementById('avatar-thought-bubble');
+  const bubbleMsg    = document.getElementById('avatar-bubble-msg');
+  const bubbleTag    = document.getElementById('avatar-bubble-tag');
+  const statusLabel  = document.getElementById('avatar-status-label');
+
+  if (!container || !charBody) return;
+
+  // Preload all outfit WebP sprites into browser memory for 0ms instant costume switches
+  if (window.AVATAR_SPRITES) {
+    Object.values(window.AVATAR_SPRITES).forEach(url => {
+      const pImg = new Image();
+      pImg.src = url;
+    });
+  }
+
+  // ==================== AUTHENTIC PIXEL-ART EYE BLINK SYSTEM ====================
+  let isBlinking = false;
+  function triggerEyeBlink() {
+    if (!spriteImg || isBlinking) return;
+    const currentOutfit = OUTFITS[currentOutfitIdx]?.id || 'casual';
+    const blinkSrc = (window.AVATAR_SPRITES && window.AVATAR_SPRITES[currentOutfit + '-blink']) || `assets/avatar-priyam-${currentOutfit}-blink.webp?v=20260902_45`;
+    const normalSrc = (window.AVATAR_SPRITES && window.AVATAR_SPRITES[currentOutfit]) || `assets/avatar-priyam-${currentOutfit}.webp?v=20260902_45`;
+
+    if (!blinkSrc) return;
+
+    isBlinking = true;
+    spriteImg.src = blinkSrc;
+
+    setTimeout(() => {
+      spriteImg.src = normalSrc;
+      isBlinking = false;
+
+      // 25% chance of organic double-blink
+      if (Math.random() < 0.25) {
+        setTimeout(() => {
+          if (!spriteImg) return;
+          isBlinking = true;
+          spriteImg.src = blinkSrc;
+          setTimeout(() => {
+            spriteImg.src = normalSrc;
+            isBlinking = false;
+          }, 95);
+        }, 120);
+      }
+    }, 110);
+  }
+
+  function scheduleNextBlink() {
+    const nextInterval = 2600 + Math.random() * 3000;
+    setTimeout(() => {
+      triggerEyeBlink();
+      scheduleNextBlink();
+    }, nextInterval);
+  }
+  scheduleNextBlink();
+
+  // Viewport position & autonomous roaming state (Starts immediately at Top-Left red circle)
+  const isInitialMobile = window.innerWidth <= 600;
+  let posX = isInitialMobile ? 14 : 65;
+  let posY = isInitialMobile ? 70 : 85;
+  let targetX = posX;
+  let targetY = posY;
+  let velX = 0;
+  let velY = 0;
+  let facingRight = false;
+  let isDragging = false;
+  let dragOffsetX = 0;
+  let dragOffsetY = 0;
+  let lastDragX = 0;
+  let lastDragY = 0;
+  let throwVelX = 0;
+  let throwVelY = 0;
+
+  // Immediately apply initial position
+  container.style.transform = `translate3d(${posX.toFixed(1)}px, ${posY.toFixed(1)}px, 0)`;
+
+  let mouseX = window.innerWidth * 0.5;
+  let mouseY = window.innerHeight * 0.5;
+  let lastMouseMoveTime = Date.now();
+  let lastScrollY = window.scrollY;
+  let bubbleTimeout = null;
+  let lastSection = '';
+  let roamTimer = null;
+  let lastDodgeTime = 0;
+
+  // Evasion & Combat State
+  let evasionUntil = 0;
+  let wasEvading = false;
+  let pointerDownX = 0;
+  let pointerDownY = 0;
+  let pointerDownTime = 0;
+  let cornerTrappedSince = 0;
+  let lastWarpTime = 0;
+
+  // ==================== ON / OFF COMPANION TOGGLE ====================
+  let isAvatarEnabled = true;
+  localStorage.setItem('priyam_avatar_enabled', 'true');
+
+  window.toggleAvatarEnabled = (forceState) => {
+    if (typeof forceState === 'boolean') {
+      isAvatarEnabled = forceState;
+    } else {
+      isAvatarEnabled = !isAvatarEnabled;
+    }
+    localStorage.setItem('priyam_avatar_enabled', isAvatarEnabled ? 'true' : 'false');
+    applyAvatarEnabledState();
+  };
+
+  function applyAvatarEnabledState() {
+    const toggleBtn = document.getElementById('wpp-avatar-toggle-btn');
+    const toggleText = document.getElementById('wpp-toggle-text');
+    const toggleIcon = document.getElementById('wpp-toggle-icon');
+    const hubBadge = document.getElementById('wardrobe-active-badge');
+
+    if (isAvatarEnabled) {
+      container.classList.remove('is-disabled');
+      container.style.opacity = '1';
+      if (toggleBtn) toggleBtn.classList.remove('is-disabled');
+      if (toggleText) toggleText.textContent = 'COMPANION: ON';
+      if (toggleIcon) toggleIcon.textContent = '👁️';
+      const currentOutfit = OUTFITS[currentOutfitIdx];
+      if (hubBadge) hubBadge.textContent = currentOutfit ? currentOutfit.id.toUpperCase() : 'CASUAL';
+      if (is18PlusMode && hubBadge) hubBadge.classList.add('is-18plus');
+    } else {
+      container.classList.add('is-disabled');
+      if (toggleBtn) toggleBtn.classList.add('is-disabled');
+      if (toggleText) toggleText.textContent = 'COMPANION: OFF (CLICK TO ENABLE)';
+      if (toggleIcon) toggleIcon.textContent = '🙈';
+      if (hubBadge) hubBadge.textContent = 'OFF';
+      bubble?.classList.remove('active');
+    }
+  }
+
+  // Audio Synthesizer for Bakchod 18+ Unlock Blast
+  function playBakchodUnlockSound() {
+    try {
+      const actx = getSharedAudioContext();
+      if (!actx) return;
+      const now = actx.currentTime;
+      
+      // Laser slide down
+      const osc = actx.createOscillator();
+      const gain = actx.createGain();
+      osc.connect(gain);
+      gain.connect(actx.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(880, now);
+      osc.frequency.exponentialRampToValueAtTime(110, now + 0.35);
+      gain.gain.setValueAtTime(0.5, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.38);
+      osc.start(now);
+      osc.stop(now + 0.38);
+
+      // Sub bass hit
+      const sub = actx.createOscillator();
+      const subGain = actx.createGain();
+      sub.connect(subGain);
+      subGain.connect(actx.destination);
+      sub.type = 'triangle';
+      sub.frequency.setValueAtTime(140, now + 0.05);
+      sub.frequency.exponentialRampToValueAtTime(35, now + 0.45);
+      subGain.gain.setValueAtTime(0.6, now + 0.05);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.48);
+      sub.start(now + 0.05);
+      sub.stop(now + 0.48);
+    } catch (_) {}
+  }
+
+  // ==================== 18+ FUCKER MODE & SECRET WARDROBE UNLOCK ====================
+  // Strictly Normal Mode by default until user types the secret code in the chatbot
+  localStorage.removeItem('priyam_18plus_mode'); // Clear legacy persistent toggle
+  let is18PlusMode = sessionStorage.getItem('priyam_18plus_mode') === 'true';
+
+  window.activateFuckerMode18Plus = () => {
+    is18PlusMode = true;
+    sessionStorage.setItem('priyam_18plus_mode', 'true');
+    const wardrobeHub = document.getElementById('floating-wardrobe-hub');
+    const hubBadge = document.getElementById('wardrobe-active-badge');
+
+    if (wardrobeHub) {
+      wardrobeHub.classList.remove('wardrobe-hidden-public');
+      wardrobeHub.classList.add('wardrobe-unlocked-glitch');
+    }
+    if (hubBadge) {
+      hubBadge.classList.add('is-18plus');
+    }
+    if (charBody) {
+      charBody.classList.add('is-fucker-mode');
+    }
+
+    playBakchodUnlockSound();
+    window.setAvatarMood('angry', 4000);
+    window.showAvatarThought("🚨 FUCKER MODE ACTIVATED BC! 🔞 All 7 fits unlocked on bottom-left. Zero filter mode ON! 🕶️🔥", "🔞 18+ ROGUE", "🔞 18+ MODE", 4500);
+    if (navigator.vibrate) navigator.vibrate([120, 60, 120, 60, 240]);
+  };
+
+  window.deactivateFuckerMode18Plus = () => {
+    is18PlusMode = false;
+    sessionStorage.removeItem('priyam_18plus_mode');
+    localStorage.removeItem('priyam_18plus_mode');
+    
+    const wardrobeHub = document.getElementById('floating-wardrobe-hub');
+    const hubBadge = document.getElementById('wardrobe-active-badge');
+    const panel = document.getElementById('wardrobe-popup-panel');
+
+    if (panel) panel.classList.add('hidden');
+    if (wardrobeHub) {
+      wardrobeHub.classList.add('wardrobe-hidden-public');
+      wardrobeHub.classList.remove('wardrobe-unlocked-glitch');
+    }
+    if (hubBadge) {
+      hubBadge.classList.remove('is-18plus');
+      hubBadge.textContent = 'CASUAL';
+    }
+    if (charBody) {
+      charBody.classList.remove('is-fucker-mode');
+    }
+
+    // Reset outfit back to casual
+    const casualIdx = OUTFITS.findIndex(o => o.id === 'casual');
+    if (casualIdx !== -1) currentOutfitIdx = casualIdx;
+    applyCurrentOutfit(false);
+
+    window.setAvatarMood('happy', 3000);
+    window.showAvatarThought("👔 Normal mode restored! Clean, polite, and ready to ship. 🚀", "PRIYAM · LIVE", "😊 ONLINE", 3500);
+  };
+
+  // Sync initial wardrobe visibility (hidden by default for public)
+  const wardrobeHubEl = document.getElementById('floating-wardrobe-hub');
+  const hubBadgeInit = document.getElementById('wardrobe-active-badge');
+  if (wardrobeHubEl) {
+    if (is18PlusMode) {
+      wardrobeHubEl.classList.remove('wardrobe-hidden-public');
+      if (hubBadgeInit) hubBadgeInit.classList.add('is-18plus');
+      if (charBody) charBody.classList.add('is-fucker-mode');
+    } else {
+      wardrobeHubEl.classList.add('wardrobe-hidden-public');
+      if (hubBadgeInit) hubBadgeInit.classList.remove('is-18plus');
+      if (charBody) charBody.classList.remove('is-fucker-mode');
+    }
+  }
+
+  // ==================== WARDROBE SYSTEM & AUTO-CLOSE ====================
+  const OUTFITS = [
+    { id: 'casual', tag: '👔 CASUAL' },
+    { id: 'techwear', tag: '🕶️ TECHWEAR' },
+    { id: 'saiyan', tag: '🔥 SAIYAN' },
+    { id: 'spiderman', tag: '🕷️ SPIDEY' },
+    { id: 'ironman', tag: '🤖 IRON MAN' },
+    { id: 'football', tag: '⚽ CR7 NO. 7' },
+    { id: 'f1', tag: '🏎️ F1 RACING' }
+  ];
+
+  let currentOutfitIdx = 0;
+  let userSelectedOutfit = localStorage.getItem('priyam_avatar_outfit') || 'casual';
+  if (!is18PlusMode) {
+    userSelectedOutfit = 'casual';
+    localStorage.setItem('priyam_avatar_outfit', 'casual');
+  }
+  const initialIdx = OUTFITS.findIndex(o => o.id === userSelectedOutfit);
+  if (initialIdx !== -1) currentOutfitIdx = initialIdx;
+
+  let wardrobeAutoCloseTimer = null;
+
+  function resetWardrobeAutoClose() {
+    clearTimeout(wardrobeAutoCloseTimer);
+    const panel = document.getElementById('wardrobe-popup-panel');
+    if (panel && !panel.classList.contains('hidden')) {
+      wardrobeAutoCloseTimer = setTimeout(() => {
+        window.toggleWardrobeMenu(false);
+      }, 4500);
+    }
+  }
+
+  window.toggleWardrobeMenu = (forceState) => {
+    const panel = document.getElementById('wardrobe-popup-panel');
+    if (!panel) return;
+    clearTimeout(wardrobeAutoCloseTimer);
+
+    if (typeof forceState === 'boolean') {
+      panel.classList.toggle('hidden', !forceState);
+    } else {
+      panel.classList.toggle('hidden');
+    }
+
+    if (!panel.classList.contains('hidden')) {
+      resetWardrobeAutoClose();
+    }
+  };
+
+  const wardrobePanel = document.getElementById('wardrobe-popup-panel');
+  if (wardrobePanel) {
+    wardrobePanel.addEventListener('pointerenter', resetWardrobeAutoClose);
+    wardrobePanel.addEventListener('pointermove', resetWardrobeAutoClose);
+    wardrobePanel.addEventListener('touchstart', resetWardrobeAutoClose, { passive: true });
+  }
+
+  window.scrollWardrobeCarousel = (dir) => {
+    resetWardrobeAutoClose();
+    const track = document.getElementById('wpp-carousel-track');
+    if (track) {
+      track.scrollBy({ left: dir * 110, behavior: 'smooth' });
+    }
+  };
+
+  window.setAvatarOutfit = (outfitId, showQuip = true) => {
+    userSelectedOutfit = outfitId;
+    const idx = OUTFITS.findIndex(o => o.id === outfitId);
+    if (idx !== -1) currentOutfitIdx = idx;
+    applyCurrentOutfit(showQuip);
+
+    // Auto-close wardrobe smoothly shortly after selecting
+    resetWardrobeAutoClose();
+    setTimeout(() => {
+      window.toggleWardrobeMenu(false);
+    }, 1400);
+  };
+
+  window.cycleAvatarOutfit = (delta) => {
+    currentOutfitIdx = (currentOutfitIdx + delta + OUTFITS.length) % OUTFITS.length;
+    userSelectedOutfit = OUTFITS[currentOutfitIdx].id;
+    applyCurrentOutfit(true);
+  };
+
+  function applyCurrentOutfit(showQuip = false) {
+    const outfit = OUTFITS[currentOutfitIdx];
+    localStorage.setItem('priyam_avatar_outfit', outfit.id);
+
+    // Update Sprite Image instantly from embedded asset dictionary
+    if (spriteImg) {
+      if (window.AVATAR_SPRITES && window.AVATAR_SPRITES[outfit.id]) {
+        spriteImg.src = window.AVATAR_SPRITES[outfit.id];
+      } else {
+        spriteImg.src = `assets/avatar-priyam-${outfit.id}.webp?v=20260902_45`;
+      }
+    }
+
+    // Update Dynamic FX Aura
+    if (saiyanEnergy) {
+      saiyanEnergy.classList.toggle('hidden', outfit.id !== 'saiyan');
+    }
+    if (ironRepulsors) {
+      ironRepulsors.classList.toggle('hidden', outfit.id !== 'ironman');
+    }
+
+    // Update Floating Hub trigger badge
+    const badge = document.getElementById('wardrobe-active-badge');
+    if (badge) {
+      badge.textContent = isAvatarEnabled ? outfit.id.toUpperCase() : 'OFF';
+    }
+
+    // Update popup cards active state & scroll active into view
+    document.querySelectorAll('.wpp-card').forEach(card => {
+      const isActive = card.getAttribute('data-outfit') === outfit.id;
+      card.classList.toggle('active', isActive);
+      if (isActive) {
+        card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      }
+    });
+
+    if (showQuip && isAvatarEnabled) {
+      const outfitQuips = {
+        'casual': "Classic founder drip 👔 +10,000 aura. Ready to ship.",
+        'techwear': "Cyber techwear locked in 🕶️ Mogging Silicon Valley.",
+        'saiyan': "POWER LEVEL OVER 9000! 🔥 Pure gigachad energy.",
+        'spiderman': "With great power comes great dhandho 🕷️ No cap.",
+        'ironman': "I am Iron Man. JARVIS, deploy straight to prod! 🤖",
+        'football': "CR7 on the pitch! ⚽ SIUUUU! 👑 Clutch mentality.",
+        'f1': "Scuderia speed! 🏎️ 340 km/h apex telemetry trace."
+      };
+      if (outfitQuips[outfit.id]) {
+        window.showAvatarThought(outfitQuips[outfit.id], outfit.tag, "STYLING", 2800);
+      }
+    }
+  }
+
+  // ==================== MOOD & EMOTIONS SYSTEM ====================
+  let currentMood = 'normal';
+  let moodResetTimeout = null;
+
+  window.setAvatarMood = (mood, duration = null) => {
+    if (!isAvatarEnabled) return;
+    currentMood = mood;
+    clearTimeout(moodResetTimeout);
+
+    angerVein?.classList.add('hidden');
+    teardrop?.classList.add('hidden');
+    sweat?.classList.add('hidden');
+
+    if (mood === 'happy') {
+      charBody.classList.remove('avatar-happy-hop', 'avatar-sad-slump');
+      void charBody.offsetWidth;
+      charBody.classList.add('avatar-happy-hop');
+    } else if (mood === 'sad') {
+      teardrop?.classList.remove('hidden');
+      charBody.classList.add('avatar-sad-slump');
+    } else if (mood === 'angry') {
+      angerVein?.classList.remove('hidden');
+    } else if (mood === 'shocked') {
+      sweat?.classList.remove('hidden');
+    } else {
+      charBody.classList.remove('avatar-sad-slump');
+    }
+
+    if (duration) {
+      moodResetTimeout = setTimeout(() => {
+        window.setAvatarMood('normal');
+      }, duration);
+    }
+  };
+
+  // Audio Synthesizers
+  function playPunchSound() {
+    try {
+      const actx = getSharedAudioContext();
+      if (!actx) return;
+      const now = actx.currentTime;
+      const osc = actx.createOscillator();
+      const gain = actx.createGain();
+      osc.connect(gain);
+      gain.connect(actx.destination);
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(40, now + 0.18);
+      gain.gain.setValueAtTime(0.45, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.20);
+      osc.start(now);
+      osc.stop(now + 0.20);
+    } catch (_) {}
+  }
+
+  function playSlapSound() {
+    try {
+      const actx = getSharedAudioContext();
+      if (!actx) return;
+      const now = actx.currentTime;
+      const osc = actx.createOscillator();
+      const gain = actx.createGain();
+      osc.connect(gain);
+      gain.connect(actx.destination);
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(1600, now);
+      osc.frequency.exponentialRampToValueAtTime(180, now + 0.14);
+      gain.gain.setValueAtTime(0.4, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.16);
+      osc.start(now);
+      osc.stop(now + 0.16);
+    } catch (_) {}
+  }
+
+  // ==================== COMBAT / HIT TRANSFORMATIONS ====================
+  // ==================== COMBAT / HIT TRANSFORMATIONS ====================
+  function triggerPunchHit() {
+    if (!isAvatarEnabled) return;
+    evasionUntil = Date.now() + 4500;
+    wasEvading = true;
+    charBody.className = `avatar-character is-evading avatar-punch-hit ${is18PlusMode ? 'is-fucker-mode' : ''}`;
+    playPunchSound();
+
+    if (impactBubble && impactText) {
+      impactText.textContent = is18PlusMode ? '💥 BHOSAD!' : '💥 BAM!';
+      impactBubble.classList.remove('hidden');
+      setTimeout(() => impactBubble.classList.add('hidden'), 400);
+    }
+
+    // Transform into Super Saiyan Mode
+    const saiyanIdx = OUTFITS.findIndex(o => o.id === 'saiyan');
+    if (saiyanIdx !== -1) currentOutfitIdx = saiyanIdx;
+    applyCurrentOutfit(false);
+    if (saiyanEnergy) {
+      saiyanEnergy.classList.remove('hidden');
+      saiyanEnergy.classList.add('active');
+    }
+    window.setAvatarMood('angry', 4500);
+
+    const punchMsg = is18PlusMode 
+      ? "🚨 ABE SAALE! Super Saiyan mode mein direct prod db drop kar dunga! 🔥⚡"
+      : "🔥 HAAA! OVER 9000! Super Saiyan escape engaged! ⚡";
+    window.showAvatarThought(punchMsg, is18PlusMode ? "🔞 18+ SAIYAN" : "⚡ SUPER SAIYAN", "🚨 EVADING", 4200);
+
+    // Blast away from cursor position with high initial impulse
+    const { w, h } = getAvatarDimensions();
+    const charCenterX = posX + w * 0.5;
+    const charCenterY = posY + h * 0.5;
+    const dx = charCenterX - mouseX;
+    const dy = charCenterY - mouseY;
+    const dist = Math.hypot(dx, dy) || 1;
+    velX = (dx / dist) * 22.0;
+    velY = (dy / dist) * 18.0;
+  }
+
+  function triggerSlapHit() {
+    triggerPunchHit();
+  }
+
+  // Pointer Movement & Inactivity Watcher
+  let idleTimer = null;
+  function resetInactivityTimer() {
+    clearTimeout(idleTimer);
+    if (currentMood === 'sad' && isAvatarEnabled) {
+      window.setAvatarMood('happy', 3500);
+      window.showAvatarThought("Yay! You're back! 🚀", "HAPPY", "😊 HYPED", 2500);
+    }
+    idleTimer = setTimeout(() => {
+      if (Date.now() >= evasionUntil && !isReadingActive() && isAvatarEnabled) {
+        window.setAvatarMood('sad');
+        const sadQuips = [
+          "Still there? 🥺",
+          "Let's play radar game! 🎯",
+          "Vibe coding awaits ✨"
+        ];
+        const quip = sadQuips[Math.floor(Math.random() * sadQuips.length)];
+        window.showAvatarThought(quip, "IDLE", "🥺 SAD", 3500);
+      }
+    }, 25000);
+  }
+
+  // ==================== SCREEN BOUNDS & NON-OBSTRUCTIVE CLAMPING ====================
+  function getAvatarDimensions() {
+    const isMobile = window.innerWidth <= 600;
+    const isTablet = window.innerWidth <= 900;
+    return {
+      w: isMobile ? 76 : (isTablet ? 98 : 120),
+      h: isMobile ? 84 : (isTablet ? 109 : 133),
+      isMobile,
+      isTablet
+    };
+  }
+
+  function clampPosition(x, y) {
+    const { w, h, isMobile } = getAvatarDimensions();
+    const minX = isMobile ? 6 : 12;
+    const maxX = Math.max(minX + 10, window.innerWidth - w - (isMobile ? 6 : 14));
+    const minY = isMobile ? 45 : 55;
+    const maxY = Math.max(minY + 20, window.innerHeight - h - (isMobile ? 35 : 85));
+    return {
+      x: Math.max(minX, Math.min(maxX, x)),
+      y: Math.max(minY, Math.min(maxY, y))
+    };
+  }
+
+  // Window Resize & Orientation Handling
+  window.addEventListener('resize', () => {
+    const clamped = clampPosition(posX, posY);
+    posX = clamped.x;
+    posY = clamped.y;
+    targetX = posX;
+    targetY = posY;
+  }, { passive: true });
+
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      const clamped = clampPosition(posX, posY);
+      posX = clamped.x;
+      posY = clamped.y;
+      targetX = posX;
+      targetY = posY;
+    }, 200);
+  }, { passive: true });
+
+  // ==================== READING & GAME OBSTRUCTION INTELLIGENCE ====================
+  function isGameActive() {
+    const funSection = document.getElementById('fun-zone');
+    if (funSection) {
+      const rect = funSection.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 80 && rect.bottom > 80) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function isReadingActive() {
+    const aiDrawer = document.getElementById('priyam-ai-drawer');
+    const projModal = document.getElementById('project-modal');
+    const cmdModal = document.getElementById('cmd-palette-modal');
+    const mobileDrawer = document.getElementById('mobile-drawer');
+    const isAiOpen = aiDrawer && !aiDrawer.classList.contains('hidden');
+    const isProjOpen = projModal && !projModal.classList.contains('hidden');
+    const isCmdOpen = cmdModal && !cmdModal.classList.contains('hidden');
+    const isMenuOpen = mobileDrawer && !mobileDrawer.classList.contains('hidden');
+    const isGame = isGameActive();
+    return isAiOpen || isProjOpen || isCmdOpen || isMenuOpen || isGame;
+  }
+
+  function isInputFocused() {
+    const active = document.activeElement;
+    return active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable);
+  }
+
+  // Pointer & Touch Movement
+  function onPointerMove(e) {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    lastMouseMoveTime = Date.now();
+    resetInactivityTimer();
+
+    if (isDragging) {
+      const clamped = clampPosition(e.clientX - dragOffsetX, e.clientY - dragOffsetY);
+      posX = clamped.x;
+      posY = clamped.y;
+      targetX = posX;
+      targetY = posY;
+    }
+  }
+  window.addEventListener('pointermove', onPointerMove, { passive: true });
+  window.addEventListener('keydown', resetInactivityTimer, { passive: true });
+  resetInactivityTimer();
+
+  // Right-click Slap Trigger
+  charBody.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+    triggerPunchHit();
+  });
+
+  // Pointer Down: Distinguish Tap/Punch vs Drag
+  charBody.addEventListener('pointerdown', (e) => {
+    if (e.button === 2 || !isAvatarEnabled) return;
+
+    isDragging = true;
+    pointerDownX = e.clientX;
+    pointerDownY = e.clientY;
+    pointerDownTime = Date.now();
+
+    charBody.classList.add('is-dragging');
+    charBody.classList.remove('avatar-sonic-spin', 'avatar-happy-hop', 'avatar-punch-hit', 'avatar-slap-hit', 'avatar-warp-poof');
+    dragOffsetX = e.clientX - posX;
+    dragOffsetY = e.clientY - posY;
+    lastDragX = e.clientX;
+    lastDragY = e.clientY;
+    throwVelX = 0;
+    throwVelY = 0;
+  });
+
+  window.addEventListener('pointerup', (e) => {
+    if (isDragging) {
+      isDragging = false;
+      charBody.classList.remove('is-dragging');
+      velX = throwVelX * 0.8;
+      velY = throwVelY * 0.8;
+
+      const distMoved = Math.hypot(e.clientX - pointerDownX, e.clientY - pointerDownY);
+      const pressDuration = Date.now() - pointerDownTime;
+
+      if (distMoved < 10 && pressDuration < 380) {
+        triggerPunchHit();
+        return;
+      }
+
+      if (Math.hypot(throwVelX, throwVelY) > 7 && isAvatarEnabled) {
+        charBody.classList.add('avatar-sonic-spin');
+        window.showAvatarThought("WHEEEEE! 🚀 5th-wall flight!", "5TH WALL", "🚀 WHEEE", 2500);
+      }
+      if (statusLabel && Date.now() >= evasionUntil && isAvatarEnabled) statusLabel.textContent = 'ROAMING';
+    }
+  });
+
+  // Direct Click Backup Listener
+  charBody.addEventListener('click', (e) => {
+    e.stopPropagation();
+    triggerPunchHit();
+  });
+
+  // Mobile & Tablet Touch Gestures
+  let lastTouchTapTime = 0;
+  let longPressTimer = null;
+
+  // ==================== CATMULL-ROM CUBIC SPLINE & SPRING TRAJECTORY ====================
+  function catmullRom1D(p0, p1, p2, p3, t) {
+    const t2 = t * t;
+    const t3 = t2 * t;
+    return 0.5 * (
+      (2 * p1) +
+      (-p0 + p2) * t +
+      (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 +
+      (-p0 + 3 * p1 - 3 * p2 + p3) * t3
+    );
+  }
+
+  // ==================== DYNAMIC SECTION-ANCHORED SCROLL ENGINE ====================
+  let currentFlightTilt = 0;
+
+  function getScrollWaypoint() {
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const { w: avW, h: avH, isMobile } = getAvatarDimensions();
+
+    // 1. DYNAMIC FINAL DOCK: Exactly above the "Talk to Priyuum (AI Clone)" button and middle of it
+    let dockTargetX = w - avW - 35;
+    let dockTargetY = h - avH - 75;
+    const triggerEl = document.getElementById('priyam-ai-trigger');
+    if (triggerEl) {
+      const rect = triggerEl.getBoundingClientRect();
+      if (rect && rect.width > 0 && rect.height > 0) {
+        const triggerCenterX = rect.left + rect.width * 0.5;
+        dockTargetX = triggerCenterX - avW * 0.5;
+        dockTargetY = rect.top - avH - 4;
+      }
+    }
+
+    // 2. FIXED OBSERVATION PERCH DURING 360° SURGE BOTTLE SCROLL ANIMATION
+    const fixedSurgeX = isMobile ? (w - avW - 12) : (w * 0.84 - avW * 0.5);
+    const fixedSurgeY = isMobile ? 70 : 165;
+
+    const surgeEl = document.getElementById('surge');
+    if (surgeEl) {
+      const scrollBody = surgeEl.querySelector('.surge-scroll-body') || surgeEl;
+      const rect = scrollBody.getBoundingClientRect();
+      const stickyViewport = surgeEl.querySelector('.surge-sticky-viewport');
+      const stickyTop = stickyViewport ? (parseFloat(getComputedStyle(stickyViewport).top) || 0) : 0;
+      const viewportH = stickyViewport ? stickyViewport.offsetHeight : window.innerHeight;
+      const totalScrollable = scrollBody.offsetHeight - viewportH;
+
+      if (totalScrollable > 0 && rect.top <= stickyTop + 15 && rect.bottom >= viewportH + stickyTop - 15) {
+        return { x: fixedSurgeX, y: fixedSurgeY, isFixed: true };
+      }
+    }
+
+    // Section live viewport bounds
+    const heroEl = document.getElementById('hero');
+    const aboutEl = document.getElementById('about');
+    const projectsEl = document.getElementById('projects');
+    const funZoneEl = document.getElementById('fun-zone');
+    const contactEl = document.getElementById('contact');
+
+    const heroRect = heroEl ? heroEl.getBoundingClientRect() : { top: 0, bottom: h, height: h };
+    const aboutRect = aboutEl ? aboutEl.getBoundingClientRect() : { top: h, bottom: h * 2, height: h };
+    const projRect = projectsEl ? projectsEl.getBoundingClientRect() : { top: h * 2, bottom: h * 3, height: h };
+    const funRect = funZoneEl ? funZoneEl.getBoundingClientRect() : { top: h * 4, bottom: h * 5, height: h };
+    const contactRect = contactEl ? contactEl.getBoundingClientRect() : { top: h * 5, bottom: h * 6, height: h };
+
+    if (isMobile) {
+      // Mobile: Keep avatar docked cleanly along the right edge/margin rail so it NEVER cuts through text
+      const rightRailX = w - avW - 14;
+      
+      // 1. In Contact / Footer: Dock right above the AI trigger button
+      if (contactRect.top <= h * 0.70) {
+        return { x: dockTargetX, y: dockTargetY };
+      }
+      
+      // 2. In Hero Section: Perch in the top-right corner over the vector wireframe
+      if (heroRect.top >= -50) {
+        return { x: rightRailX, y: 68 };
+      }
+
+      // 3. In SURGE Section: Sit nicely beside the bottle at top-right
+      if (surgeEl) {
+        const scrollBody = surgeEl.querySelector('.surge-scroll-body') || surgeEl;
+        const rect = scrollBody.getBoundingClientRect();
+        if (rect.top <= 120 && rect.bottom >= 120) {
+          return { x: rightRailX, y: 68, isFixed: true };
+        }
+      }
+
+      // 4. In Fun Zone / Radar Game: Stay at bottom right above trigger button so canvas & touch controls are 100% unobstructed
+      if (funRect.top < h * 0.80 && funRect.bottom > h * 0.15) {
+        return { x: dockTargetX, y: dockTargetY, isFixed: true };
+      }
+
+      // 5. General Scrolling on Mobile: Smoothly glide on the right margin rail
+      const scrollProgress = Math.max(0, Math.min(1, (window.scrollY || 0) / Math.max(1, document.documentElement.scrollHeight - h)));
+      const mY = 68 + scrollProgress * (dockTargetY - 68);
+      const mX = rightRailX + (dockTargetX - rightRailX) * Math.pow(scrollProgress, 2);
+      return clampPosition(mX, mY);
+    }
+
+    // DESKTOP & LAPTOP SECTION-ANCHORED WAYPOINTS
+    // Phase 1: Hero Section
+    if (heroRect.bottom > h * 0.35) {
+      const heroT = Math.max(0, Math.min(1, -heroRect.top / Math.max(1, heroRect.height - h * 0.35)));
+      const isTablet = w <= 900;
+      const startX = isTablet ? (w * 0.80 - avW * 0.5) : 65;
+      const startY = isTablet ? 75 : 85;
+      const endX = w * 0.82 - avW * 0.5;
+      const endY = 135;
+      const midX = isTablet ? (w * 0.80 - avW * 0.5) : (w * 0.42);
+      const midY = 105;
+
+      const qX = (1 - heroT) * (1 - heroT) * startX + 2 * (1 - heroT) * heroT * midX + heroT * heroT * endX;
+      const qY = (1 - heroT) * (1 - heroT) * startY + 2 * (1 - heroT) * heroT * midY + heroT * heroT * endY;
+      return { x: qX, y: qY };
+    }
+
+    // Phase 2: About Me (Left margin rail -> smooth exit past left edge)
+    if (aboutRect.top < h * 0.80 && projRect.top > h * 0.55) {
+      const aboutT = Math.max(0, Math.min(1, (h * 0.80 - aboutRect.top) / Math.max(1, aboutRect.height)));
+      if (aboutT < 0.65) {
+        return { x: 65, y: 190 + aboutT * 30 };
+      } else {
+        const exitT = (aboutT - 0.65) / 0.35;
+        const outX = 65 - exitT * 215; // 65px -> -150px (off-screen left)
+        return { x: outX, y: 220, isWarp: true };
+      }
+    }
+
+    // Phase 3: Projects (Enters from right edge -> right margin rail)
+    if (projRect.top <= h * 0.55 && (!surgeEl || surgeEl.getBoundingClientRect().top > h * 0.50)) {
+      const projT = Math.max(0, Math.min(1, (h * 0.55 - projRect.top) / Math.max(1, projRect.height)));
+      const targetRailX = w * 0.84 - avW * 0.5;
+      if (projT < 0.22) {
+        const enterT = projT / 0.22;
+        const inX = (w + 150) - enterT * (150 + (w - targetRailX));
+        return { x: inX, y: 230, isWarp: true };
+      } else {
+        return { x: targetRailX, y: 230 };
+      }
+    }
+
+    // Phase 4: SURGE Exit -> Defence & Radar Area
+    if (contactRect.top > h * 0.65) {
+      const radT = funRect.top < h * 0.85 ? Math.max(0, Math.min(1, (h * 0.85 - funRect.top) / Math.max(1, funRect.height))) : 0;
+      const targetRadarX = w * 0.78 - avW * 0.5;
+      const curX = fixedSurgeX + (targetRadarX - fixedSurgeX) * radT;
+      const curY = fixedSurgeY + (190 - fixedSurgeY) * radT;
+      return { x: curX, y: curY };
+    }
+
+    // Phase 5: Contact & Footer (Dock directly centered above AI button)
+    const contactT = Math.max(0, Math.min(1, (h * 0.65 - contactRect.top) / Math.max(1, contactRect.height - h * 0.35)));
+    const curX = (w * 0.78 - avW * 0.5) + (dockTargetX - (w * 0.78 - avW * 0.5)) * contactT;
+    const curY = 190 + (dockTargetY - 190) * contactT;
+    return { x: curX, y: curY };
+  }
+
+  function updateCharacterDirection() {
+    const { w: avW } = getAvatarDimensions();
+    const charCenterX = posX + avW * 0.5;
+    const deltaX = mouseX - charCenterX;
+
+    if (Math.abs(velX) > 0.8) {
+      if (velX > 0.8) facingRight = true;
+      else if (velX < -0.8) facingRight = false;
+    } else {
+      if (deltaX > 30) facingRight = true;
+      else if (deltaX < -30) facingRight = false;
+    }
+  }
+
+  // ==================== SMART ADAPTIVE SPEECH BUBBLE ====================
+  function updateBubblePlacement(currentX, currentY) {
+    if (!bubble) return;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const { w: avatarW, isMobile } = getAvatarDimensions();
+
+    bubble.classList.remove('bubble-below', 'bubble-right-side', 'bubble-left-side', 'bubble-above');
+
+    if (isMobile) {
+      // On mobile screens:
+      // If near bottom of screen, show bubble above avatar
+      if (currentY > h - 180) {
+        bubble.classList.add('bubble-above');
+      } else if (currentX > w * 0.40) {
+        // If on the right side of mobile screen, show bubble to the left of avatar!
+        bubble.classList.add('bubble-left-side');
+      } else {
+        bubble.classList.add('bubble-right-side');
+      }
+    } else {
+      // Desktop / Tablet
+      if (currentY < 130) {
+        bubble.classList.add('bubble-below');
+      } else if (currentX < 120) {
+        bubble.classList.add('bubble-right-side');
+      } else if (currentX > w - avatarW - 120) {
+        bubble.classList.add('bubble-left-side');
+      }
+    }
+  }
+
+  window.showAvatarThought = (msg, tag = 'PRIYAM · LIVE', mood = 'OBSERVING', duration = 3800) => {
+    if (!bubble || !bubbleMsg || !isAvatarEnabled) return;
+    if (isReadingActive()) return;
+
+    bubbleMsg.textContent = msg;
+    if (bubbleTag) bubbleTag.textContent = tag;
+    if (statusLabel && !isDragging) statusLabel.textContent = mood;
+
+    updateBubblePlacement(posX, posY);
+    bubble.classList.add('active');
+
+    clearTimeout(bubbleTimeout);
+    bubbleTimeout = setTimeout(() => {
+      bubble.classList.remove('active');
+      if (statusLabel && Date.now() >= evasionUntil && isAvatarEnabled) statusLabel.textContent = 'ROAMING';
+    }, duration);
+  };
+
+  window.dismissAvatarBubble = (e) => {
+    e?.stopPropagation();
+    bubble?.classList.remove('active');
+  };
+
+  // ==================== 60 FPS CONTINUOUS PHYSICS & ROAM LOOP ====================
+  let currentScrollTilt = 0;
+  let scrollVelocity = 0;
+  let isTabVisible = !document.hidden;
+
+  document.addEventListener('visibilitychange', () => {
+    isTabVisible = !document.hidden;
+  });
+
+  window.addEventListener('scroll', () => {
+    const currY = window.scrollY;
+    const delta = currY - lastScrollY;
+    lastScrollY = currY;
+    scrollVelocity = scrollVelocity * 0.72 + delta * 0.28;
+    resetInactivityTimer();
+
+    if (Math.abs(delta) > 45 && Date.now() >= evasionUntil && isAvatarEnabled && Math.random() < 0.25) {
+      window.showAvatarThought("HYPERSPACE JUMP! 🏎️💨 Hold onto your viewport!", "5TH WALL", "🏎️ SPEED", 2200);
+    }
+
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 90) {
+      if (lastSection !== 'bottom-reached' && isAvatarEnabled) {
+        lastSection = 'bottom-reached';
+        window.showAvatarThought("You reached the footer! I'm floating right here — ping me! ☕✉️", "5TH WALL", "🎉 SIUUU", 3800);
+      }
+    }
+  }, { passive: true });
+
+  function avatarPhysicsLoop() {
+    if (!isTabVisible || !isAvatarEnabled) {
+      setTimeout(() => requestAnimationFrame(avatarPhysicsLoop), 400);
+      return;
+    }
+
+    const reading = isReadingActive();
+
+    if (reading) {
+      bubble?.classList.remove('active');
+    }
+
+    scrollVelocity *= 0.88;
+    const targetScrollTilt = Math.max(-12, Math.min(12, -scrollVelocity * 0.25));
+    currentScrollTilt += (targetScrollTilt - currentScrollTilt) * 0.14;
+
+    const isEvading = Date.now() < evasionUntil;
+
+    if (isDragging) {
+      throwVelX = mouseX - lastDragX;
+      throwVelY = mouseY - lastDragY;
+      lastDragX = mouseX;
+      lastDragY = mouseY;
+    } else if (isEvading) {
+      // Active continuous cursor repulsion while in Super Saiyan evasion
+      const { w, h, isMobile } = getAvatarDimensions();
+      const charCenterX = posX + w * 0.5;
+      const charCenterY = posY + h * 0.5;
+      const distToCursor = Math.hypot(charCenterX - mouseX, charCenterY - mouseY) || 1;
+      
+      if (distToCursor < 200) {
+        const repForce = ((200 - distToCursor) / 200) * (isMobile ? 3.5 : 5.5);
+        const pushDirX = (charCenterX - mouseX) / distToCursor;
+        const pushDirY = (charCenterY - mouseY) / distToCursor;
+        velX += pushDirX * repForce;
+        velY += pushDirY * repForce;
+      }
+
+      posX += velX;
+      posY += velY;
+      velX *= 0.94;
+      velY *= 0.94;
+
+      const clamped = clampPosition(posX, posY);
+      if (posX !== clamped.x) { posX = clamped.x; velX *= -0.7; }
+      if (posY !== clamped.y) { posY = clamped.y; velY *= -0.7; }
+    } else {
+      if (wasEvading) {
+        wasEvading = false;
+        charBody.classList.remove('is-evading', 'avatar-punch-hit', 'avatar-slap-hit');
+        window.setAvatarMood('normal');
+        const revertIdx = OUTFITS.findIndex(o => o.id === userSelectedOutfit);
+        currentOutfitIdx = revertIdx !== -1 ? revertIdx : 0;
+        applyCurrentOutfit(false);
+
+        // Power-down energy poof
+        charBody.classList.add('avatar-warp-poof');
+        setTimeout(() => charBody.classList.remove('avatar-warp-poof'), 350);
+
+        window.showAvatarThought("Phew! Super Saiyan cooldown complete — normal mode restored 🕶️", "5TH WALL", "🕶️ CHILL", 3000);
+      }
+
+      const wp = getScrollWaypoint();
+      targetX = wp.x;
+      targetY = wp.y;
+
+      // Seamless Screen-Edge Wrap & Fast-Jump Handling
+      if (targetX > window.innerWidth * 0.5 && posX < 0) {
+        posX = window.innerWidth + 150;
+        charBody.classList.add('avatar-warp-poof');
+        setTimeout(() => charBody.classList.remove('avatar-warp-poof'), 350);
+      } else if (targetX < 0 && posX > window.innerWidth) {
+        posX = -150;
+        charBody.classList.add('avatar-warp-poof');
+        setTimeout(() => charBody.classList.remove('avatar-warp-poof'), 350);
+      } else if (Math.abs(targetX - posX) > window.innerWidth * 0.65 && !wp.isWarp) {
+        posX = targetX;
+        posY = targetY;
+      }
+
+      const smoothRate = wp.isFixed ? 0.22 : 0.16;
+      const dx = targetX - posX;
+      const dy = targetY - posY;
+
+      posX += dx * smoothRate;
+      posY += dy * smoothRate;
+      velX = dx * smoothRate;
+      velY = dy * smoothRate;
+
+      if (wp.x >= 0 && wp.x <= window.innerWidth && !wp.isWarp) {
+        const clamped = clampPosition(posX, posY);
+        posX = clamped.x;
+        posY = clamped.y;
+      }
+    }
+
+    updateCharacterDirection();
+
+    const targetFlightTilt = Math.max(-14, Math.min(14, velX * 1.8));
+    currentFlightTilt += (targetFlightTilt - currentFlightTilt) * 0.12;
+
+    const bob = Math.sin(Date.now() * 0.0035) * 4.5;
+    const totalTilt = (facingRight ? currentFlightTilt : -currentFlightTilt) + currentScrollTilt;
+    const renderY = posY + bob;
+
+    container.style.transform = `translate3d(${posX.toFixed(1)}px, ${renderY.toFixed(1)}px, 0)`;
+    charBody.style.transform = `scaleX(${facingRight ? 1 : -1}) rotate(${totalTilt.toFixed(1)}deg)`;
+
+    updateBubblePlacement(posX, renderY);
+    requestAnimationFrame(avatarPhysicsLoop);
+  }
+  requestAnimationFrame(avatarPhysicsLoop);
+
+  // ==================== SITE-WIDE 5TH-WALL AWARENESS LISTENERS ====================
+  const themeToggleBtn = document.getElementById('theme-toggle');
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      setTimeout(() => {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || document.documentElement.classList.contains('dark');
+        if (isDark) {
+          window.setAvatarMood('happy', 2500);
+          window.showAvatarThought("Dark mode locked in! 🌙 High aura coding.", "THEME", "🌙 CYBER", 3200);
+        } else {
+          window.setAvatarMood('shocked', 2500);
+          window.showAvatarThought("Let there be light! ☀️ High clarity mode.", "THEME", "☀️ LIGHT", 3200);
+        }
+      }, 100);
+    });
+  }
+
+  document.querySelectorAll('.filter-btn, .project-tag-filter').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const category = btn.textContent.trim();
+      window.setAvatarMood('happy', 2000);
+      window.showAvatarThought(`Filtering projects: ${category}! ⚡ Check the stack.`, "VAULT", "🔍 FILTER", 2800);
+    });
+  });
+
+  document.querySelectorAll('.project-card, [data-project-id]').forEach(card => {
+    card.addEventListener('click', () => {
+      window.setAvatarMood('happy', 2500);
+      window.showAvatarThought("Deep diving project architecture! 🔬 Check the live code.", "PROJECTS", "📐 ARCH", 3000);
+    });
+  });
+
+  const cmdkBtn = document.getElementById('cmdk-btn') || document.getElementById('search-btn');
+  if (cmdkBtn) {
+    cmdkBtn.addEventListener('click', () => {
+      window.showAvatarThought("Spotlight activated! 🔍 Type any command.", "SPOTLIGHT", "⚡ CMD+K", 2800);
+    });
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      window.showAvatarThought("Power user shortcut! ⚡ Spotlight opened.", "SPOTLIGHT", "⚡ CMD+K", 2800);
+    }
+  });
+
+  const aiChatTrigger = document.getElementById('priyam-ai-trigger') || document.getElementById('ai-chat-btn');
+  if (aiChatTrigger) {
+    aiChatTrigger.addEventListener('click', () => {
+      window.setAvatarMood('happy', 3000);
+      window.showAvatarThought("My AI clone is online! Ask me anything! 🤖🧠", "AI CLONE", "🧠 PRIYAM AI", 3500);
+    });
+  }
+
+  const fireMissileBtn = document.getElementById('fire-missile-btn') || document.getElementById('uav-radar-canvas');
+  if (fireMissileBtn) {
+    fireMissileBtn.addEventListener('click', () => {
+      window.setAvatarMood('happy', 2500);
+      window.showAvatarThought("AIR DEFENSE ENGAGED! 🎯 Interceptors launched!", "RADAR GAME", "🎯 DEFENSE", 3000);
+    });
+  }
+
+  document.querySelectorAll('.copy-btn, [data-copy]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      window.setAvatarMood('happy', 2500);
+      window.showAvatarThought("Copied to clipboard! 📋 Drop me a message!", "COPIED", "✉️ CONNECT", 3000);
+    });
+  });
+
+  document.addEventListener('selectionchange', () => {
+    const sel = window.getSelection();
+    if (sel && sel.toString().trim().length > 25 && Math.random() < 0.25 && isAvatarEnabled) {
+      window.showAvatarThought("Taking notes on that! 📝 Great insight.", "NOTEPAD", "📝 READING", 2500);
+    }
+  });
+
+  const SECTION_LORE = {
+    'hero': {
+      normal: { tag: '00 · INTRO', msg: "👋 Hey, I'm Priyam! Systems builder & vibe coder. Let me take you on a tour!", mood: '👋 WELCOME' },
+      spicy:  { tag: '🔞 00 · INTRO', msg: "Sup fucker! Pure builder energy here. Let's see how I ship real systems without VC fluff! 🚀", mood: '🔥 UNCENSORED' }
+    },
+    'about': {
+      normal: { tag: '01 · PHILOSOPHY', msg: "📐 First-principles systems engineering & hardware bridges. No shallow wrapper apps!", mood: '📐 FIRST PRINCIPLES' },
+      spicy:  { tag: '🔞 01 · DHANDHO', msg: "Gujarati dhandho mindset + raw execution. Zero fake founder cringe, just hard systems! 📈", mood: '⚡ DILIGENT' }
+    },
+    'projects': {
+      normal: { tag: '02 · CODE VAULT', msg: "🚀 Real hardware bridges, diagnostic LIS, and COD attribution engines. Filter by Web / AI / Hardware!", mood: '🔬 EXPLORING VAULT' },
+      spicy:  { tag: '🔞 02 · HARD CODE', msg: "Check out the repos bc! ASTM E1394 packet parsing and ₹835 COD unit margins. Hard engineering only! 🦾", mood: '🔥 SHIPPING' }
+    },
+    'surge': {
+      normal: { tag: '03 · SURGE HARDWARE', msg: "🧴 Formulation & packaging R&D for men's hair styling. Scroll down to inspect the 360° bottle!", mood: '🧴 3D BOTTLE LAB' },
+      spicy:  { tag: '🔞 03 · UNIT MATH', msg: "Paused before the MOQ debt trap. Understanding unit economics before scale is true builder discipline! 🧪", mood: '📊 UNIT ECONOMICS' }
+    },
+    'defence': {
+      normal: { tag: '04 · DEFENCE AVIONICS', msg: "🎯 MAVLink PX4 telemetry & edge AI avionics for autonomous defense UAVs.", mood: '🛸 DEFENSE AI' },
+      spicy:  { tag: '🔞 04 · AIR DEFENSE', msg: "Autonomous edge tracking and real-time UAV guidance. Military grade precision, no latency! 💥", mood: '🎯 TARGET LOCKED' }
+    },
+    'fun-zone': {
+      normal: { tag: '05 · PLAYGROUND', msg: "🕹️ Interactive Radar Interceptor! Press [SPACE] or tap the canvas to scan and intercept!", mood: '🎯 RADAR ACTIVE' },
+      spicy:  { tag: '🔞 05 · COMBAT ARENA', msg: "Try to hit the interceptor targets if you got the reflexes! SIUUU! ⚽🎯", mood: '🕹️ ARCADE COMBAT' }
+    },
+    'contact': {
+      normal: { tag: '06 · DOCKED & READY', msg: "☕ Landing complete! Click [Talk to Priyuum] below to chat with my AI clone or ping my email direct!", mood: '✉️ HIT ME UP' },
+      spicy:  { tag: '🔞 06 · LET\'S TALK', msg: "We reached the end! Hit me up for pre-seed funding, unhinged tech challenges, or click below for AI chat! 🚀", mood: '☕ COFFEE READY' }
+    }
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && entry.intersectionRatio > 0.25 && isAvatarEnabled) {
+        const id = entry.target.id;
+        if (id && SECTION_LORE[id] && id !== lastSection) {
+          lastSection = id;
+          const sectionData = SECTION_LORE[id];
+          const data = is18PlusMode ? (sectionData.spicy || sectionData.normal) : sectionData.normal;
+          window.showAvatarThought(data.msg, data.tag, data.mood, 4200);
+        }
+      }
+    });
+  }, { threshold: [0.25, 0.45] });
+
+  ['hero', 'about', 'projects', 'surge', 'defence', 'fun-zone', 'contact'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) observer.observe(el);
+  });
+
+  window.triggerAvatarInteraction = () => {
+    if (Date.now() < evasionUntil || !isAvatarEnabled) return;
+    window.setAvatarMood(is18PlusMode ? 'angry' : 'happy', 3000);
+    
+    if (is18PlusMode) {
+      const spicyQuips = [
+        "What the fuck you looking at? Look at the projects! 😂",
+        "Fucker Mode ON. All 7 fits unlocked. Pick your fighter! 🦾",
+        "Stop poking me and let's build some cool shit! 🔥",
+        "Zero corporate bullshit here. 100% pure builder. ⚡",
+        "18+ mode active: Code so fast it breaks reality."
+      ];
+      const q = spicyQuips[Math.floor(Math.random() * spicyQuips.length)];
+      window.showAvatarThought(q, "🔞 18+ ROGUE", "🔞 18+ MODE", 3000);
+    } else {
+      const quips = [
+        "Let's build something epic! 🚀",
+        "Vibe coding mode ON! 💻✨",
+        "Wanna play the radar game? 🎯",
+        "Ask my AI clone in chat! 💬",
+        "Kem chho! Dhandho mindset 📈"
+      ];
+      const q = quips[Math.floor(Math.random() * quips.length)];
+      window.showAvatarThought(q, "JOYFUL", "😊 HYPED", 2600);
+    }
+  };
+
+  const RANDOM_FOUNDER_QUOTES = [
+    { tag: '5TH WALL', msg: "Vibing from the overlay layer 🕶️ +10,000 aura", mood: '🚀 5TH WALL' },
+    { tag: 'DHANDHO', msg: "Kem chho! Dhandha no pakko 📈 High rokda", mood: '💼 DHANDHO' },
+    { tag: 'VIBE CODE', msg: "\"I'm a vibe coder, bitch.\" 🎧 3 AM stack", mood: '🎵 VIBING' },
+    { tag: 'LET HIM COOK', msg: "Let him cook! 👨‍🍳 Tapping RS232 ASTM serial cables", mood: '🔥 COOKING' },
+    { tag: 'NO CAP', msg: "Zero SaaS brainrot here, no cap fr fr 🗿", mood: '🗿 BASED' },
+    { tag: 'MOGGING', msg: "Mogging generic wrapper startups with first-principles math 📐", mood: '👑 GIGACHAD' },
+    { tag: 'DEFENSE', msg: "Defense AI & edge UAV companion avionics 🎯", mood: '🎯 DEFENSE' },
+    { tag: 'CR7 CLUTCH', msg: "Winning mentality + F1 downforce 🏎️ SIUUU! ⚽", mood: '⚽ SIUUU' },
+    { tag: 'LOCKED IN', msg: "Terminal locked in 🚀 Zero architectural paralysis", mood: '⚡ LOCKED IN' },
+    { tag: 'DSAI 3.0', msg: "Masters' Union DSAI builder 🎓 Machine learning + dhandho", mood: '🎓 DSAI 3.0' },
+    { tag: 'MATH', msg: "e^(iπ) + 1 = 0 is pure aesthetic 🌌", mood: '📐 MATH' },
+    { tag: 'CHAI RIZZ', msg: "Kathiyawadi 3 AM masala chai fuel ☕", mood: '☕ CHAI' },
+    { tag: 'AI CLONE', msg: "Priyuum AI is live in chat — ask for a roast! 🤖🧠", mood: '🧠 PRIYAM AI' }
+  ];
+
+  const RANDOM_18PLUS_QUOTES = [
+    { tag: '🔞 18+', msg: "Bc direct main branch pe commit push maar diya! +100k aura 🔥", mood: '🔥 SAVAGE' },
+    { tag: '🔞 18+', msg: "Zero VC bullshit. We cook, ship, and get rokda done.", mood: '🔥 UNFILTERED' },
+    { tag: '🔞 18+', msg: "Why the fuck did you scroll all the way here? Hire me already lodu! 😂", mood: '🖕 HIRED' },
+    { tag: '🔞 18+', msg: "Fuck slow legacy code. Pure execution mode ON, no cap. ⚡", mood: '⚡ FUCKER' },
+    { tag: '🔞 18+', msg: "Bakchodi mat kar lawde, live projects dekh! 🕶️", mood: '🕶️ NO FILTER' },
+    { tag: '🔞 18+', msg: "Teri maa ki... bug free code likhta hu me! Mogged. 💀", mood: '💀 BASED' },
+    { tag: '🔞 18+', msg: "Code so clean it makes senior devs question their entire career. 💀", mood: '💀 CLEAN AF' },
+    { tag: '🔞 18+', msg: "Talk to my AI clone if you got big fucking problems to solve.", mood: '🧠 ROGUE AI' },
+    { tag: '🔞 18+', msg: "Slap me one more time and I'll drop your production db bc! ⚡", mood: '😈 KAMEHAMEHA' },
+    { tag: '🔞 18+', msg: "18+ mode unlocked: Hard problems only. Infinite aura unlocked.", mood: '🚀 UNCHAINED' },
+    { tag: '🔞 18+', msg: "Kathiyawadi 3 AM chai & pure fuck-you builder energy. ☕🔥", mood: '☕ DHANDHO' },
+    { tag: '🔞 18+', msg: "Breaking the 5th wall because vanilla UI is boring as fuck.", mood: '💥 5TH WALL' },
+    { tag: '🔞 18+', msg: "Bhai VC money is a trap, dhandho karo aur profit banao! 📈", mood: '💼 DHANDHO' },
+    { tag: '🔞 18+', msg: "Delulu is the only solulu when you're 18 and shipping defense tech. 🚀", mood: '🗿 MAIN CHAR' }
+  ];
+
+  function runThoughtCycle() {
+    if (!isDragging && Date.now() >= evasionUntil && !isReadingActive() && isAvatarEnabled && !bubble.classList.contains('active')) {
+      const quotePool = is18PlusMode ? RANDOM_18PLUS_QUOTES : RANDOM_FOUNDER_QUOTES;
+      const quote = quotePool[Math.floor(Math.random() * quotePool.length)];
+      window.showAvatarThought(quote.msg, quote.tag, quote.mood, 3400);
+    }
+    const nextInterval = is18PlusMode ? (5500 + Math.random() * 2500) : (10000 + Math.random() * 4000);
+    setTimeout(runThoughtCycle, nextInterval);
+  }
+  setTimeout(runThoughtCycle, 3000);
+
+  // Initialize Default Saved Outfit & Enabled State
+  applyCurrentOutfit(false);
+  applyAvatarEnabledState();
+
+  // Initial welcome greeting
+  if (isAvatarEnabled) {
+    setTimeout(() => {
+      window.showAvatarThought("Kem chho! 🚀 Vibe coding mode ON", "5TH WALL", "💼 DHANDHO", 3200);
+    }, 1800);
+  }
+}
+
+/* ==========================================================================
+   INITIALIZATION LAUNCHPAD (EXECUTES AFTER ALL MODULES & DATA LOADED)
+   ========================================================================== */
+function initApp() {
+  try { initThemeEngine(); } catch (e) { console.error('initThemeEngine:', e); }
+  try { initScrollProgress(); } catch (e) { console.error('initScrollProgress:', e); }
+  try { initNavSpy(); } catch (e) { console.error('initNavSpy:', e); }
+  try { initMobileMenu(); } catch (e) { console.error('initMobileMenu:', e); }
+  try { initExpressiveTypography(); } catch (e) { console.error('initExpressiveTypography:', e); }
+  try { initHeroInteractiveCanvas(); } catch (e) { console.error('initHeroInteractiveCanvas:', e); }
+  try { initProjectFilters(); } catch (e) { console.error('initProjectFilters:', e); }
+  try { initProjectModal(); } catch (e) { console.error('initProjectModal:', e); }
+  try { initDroneAvionicsSimulation(); } catch (e) { console.error('initDroneAvionicsSimulation:', e); }
+  try { initSurgeScrollDrivenBottle(); } catch (e) { console.error('initSurgeScrollDrivenBottle:', e); }
+  try { initCommandPalette(); } catch (e) { console.error('initCommandPalette:', e); }
+  try { initFunZone(); } catch (e) { console.error('initFunZone:', e); }
+  try { initPriyamAiClone(); } catch (e) { console.error('initPriyamAiClone:', e); }
+  try { initRoamingPriyamAvatar(); } catch (e) { console.error('initRoamingPriyamAvatar:', e); }
+  try { initClipboard(); } catch (e) { console.error('initClipboard:', e); }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
 }
