@@ -1535,22 +1535,22 @@ button { font-family: inherit; }
 
 /* Dark Flight Deck & Tactical Simulator Styling */
 .game-card-wrapper {
-  background: var(--paper);
+  background: var(--paper-card);
   border: 1px solid var(--line);
-  padding: clamp(1.25rem, 3vw, 2.25rem);
+  padding: clamp(1rem, 2.5vw, 1.75rem);
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
   max-width: 960px;
   margin: 0 auto;
-  border-radius: 14px;
+  border-radius: 2px;
 }
 
 .game-card--dark {
-  background: #06080D;
-  border-color: #1E293B;
+  background: #090C12;
+  border: 1px solid #1E2636;
   color: #F8FAFC;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: none;
 }
 
 .game-header-bar {
@@ -1558,23 +1558,24 @@ button { font-family: inherit; }
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.85rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  padding-bottom: 0.85rem;
+  gap: 0.75rem;
+  border-bottom: 1px solid #1A202C;
+  padding-bottom: 0.75rem;
 }
 
 .game-title {
   font-family: var(--font-display);
-  font-size: clamp(1.6rem, 3.8vw, 2.5rem);
-  line-height: 0.95;
-  color: var(--ink);
-  margin-top: 0.2rem;
+  font-size: clamp(1.4rem, 3.2vw, 2.2rem);
+  letter-spacing: 0.04em;
+  color: #F8FAFC;
+  margin-top: 0.15rem;
+  line-height: 1;
 }
 
 .flight-hud-pills {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.4rem;
   flex-wrap: wrap;
 }
 
@@ -1582,42 +1583,47 @@ button { font-family: inherit; }
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   font-weight: 700;
-  padding: 0.35rem 0.75rem;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--paper);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
+  letter-spacing: 0.06em;
+  padding: 0.35rem 0.65rem;
+  background: #101520;
+  color: #00F0FF;
+  border: 1px solid #222C3E;
+  border-radius: 0;
+}
+
+#uav-hud-high {
+  color: #FFE600;
+  border-color: rgba(255, 230, 0, 0.3);
 }
 
 .audio-toggle-btn {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
   font-weight: 700;
-  padding: 0.35rem 0.75rem;
-  background: transparent;
+  padding: 0.35rem 0.65rem;
+  background: #101520;
   color: #94A3B8;
-  border: 1px solid #334155;
+  border: 1px solid #222C3E;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 0;
   transition: all 0.15s ease;
 }
 
 .audio-toggle-btn:hover {
   color: #FFF;
-  border-color: #64748B;
+  border-color: #00F0FF;
 }
 
 .audio-toggle-btn.btn--paused {
-  background: rgba(245, 158, 11, 0.22);
+  background: rgba(245, 158, 11, 0.15);
   color: #F59E0B;
   border-color: #F59E0B;
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
   animation: pausePulse 1.5s infinite ease-in-out;
 }
 
 @keyframes pausePulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.75; }
+  50% { opacity: 0.7; }
 }
 
 /* UAV Flight Simulator Telemetry Row */
@@ -1625,16 +1631,16 @@ button { font-family: inherit; }
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 1px;
-  background: #1E293B;
-  border: 1px solid #1E293B;
-  border-radius: 6px;
+  background: #1E2636;
+  border: 1px solid #1E2636;
+  border-radius: 0;
   overflow: hidden;
   width: 100%;
 }
 
 .uav-tele-item {
-  background: #090C12;
-  padding: 0.65rem 0.85rem;
+  background: #080B10;
+  padding: 0.55rem 0.8rem;
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
@@ -1642,7 +1648,7 @@ button { font-family: inherit; }
 
 .uav-tval {
   font-family: var(--font-mono);
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #F8FAFC;
 }
@@ -1652,10 +1658,10 @@ button { font-family: inherit; }
   position: relative;
   width: 100%;
   aspect-ratio: 2 / 1;
-  min-height: 430px;
-  background: #030508;
-  border: 1px solid #1E293B;
-  border-radius: 8px;
+  min-height: 400px;
+  background: #04060A;
+  border: 1px solid #1E2636;
+  border-radius: 0;
   overflow: hidden;
 }
 
@@ -1665,19 +1671,19 @@ button { font-family: inherit; }
   width: 100%;
   height: 100%;
   aspect-ratio: 2 / 1;
-  background: radial-gradient(circle at center, #0B1320 0%, #030508 100%);
+  background: #04060A;
   cursor: crosshair;
 }
 
 .uav-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(3, 5, 8, 0.92);
-  backdrop-filter: blur(6px);
+  background: rgba(4, 6, 10, 0.92);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.4rem 0.6rem;
+  padding: 0.5rem 0.75rem;
   text-align: center;
   z-index: 10;
   overflow-y: auto;
@@ -1686,79 +1692,92 @@ button { font-family: inherit; }
 .uav-overlay.hidden { display: none; }
 
 .uav-overlay-box {
-  max-width: 430px;
+  max-width: 420px;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.4rem;
   align-items: center;
 }
 
 .uav-overlay-title {
   font-family: var(--font-display);
-  font-size: 1.15rem;
-  line-height: 1.1;
+  font-size: clamp(1.3rem, 3vw, 1.85rem);
+  line-height: 1.05;
   color: #EF4444;
+  letter-spacing: 0.04em;
   margin: 0;
 }
 
 .uav-overlay-desc {
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   color: #94A3B8;
-  line-height: 1.25;
+  line-height: 1.35;
   margin: 0;
-  max-width: 400px;
+  max-width: 380px;
 }
 
 .uav-btn-primary {
   font-family: var(--font-mono);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  padding: 0.45rem 0.9rem;
+  padding: 0.55rem 1rem;
   background: #00F0FF;
-  color: #030508;
+  color: #04060A;
   border: none;
-  border-radius: 4px;
+  border-radius: 0;
   cursor: pointer;
-  transition: transform 0.15s ease, background 0.15s ease;
+  transition: background 0.15s ease, transform 0.15s ease;
 }
 
 .uav-btn-primary:hover {
-  transform: translateY(-2px);
   background: #38BDF8;
+  transform: translateY(-1px);
 }
 
 /* UAV Controls Bar */
 .uav-controls-bar {
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
+  gap: 0.5rem;
   width: 100%;
 }
 
 .uav-key-hints {
   color: #64748B;
-  font-size: 0.6875rem;
+  font-size: 0.65rem;
   letter-spacing: 0.06em;
 }
 
 .uav-touch-controls {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
   width: 100%;
+}
+
+.uav-touch-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.uav-touch-row:last-child {
+  grid-template-columns: repeat(3, 1fr);
 }
 
 .touch-ctrl-btn {
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 0.6rem 0.65rem;
-  background: #0F172A;
-  color: #F8FAFC;
-  border: 1px solid #1E293B;
-  border-radius: 6px;
+  letter-spacing: 0.04em;
+  padding: 0.55rem 0.4rem;
+  background: #0F141F;
+  color: #CBD5E1;
+  border: 1px solid #1E2638;
+  border-radius: 0;
   cursor: pointer;
   text-align: center;
   transition: all 0.12s ease;
@@ -1767,37 +1786,29 @@ button { font-family: inherit; }
 
 .touch-ctrl-btn:hover,
 .touch-ctrl-btn:active {
-  background: #0284C7;
-  color: #FFFFFF;
-  border-color: #38BDF8;
-  transform: translateY(-1px);
+  background: #182030;
+  color: #00F0FF;
+  border-color: #00F0FF;
 }
 
-.touch-ctrl-btn--boost {
-  border-color: #0D9488;
-  background: #0F766E;
-  color: #2DD4BF;
+.touch-ctrl-btn--primary {
+  border-color: #00F0FF;
+  color: #00F0FF;
+  background: rgba(0, 240, 255, 0.08);
 }
 
-.touch-ctrl-btn--boost:hover,
-.touch-ctrl-btn--boost:active {
-  background: #14B8A6;
-  color: #030508;
-}
-
-/* ==================== TACTICAL SCORE SUBMISSION & GLOBAL LEADERBOARD ==================== */
+/* Tactical Score Submission Dossier */
 .uav-score-submit-card {
   width: 100%;
-  max-width: 440px;
-  background: rgba(11, 19, 34, 0.96);
-  border: 1.5px solid rgba(0, 240, 255, 0.4);
-  box-shadow: 0 0 25px rgba(0, 240, 255, 0.2), inset 0 0 15px rgba(0, 240, 255, 0.05);
-  border-radius: 8px;
+  max-width: 420px;
+  background: #0C1018;
+  border: 1px solid #00F0FF;
+  border-radius: 0;
   padding: 0.75rem 1rem;
   margin: 0.25rem auto;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.45rem;
   box-sizing: border-box;
 }
 
@@ -1805,32 +1816,15 @@ button { font-family: inherit; }
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid #1E2638;
   padding-bottom: 0.35rem;
-  gap: 0.5rem;
 }
 
 .uav-dossier-tag {
-  color: #FFE600;
-  font-size: 0.7rem;
+  color: #00F0FF;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.06em;
-}
-
-.uav-dossier-rank {
-  font-family: var(--font-mono);
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 0.15rem 0.45rem;
-  border-radius: 3px;
-  background: rgba(0, 240, 255, 0.12);
-  color: #00F0FF;
-  border: 1px solid rgba(0, 240, 255, 0.3);
-  white-space: nowrap;
-}
-
-.uav-callsign-chips {
-  display: none;
 }
 
 .uav-submit-inputs {
@@ -1843,10 +1837,10 @@ button { font-family: inherit; }
 
 .uav-callsign-input {
   width: 100%;
-  background: #030712;
-  border: 1.5px solid #334155;
-  border-radius: 6px;
-  padding: 0.55rem 0.85rem;
+  background: #05080E;
+  border: 1px solid #283346;
+  border-radius: 0;
+  padding: 0.55rem 0.75rem;
   color: #00F0FF;
   font-family: var(--font-mono);
   font-size: 0.85rem;
@@ -1856,12 +1850,11 @@ button { font-family: inherit; }
   text-align: center;
   outline: none;
   box-sizing: border-box;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  transition: border-color 0.15s ease;
 }
 
 .uav-callsign-input:focus {
   border-color: #00F0FF;
-  box-shadow: 0 0 14px rgba(0, 240, 255, 0.4);
 }
 
 .uav-callsign-input::placeholder {
@@ -1876,33 +1869,30 @@ button { font-family: inherit; }
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
-  padding: 0.6rem 0.9rem;
-  background: linear-gradient(135deg, #0284C7 0%, #00F0FF 100%);
-  color: #030712;
+  letter-spacing: 0.06em;
+  padding: 0.6rem 0.85rem;
+  background: #00F0FF;
+  color: #05080E;
   border: none;
-  border-radius: 6px;
+  border-radius: 0;
   cursor: pointer;
   text-align: center;
-  transition: all 0.15s ease;
-  box-shadow: 0 0 14px rgba(0, 240, 255, 0.35);
+  transition: background 0.15s ease;
   box-sizing: border-box;
 }
 
 .uav-btn-submit:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.65);
+  background: #38BDF8;
 }
 
 .uav-btn-submit:disabled {
-  opacity: 0.7;
+  opacity: 0.6;
   cursor: not-allowed;
-  transform: none;
 }
 
 .uav-submit-status {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
+  font-size: 0.6875rem;
   color: #FFE600;
   text-align: center;
   margin: 0;
@@ -1911,9 +1901,10 @@ button { font-family: inherit; }
 
 .uav-action-btns {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.45rem;
   flex-wrap: wrap;
   justify-content: center;
+  margin-top: 0.15rem;
 }
 
 .uav-btn-secondary {
@@ -1921,30 +1912,29 @@ button { font-family: inherit; }
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.06em;
-  padding: 0.55rem 1.1rem;
-  background: rgba(30, 41, 59, 0.8);
-  color: #38BDF8;
-  border: 1px solid #334155;
-  border-radius: 4px;
+  padding: 0.55rem 1rem;
+  background: #111622;
+  color: #94A3B8;
+  border: 1px solid #242D3E;
+  border-radius: 0;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .uav-btn-secondary:hover {
-  background: #1E293B;
+  background: #1A2234;
   color: #FFF;
   border-color: #00F0FF;
 }
 
-/* Global Leaderboard Deck */
+/* ==================== GLOBAL LEADERBOARD DECK (EDITORIAL TOP 3) ==================== */
 .game-leaderboard-deck {
   max-width: 960px;
-  margin: 1.5rem auto 0 auto;
-  background: #06080D;
-  border: 1px solid #1E293B;
-  border-radius: 12px;
-  padding: clamp(1rem, 2.5vw, 1.75rem);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  margin: 1.25rem auto 0 auto;
+  background: #090C12;
+  border: 1px solid #1E2636;
+  border-radius: 2px;
+  padding: clamp(0.85rem, 2vw, 1.35rem);
 }
 
 .glb-header {
@@ -1952,28 +1942,30 @@ button { font-family: inherit; }
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.85rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid #1A202C;
 }
 
 .glb-title {
   font-family: var(--font-display);
-  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  font-size: clamp(1.3rem, 2.6vw, 1.75rem);
+  letter-spacing: 0.04em;
   color: #F8FAFC;
-  margin: 0.15rem 0 0 0;
+  margin: 0;
+  line-height: 1;
 }
 
 .glb-actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.65rem;
 }
 
 .glb-live-badge {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.65rem;
   font-weight: 700;
   color: #10B981;
   display: flex;
@@ -1982,11 +1974,10 @@ button { font-family: inherit; }
 }
 
 .glb-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   background: #10B981;
   border-radius: 50%;
-  box-shadow: 0 0 8px #10B981;
   animation: glbDotPulse 1.8s infinite ease-in-out;
 }
 
@@ -1997,160 +1988,178 @@ button { font-family: inherit; }
 
 .glb-refresh-btn {
   font-family: var(--font-mono);
-  font-size: 0.6875rem;
+  font-size: 0.65rem;
   font-weight: 700;
-  padding: 0.35rem 0.65rem;
-  background: #0F172A;
+  padding: 0.3rem 0.6rem;
+  background: #101520;
   color: #94A3B8;
-  border: 1px solid #334155;
-  border-radius: 4px;
+  border: 1px solid #242D3E;
+  border-radius: 0;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .glb-refresh-btn:hover {
-  background: #1E293B;
-  color: #FFF;
+  background: #1A2234;
+  color: #00F0FF;
   border-color: #00F0FF;
 }
 
-/* Top 3 Champions Podium Grid */
+/* Top 3 Podium Grid (Desktop) */
 .glb-podium-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.85rem;
-  margin-bottom: 1.25rem;
-}
-
-@media (max-width: 640px) {
-  .glb-podium-grid {
-    grid-template-columns: 1fr;
-  }
+  gap: 0.65rem;
 }
 
 .glb-podium-card {
-  background: #080D18;
-  border: 1px solid #1E293B;
-  border-radius: 8px;
-  padding: 1rem;
+  background: #0C1018;
+  border: 1px solid #1E2638;
+  border-radius: 0;
+  padding: 0.85rem 1rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  justify-content: space-between;
   gap: 0.35rem;
   position: relative;
-  overflow: hidden;
-  transition: transform 0.2s ease;
+  transition: transform 0.15s ease, border-color 0.15s ease;
 }
 
 .glb-podium-card:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
 }
 
 .glb-podium--gold {
-  border-color: rgba(245, 158, 11, 0.4);
-  background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, #080D18 100%);
-  box-shadow: 0 0 16px rgba(245, 158, 11, 0.12);
+  border-color: rgba(255, 230, 0, 0.4);
+  background: linear-gradient(180deg, rgba(255, 230, 0, 0.05) 0%, #0C1018 100%);
 }
 
 .glb-podium--silver {
-  border-color: rgba(226, 232, 240, 0.3);
-  background: linear-gradient(180deg, rgba(226, 232, 240, 0.05) 0%, #080D18 100%);
+  border-color: rgba(203, 213, 225, 0.3);
 }
 
 .glb-podium--bronze {
-  border-color: rgba(205, 127, 50, 0.3);
-  background: linear-gradient(180deg, rgba(205, 127, 50, 0.05) 0%, #080D18 100%);
+  border-color: rgba(217, 119, 6, 0.3);
+}
+
+.glb-podium-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
 .glb-podium-rank {
   font-family: var(--font-mono);
   font-size: 0.625rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #94A3B8;
+  letter-spacing: 0.06em;
+  color: #64748B;
 }
 
-.glb-podium--gold .glb-podium-rank { color: #F59E0B; }
-.glb-podium--silver .glb-podium-rank { color: #E2E8F0; }
-.glb-podium--bronze .glb-podium-rank { color: #CD7F32; }
+.glb-podium--gold .glb-podium-rank { color: #FFE600; }
+.glb-podium--silver .glb-podium-rank { color: #CBD5E1; }
+.glb-podium--bronze .glb-podium-rank { color: #F59E0B; }
 
 .glb-podium-name {
   font-family: var(--font-mono);
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #00F0FF;
-  margin: 0.15rem 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #F8FAFC;
+  margin: 0;
   letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .glb-podium-score {
   font-family: var(--font-display);
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   line-height: 1;
   color: #FFF;
+  letter-spacing: 0.02em;
 }
 
-.glb-table-container {
-  overflow-x: auto;
-  border: 1px solid #1E293B;
-  border-radius: 6px;
-  background: #030508;
-}
+.glb-podium--gold .glb-podium-score { color: #FFE600; }
 
-.glb-table {
-  width: 100%;
-  border-collapse: collapse;
-  text-align: left;
+.glb-me-tag {
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
-}
-
-.glb-table th {
-  background: #0B101B;
-  color: #64748B;
-  padding: 0.65rem 0.85rem;
-  font-size: 0.6875rem;
-  letter-spacing: 0.08em;
-  border-bottom: 1px solid #1E293B;
-}
-
-.glb-table td {
-  padding: 0.65rem 0.85rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  color: #E2E8F0;
-}
-
-.glb-table tr:hover td {
-  background: rgba(0, 240, 255, 0.03);
-}
-
-.glb-rank-1 td { color: #F59E0B; font-weight: 700; background: rgba(245, 158, 11, 0.05); }
-.glb-rank-2 td { color: #E2E8F0; font-weight: 700; background: rgba(226, 232, 240, 0.03); }
-.glb-rank-3 td { color: #CD7F32; font-weight: 700; background: rgba(205, 127, 50, 0.03); }
-
-.glb-row--my-score td {
-  background: rgba(0, 240, 255, 0.08) !important;
-  border-left: 3px solid #00F0FF;
-}
-
-.glb-tag {
-  display: inline-block;
-  padding: 0.2rem 0.5rem;
   font-size: 0.625rem;
   font-weight: 700;
-  border-radius: 3px;
-  letter-spacing: 0.04em;
-  background: rgba(56, 189, 248, 0.12);
-  color: #38BDF8;
-  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: #10B981;
 }
 
-.glb-loading {
-  text-align: center;
-  padding: 1.5rem !important;
-  color: #64748B;
-  font-style: italic;
+.glb-podium--me {
+  border-color: #10B981 !important;
+}
+
+/* Mobile Condensed Layout (< 640px) */
+@media (max-width: 640px) {
+  .glb-podium-grid {
+    grid-template-columns: 1fr;
+    gap: 0.35rem;
+  }
+
+  .glb-podium-card {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.55rem 0.75rem;
+    gap: 0.5rem;
+    min-height: 44px;
+  }
+
+  .glb-podium-meta {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.55rem;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .glb-rank-sep,
+  .glb-rank-label {
+    display: none;
+  }
+
+  .glb-podium-rank {
+    font-size: 0.8125rem;
+    font-weight: 800;
+    min-width: 22px;
+    flex-shrink: 0;
+  }
+
+  .glb-podium-name {
+    font-size: 0.875rem;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .glb-podium-score {
+    font-size: 1.25rem;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .uav-telemetry-bar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .uav-touch-row {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.25rem;
+  }
+
+  .uav-touch-row:last-child {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.25rem;
+  }
+
+  .touch-ctrl-btn {
+    font-size: 0.6875rem;
+    padding: 0.5rem 0.2rem;
+    min-height: 40px;
+  }
 }
 
 /* ==========================================================================
@@ -4990,9 +4999,9 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
   }
 
   .game-card-wrapper {
-    padding: 1rem 0.75rem;
+    padding: 0.85rem 0.65rem;
     gap: 0.65rem;
-    border-radius: 10px;
+    border-radius: 0;
   }
 
   .game-header-bar {
@@ -5012,20 +5021,23 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
   .game-score-badge {
     font-size: 0.625rem;
     padding: 0.25rem 0.5rem;
+    border-radius: 0;
   }
 
   .audio-toggle-btn {
     font-size: 0.625rem;
     padding: 0.25rem 0.5rem;
+    border-radius: 0;
   }
 
   .uav-telemetry-bar {
     grid-template-columns: repeat(2, 1fr);
-    gap: 4px;
+    gap: 1px;
+    border-radius: 0;
   }
 
   .uav-tele-item {
-    padding: 0.35rem 0.6rem;
+    padding: 0.4rem 0.55rem;
   }
 
   .uav-tele-item .mono-label {
@@ -5040,7 +5052,7 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
     width: 100%;
     aspect-ratio: 2 / 1;
     height: auto;
-    border-radius: 8px;
+    border-radius: 0;
     overflow: hidden;
   }
 
@@ -5055,23 +5067,24 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
 
   .uav-overlay-box {
     max-width: 92%;
-    gap: 0.6rem;
+    gap: 0.45rem;
   }
 
   .uav-overlay-title {
-    font-size: 1.35rem;
+    font-size: 1.25rem;
   }
 
   .uav-overlay-desc {
-    font-size: 0.75rem;
-    line-height: 1.4;
+    font-size: 0.72rem;
+    line-height: 1.35;
   }
 
   .uav-btn-primary {
     width: 100%;
-    padding: 0.75rem 1rem;
-    min-height: 44px;
+    padding: 0.65rem 1rem;
+    min-height: 40px;
     font-size: 0.75rem;
+    border-radius: 0;
     touch-action: manipulation;
   }
 
@@ -5080,35 +5093,37 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
   }
 
   .uav-touch-controls {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
     width: 100%;
   }
 
-  .uav-touch-controls .touch-ctrl-btn {
-    min-height: 44px;
-    padding: 0.55rem 0.2rem;
-    font-size: 0.7rem;
-    border-radius: 6px;
+  .uav-touch-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.25rem;
+    width: 100%;
+  }
+
+  .uav-touch-row:last-child {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.25rem;
+  }
+
+  .touch-ctrl-btn {
+    min-height: 38px;
+    padding: 0.45rem 0.15rem;
+    font-size: 0.65rem;
+    border-radius: 0;
     font-weight: 700;
     touch-action: manipulation;
   }
 
-  .uav-touch-controls .touch-ctrl-btn:active {
-    transform: scale(0.96);
-    filter: brightness(1.2);
-  }
-
-  .uav-touch-controls .touch-ctrl-btn--boost {
-    background: #00F0FF;
-    color: #030508;
+  .touch-ctrl-btn:active {
+    background: #1E2638;
+    color: #00F0FF;
     border-color: #00F0FF;
-  }
-
-  .uav-touch-controls .touch-ctrl-btn:nth-child(7) {
-    grid-column: span 3;
-    min-height: 40px;
   }
 
   .pl-station-grid {
