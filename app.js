@@ -192,7 +192,7 @@ function initExpressiveTypography() {
   const LINES = ['I (Build)', 'Systems.', 'Not Dashboards.'];
   const SCRAMBLE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&§';
 
-  heading.innerHTML = '';
+  const fragment = document.createDocumentFragment();
 
   LINES.forEach((line) => {
     const lineWrapper = document.createElement('span');
@@ -204,7 +204,7 @@ function initExpressiveTypography() {
         span.className = 'char-letter char-space';
         span.innerHTML = '&nbsp;';
       } else {
-        span.className = 'char-letter';
+        span.className = 'char-letter is-in';
         span.textContent = char;
         span.setAttribute('data-char', char);
         span.addEventListener('mouseenter', () => scramble(span));
@@ -212,31 +212,12 @@ function initExpressiveTypography() {
       lineWrapper.appendChild(span);
     });
 
-    heading.appendChild(lineWrapper);
+    fragment.appendChild(lineWrapper);
   });
 
-  const letters = heading.querySelectorAll('.char-letter:not(.char-space)');
+  heading.replaceChildren(fragment);
 
-  letters.forEach((letter, i) => {
-    const delay = 150 + i * 30;
-    const orig = letter.getAttribute('data-char');
-
-    setTimeout(() => {
-      let count = 0;
-      const max = 5;
-      const iv = setInterval(() => {
-        letter.textContent = SCRAMBLE[Math.floor(Math.random() * SCRAMBLE.length)];
-        count++;
-        if (count >= max) {
-          clearInterval(iv);
-          letter.textContent = orig;
-          letter.classList.add('is-in');
-        }
-      }, 45);
-    }, delay);
-  });
-
-  function scramble(el, max = 5) {
+  function scramble(el, max = 4) {
     const orig = el.getAttribute('data-char');
     if (!orig) return;
     let count = 0;
@@ -247,7 +228,7 @@ function initExpressiveTypography() {
         clearInterval(iv);
         el.textContent = orig;
       }
-    }, 40);
+    }, 38);
   }
 }
 
@@ -1696,10 +1677,11 @@ function initDroneAvionicsSimulation() {
 
   resize();
   window.addEventListener('resize', resize, { passive: true });
+  window.addEventListener('load', resize, { passive: true });
   window.addEventListener('scroll', () => {
     if (!container) return;
     const rect = container.getBoundingClientRect();
-    const isNear = rect.top < window.innerHeight + 350 && rect.bottom > -350;
+    const isNear = rect.top < window.innerHeight + 800 && rect.bottom > -800;
     if (isNear) startCAD();
     else stopCAD();
   }, { passive: true });
@@ -1711,7 +1693,7 @@ function initDroneAvionicsSimulation() {
       } else {
         stopCAD();
       }
-    }, { threshold: 0.01, rootMargin: '350px 0px' });
+    }, { threshold: 0.01, rootMargin: '800px 0px' });
     observer.observe(container);
   }
 
@@ -1771,10 +1753,21 @@ function initSurgeScrollDrivenBottle() {
     const img = new Image();
     img.decoding = 'async';
     img.src = `assets/surge/bottle_frames/bottle_${String(idx).padStart(3, '0')}.webp?v=20260902_45`;
-    img.onload = () => {
+
+    const onComplete = () => {
+      frames[idx] = img;
       if (idx === currentFrame || (currentFrame === 0 && idx === 0)) draw(currentFrame);
       if (onDone) onDone();
     };
+
+    if (img.decode) {
+      img.decode().then(onComplete).catch(() => {
+        img.onload = onComplete;
+      });
+    } else {
+      img.onload = onComplete;
+    }
+
     frames[idx] = img;
     return img;
   }
@@ -1782,35 +1775,27 @@ function initSurgeScrollDrivenBottle() {
   // Stage 1: Load and draw primary frame 0 immediately (0ms instant display)
   loadFrame(0, () => draw(0));
 
-  // Stage 2: Load key 360-degree milestone frames for instant drag/scroll response
-  const keyFrames = [10, 20, 30, 40, 50, 60, 70, 79];
-  keyFrames.forEach(idx => loadFrame(idx));
+  // Stage 2: High-Speed Parallel Background Preload of all 80 frames
+  function preloadAllFrames() {
+    // Prime key landmark frames first
+    const keyFrames = [10, 20, 30, 40, 50, 60, 70, 79];
+    keyFrames.forEach(idx => loadFrame(idx));
 
-  // Stage 3: Progressive non-blocking background buffering of remaining frames
-  let nextLoadIdx = 1;
-  function loadNextBatch() {
-    let count = 0;
-    while (nextLoadIdx < TOTAL_FRAMES && count < 6) {
-      if (!frames[nextLoadIdx]) {
-        loadFrame(nextLoadIdx);
-        count++;
+    // Stream all frames concurrently in fast parallel batches of 16
+    let batchStart = 1;
+    function streamNextBatch() {
+      const batchEnd = Math.min(batchStart + 16, TOTAL_FRAMES);
+      for (let i = batchStart; i < batchEnd; i++) {
+        if (!frames[i]) loadFrame(i);
       }
-      nextLoadIdx++;
-    }
-    if (nextLoadIdx < TOTAL_FRAMES) {
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(loadNextBatch, { timeout: 150 });
-      } else {
-        setTimeout(loadNextBatch, 40);
+      batchStart = batchEnd;
+      if (batchStart < TOTAL_FRAMES) {
+        setTimeout(streamNextBatch, 15);
       }
     }
+    setTimeout(streamNextBatch, 25);
   }
-
-  if ('requestIdleCallback' in window) {
-    requestIdleCallback(loadNextBatch, { timeout: 200 });
-  } else {
-    setTimeout(loadNextBatch, 80);
-  }
+  preloadAllFrames();
 
   let ticking = false;
   function onScroll() {
@@ -2202,7 +2187,12 @@ function initUavFlightGame() {
   ];
 
   function spawnThreat() {
-    const template = THREAT_TYPES[Math.floor(Math.random() * THREAT_TYPES.length)];
+    // Progressive Threat Unlocking (Mildly unlocks as score increases)
+    let availableTypes = [THREAT_TYPES[0], THREAT_TYPES[1]]; // Missiles + Loitering Munitions
+    if (state.intercepted >= 4) availableTypes.push(THREAT_TYPES[2]); // EW Jammer
+    if (state.intercepted >= 8) availableTypes.push(THREAT_TYPES[3]); // Ballistic Warhead
+
+    const template = availableTypes[Math.floor(Math.random() * availableTypes.length)];
     const startAngle = Math.PI + (Math.random() * Math.PI * 0.8 + 0.1 * Math.PI); // Northern arc
     const startDist = 370 + Math.random() * 40;
     const startX = BASE.x + Math.cos(startAngle) * startDist;
@@ -2212,15 +2202,19 @@ function initUavFlightGame() {
     const targetY = BASE.y;
     const angleToBase = Math.atan2(targetY - startY, targetX - startX);
 
+    // Very gentle mild speed scaling (+0.6% per kill, capped at +30% max)
+    const speedMultiplier = 1.0 + Math.min(0.30, state.intercepted * 0.006);
+    const finalSpeed = template.speed * speedMultiplier;
+
     threats.push({
       id: state.threatIdCounter++,
       type: template.type,
       name: template.name,
       x: startX,
       y: startY,
-      vx: Math.cos(angleToBase) * template.speed,
-      vy: Math.sin(angleToBase) * template.speed,
-      speed: template.speed,
+      vx: Math.cos(angleToBase) * finalSpeed,
+      vy: Math.sin(angleToBase) * finalSpeed,
+      speed: finalSpeed,
       rcs: template.rcs,
       color: template.color,
       score: template.score,
@@ -2232,15 +2226,16 @@ function initUavFlightGame() {
     });
   }
 
-  // Hostile Coordinated Drone Swarm (4 to 6 Micro-Drones in Formation)
+  // Hostile Coordinated Drone Swarm (3 to 5 Micro-Drones in Formation)
   function spawnDroneSwarm() {
-    const swarmSize = 4 + Math.floor(Math.random() * 3);
+    const swarmSize = 3 + Math.floor(Math.random() * 3);
     const startAngle = Math.PI + (Math.random() * Math.PI * 0.7 + 0.15 * Math.PI);
     const startDist = 380;
     const leaderX = BASE.x + Math.cos(startAngle) * startDist;
     const leaderY = BASE.y + Math.sin(startAngle) * startDist;
     const angleToBase = Math.atan2(BASE.y - leaderY, BASE.x - leaderX);
-    const swarmSpeed = 1.4 + Math.random() * 0.3;
+    const speedMultiplier = 1.0 + Math.min(0.25, state.intercepted * 0.005);
+    const swarmSpeed = (1.25 + Math.random() * 0.25) * speedMultiplier;
 
     state.swarmAlertText = `⚠️ HOSTILE DRONE SWARM DETECTED [${swarmSize}x UNITS]`;
     state.swarmAlertTimer = 180; // 3s
@@ -2380,6 +2375,7 @@ function initUavFlightGame() {
       const th = threats[i];
       if (Math.hypot(th.x - blastX, th.y - blastY) < blastRadius) {
         state.intercepted++;
+        handleGameMilestone(state.intercepted);
         for (let k = 0; k < 14; k++) {
           particles.push({
             x: th.x,
@@ -2408,6 +2404,11 @@ function initUavFlightGame() {
     state.railgunCooldown = 240; // 4s cooldown
     playSound('intercept');
 
+    if (typeof window.showAvatarThought === 'function' && Math.random() < 0.5) {
+      window.setAvatarMood?.('shocked', 2500);
+      window.showAvatarThought("ORBITAL RAILGUN! ⚡ Pure hyper-velocity blast!", "WEAPON", "⚡ RAILGUN", 2400);
+    }
+
     const targetX = state.aimPos.x;
     const targetY = state.aimPos.y;
 
@@ -2425,6 +2426,7 @@ function initUavFlightGame() {
       const th = threats[i];
       if (Math.hypot(th.x - targetX, th.y - targetY) < 70) {
         state.intercepted++;
+        handleGameMilestone(state.intercepted);
         for (let k = 0; k < 16; k++) {
           particles.push({
             x: th.x,
@@ -2477,6 +2479,11 @@ function initUavFlightGame() {
       life: 720, // 12 seconds
     });
     playSound('launch');
+
+    if (typeof window.showAvatarThought === 'function') {
+      window.setAvatarMood?.('happy', 2500);
+      window.showAvatarThought("Autonomous Wingman Drones airborne! 🛸 Covering your flanks!", "WEAPON", "🛸 DRONES", 2500);
+    }
   };
 
   canvas.addEventListener('pointermove', (e) => {
@@ -2553,7 +2560,74 @@ function initUavFlightGame() {
     }
   });
 
+  // ==================== COMPANION LIVE GAMEPLAY REACTION ENGINE ====================
+  let lastGameMilestoneAnnounced = 0;
+
+  function handleGameMilestone(score) {
+    if (typeof window.showAvatarThought !== 'function') return;
+    const is18 = localStorage.getItem('priyam_18plus_mode') === 'true';
+
+    if (score === 1 && lastGameMilestoneAnnounced < 1) {
+      lastGameMilestoneAnnounced = 1;
+      window.setAvatarMood?.('happy', 2500);
+      const msg = is18
+        ? "First blood bc! 💥 Direct kinetic intercept!"
+        : "First blood! 💥 Direct kinetic intercept!";
+      window.showAvatarThought(msg, "RADAR C2", "🎯 FIRST BLOOD", 2500);
+    } else if (score === 3 && lastGameMilestoneAnnounced < 3) {
+      lastGameMilestoneAnnounced = 3;
+      window.setAvatarMood?.('happy', 2500);
+      const msg = is18
+        ? "3 bogeys down! Sahi aim hai, rhythm ban gaya! 🔥"
+        : "3 bogeys down! Trajectory prediction is locked on target! 🎯";
+      window.showAvatarThought(msg, "RADAR C2", "🎯 ON TARGET", 2600);
+    } else if (score === 5 && lastGameMilestoneAnnounced < 5) {
+      lastGameMilestoneAnnounced = 5;
+      window.setAvatarMood?.('happy', 3000);
+      const msg = is18
+        ? "5 bogeys intercepted! Smooth defense bc, keep firing! ⚡"
+        : "5 bogeys intercepted! Kinetic tracking is locked on target! 🎯";
+      window.showAvatarThought(msg, "RADAR C2", "⚡ LOCKED IN", 2800);
+    } else if (score === 10 && lastGameMilestoneAnnounced < 10) {
+      lastGameMilestoneAnnounced = 10;
+      window.setAvatarMood?.('happy', 3500);
+      const msg = is18
+        ? "10 intercepts! Double digits bc! Swarms ko dhool chatwa di! 🔥"
+        : "10 hypersonic intercepts! That trajectory prediction math is paying off! 📐🔥";
+      window.showAvatarThought(msg, "RADAR C2", "🔥 HEATING UP", 3200);
+    } else if (score === 15 && lastGameMilestoneAnnounced < 15) {
+      lastGameMilestoneAnnounced = 15;
+      window.setAvatarMood?.('happy', 3500);
+      const msg = is18
+        ? "SWARM WIPED OUT! 💥 Pure area control! Top tier reaction time!"
+        : "SWARM ELIMINATED! 💥 Clean sector defense! You're in the zone!";
+      window.showAvatarThought(msg, "RADAR C2", "💥 SWARM CLEAR", 3200);
+    } else if (score === 20 && lastGameMilestoneAnnounced < 20) {
+      lastGameMilestoneAnnounced = 20;
+      window.setAvatarMood?.('happy', 4000);
+      const msg = is18
+        ? "20 INTERCEPTS?! CR7 clutch gene unlocked bc! SIUUUU! ⚽👑"
+        : "20 INTERCEPTS! SIUUU! 🚀 Airspace is totally locked down! Ace pilot level!";
+      window.showAvatarThought(msg, "RADAR C2", "👑 ACE PILOT", 3500);
+    } else if (score === 30 && lastGameMilestoneAnnounced < 30) {
+      lastGameMilestoneAnnounced = 30;
+      window.setAvatarMood?.('shocked', 4500);
+      const msg = is18
+        ? "30+ KINETIC KILLS! Bhai tu human hai ya Autonomous UAV AI?! 🤯🔥"
+        : "30+ KINETIC KILLS! GODLIKE REFLEXES! Dominating the C2 sector! 🤖⚡";
+      window.showAvatarThought(msg, "RADAR C2", "⚡ GODLIKE", 3800);
+    } else if (score === 50 && lastGameMilestoneAnnounced < 50) {
+      lastGameMilestoneAnnounced = 50;
+      window.setAvatarMood?.('happy', 5000);
+      const msg = is18
+        ? "50 KILLS! PURE AIR MARSHAL DOMINANCE! Incredible piloting bc! 👑🚀"
+        : "50 KILLS! IMMORTAL AIR DEFENCE! You just set a legendary score! 👑🌟";
+      window.showAvatarThought(msg, "RADAR C2", "🌟 AIR MARSHAL", 4500);
+    }
+  }
+
   window.startUavGame = () => {
+    lastGameMilestoneAnnounced = 0;
     threats = [];
     missiles = [];
     patrolUavs = [];
@@ -2578,6 +2652,16 @@ function initUavFlightGame() {
     updateTelemetryUI();
     spawnThreat();
     setTimeout(() => { if (state.hasStarted && !state.isGameOver) spawnThreat(); }, 700);
+
+    // Cheerful game launch greeting from Priyam
+    if (typeof window.showAvatarThought === 'function') {
+      window.setAvatarMood?.('happy', 3500);
+      const is18 = localStorage.getItem('priyam_18plus_mode') === 'true';
+      const startMsg = is18
+        ? "C2 Radar Online! Hypersonic threats aa rahe hai — ek bhi missile bachni nahi chahiye! 🚀"
+        : "C2 Radar Online! 🎯 I'm your wingman — let's lock down this airspace! Space / tap to fire!";
+      window.showAvatarThought(startMsg, "RADAR C2", "🎮 DEFEND", 3500);
+    }
   };
 
   function update() {
@@ -2603,19 +2687,22 @@ function initUavFlightGame() {
 
     if (state.eccmActiveTimer > 0) state.eccmActiveTimer--;
 
-    // Spawn regular threats
-    const spawnRate = Math.max(50, 115 - Math.floor(state.intercepted * 2));
+    // Mild, smooth threat spawn progression (starts at ~2.25s, scales gently to a 1.0s floor)
+    const spawnRate = Math.max(60, 135 - Math.floor(state.intercepted * 1.2));
     if (state.frameCount % spawnRate === 0) {
       spawnThreat();
     }
 
-    // Spawn Swarms periodically
-    if (state.frameCount % 360 === 0) {
-      spawnDroneSwarm();
+    // Drone Swarms unlock after 5 intercepts and spawn at gentle 12s-10s intervals
+    if (state.intercepted >= 5) {
+      const swarmInterval = Math.max(540, 720 - Math.floor(state.intercepted * 3));
+      if (state.frameCount % swarmInterval === 0) {
+        spawnDroneSwarm();
+      }
     }
 
-    // Spawn Supply Drops periodically (~20 seconds)
-    if (state.frameCount % 1100 === 0 || state.frameCount === 240) {
+    // Spawn Supply Drops periodically (~18-20 seconds) to support sustained defense
+    if (state.frameCount % 1000 === 0 || state.frameCount === 240) {
       spawnSupplyDrop();
     }
 
@@ -2632,7 +2719,12 @@ function initUavFlightGame() {
         state.baseHealth = Math.min(100, state.baseHealth + drop.healthBonus);
         state.missileCount = state.maxMissiles;
         playSound('lock');
-        // Toast logic would go here
+
+        if (typeof window.showAvatarThought === 'function') {
+          window.setAvatarMood?.('happy', 2800);
+          window.showAvatarThought("Supply drop secured! 🔋 Shields repaired & missiles full!", "SUPPLY", "🔋 REPAIRED", 2600);
+        }
+
         for (let k = 0; k < 16; k++) {
           particles.push({
             x: drop.x,
@@ -2741,6 +2833,7 @@ function initUavFlightGame() {
         if (interceptedIndex !== -1) {
           const hitThreat = threats[interceptedIndex];
           state.intercepted++;
+          handleGameMilestone(state.intercepted);
           playSound('intercept');
 
           for (let k = 0; k < 20; k++) {
@@ -2806,6 +2899,7 @@ function initUavFlightGame() {
       let hitIdx = threats.findIndex(th => Math.hypot(fl.x - th.x, fl.y - th.y) < 22);
       if (hitIdx !== -1) {
         state.intercepted++;
+        handleGameMilestone(state.intercepted);
         playSound('intercept');
         const hitT = threats[hitIdx];
         for (let k = 0; k < 12; k++) {
@@ -2908,6 +3002,8 @@ function initUavFlightGame() {
     state.isGameOver = true;
     state.hasStarted = false;
     playSound('breach');
+    
+    const isNewRecord = state.intercepted > highScore && state.intercepted > 0;
     if (state.intercepted > highScore) {
       highScore = state.intercepted;
       localStorage.setItem('priyam_c2_highscore', highScore.toString());
@@ -2919,9 +3015,71 @@ function initUavFlightGame() {
     const desc = document.getElementById('uav-overlay-desc');
     overlay?.classList.remove('hidden');
 
-    if (title) title.textContent = `SECTOR COMPROMISED · ${reason}`;
-    if (desc) desc.textContent = `Tactical Air Defence intercepted ${state.intercepted} incoming hypersonic threats & coordinated drone swarms using multi-salvo ripples and combat drone squads!`;
+    if (title) {
+      if (isNewRecord) {
+        title.innerHTML = `🏆 NEW ALL-TIME RECORD! <span style="color:#F59E0B;">[${state.intercepted} KILLS]</span>`;
+      } else {
+        title.textContent = `SECTOR COMPROMISED · ${reason}`;
+      }
+    }
+    if (desc) {
+      if (isNewRecord) {
+        desc.textContent = `Outstanding combat piloting! You've set a new high score of ${state.intercepted} hypersonic intercepts! Enter your callsign below to immortalize your name on the Global All-Time Leaderboard!`;
+      } else {
+        desc.textContent = `Tactical Air Defence intercepted ${state.intercepted} incoming hypersonic threats & coordinated drone swarms. Enter your callsign to log your sortie to the Global Leaderboard!`;
+      }
+    }
     updateTelemetryUI();
+
+    // Setup Live Supabase Score Submission Card
+    const callsignInput = document.getElementById('uav-pilot-name');
+    const submitBtn = document.getElementById('uav-submit-score-btn');
+    const submitStatus = document.getElementById('uav-submit-status');
+    const rankBadgeEl = document.getElementById('uav-dossier-rank-badge');
+    
+    if (rankBadgeEl) {
+      rankBadgeEl.textContent = getRankTitle(state.intercepted);
+    }
+    if (callsignInput) {
+      callsignInput.value = localStorage.getItem('priyam_c2_pilot_name') || '';
+      if (isNewRecord) {
+        callsignInput.focus();
+      }
+    }
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = isNewRecord ? '[ 🏆 IMMORTALIZE RECORD IN HALL OF FAME ]' : '[ 🚀 SUBMIT TO HALL OF FAME ]';
+    }
+    if (submitStatus) {
+      submitStatus.textContent = isNewRecord ? '⭐ New personal best achieved! Submit to claim your global rank.' : '';
+      submitStatus.style.color = '#F59E0B';
+    }
+
+    // Playful, Positive & Motivating Banter from Priyam Companion
+    if (typeof window.showAvatarThought === 'function') {
+      const finalScore = state.intercepted;
+      const is18 = localStorage.getItem('priyam_18plus_mode') === 'true';
+
+      if (finalScore < 6) {
+        window.setAvatarMood?.('shocked', 4500);
+        const banter = is18
+          ? `Abe hypersonic missile ne sneak attack maar ke base uda diya! 😂 Koi baat nahi, hit restart and let's clear the airspace like a real boss! 🔥`
+          : `Haha caught napping by that supersonic swarm! 😂 Don't worry, even Iron Man crashed Mark 1. Hit Re-Arm and show them real 99+ math reflexes! 🚀`;
+        window.showAvatarThought(banter, "RADAR BANTER", "😂 GG", 4800);
+      } else if (finalScore < 18) {
+        window.setAvatarMood?.('happy', 4500);
+        const banter = is18
+          ? `Not bad bc! ${finalScore} bogeys down! Bas last ripple mein reaction thoda late ho gaya. Re-arm and crack the high score! 🎯`
+          : `Great defense! ${finalScore} hypersonic intercepts is solid tactical piloting. One more round to crack the high score? 🚀✨`;
+        window.showAvatarThought(banter, "RADAR C2", "👏 NICE RUN", 4800);
+      } else {
+        window.setAvatarMood?.('happy', 5500);
+        const banter = is18
+          ? `DAMN! ${finalScore} INTERCEPTS! Bhai pure clutch god! Top gun defense level! SIUUU! 👑🔥`
+          : `ABSOLUTE CLUTCH RUN! 👑 ${finalScore} intercepts! That was legendary tactical C2 defense! Stand tall Air Marshal! 🚀🔥`;
+        window.showAvatarThought(banter, "RADAR C2", "👑 LEGEND", 5200);
+      }
+    }
   }
 
   function draw() {
@@ -3252,6 +3410,242 @@ function initUavFlightGame() {
   };
 
   animId = requestAnimationFrame(loop);
+}
+
+// ==================== SUPABASE CLOUD RADAR LEADERBOARD ENGINE ====================
+const SUPABASE_CONFIG = {
+  url: 'https://rwbwxcilitwaafllrtsm.supabase.co',
+  anonKey: 'sb_publishable_8nly8rfiCE3BeQSFm5ARCw_N_mo5GJF',
+  table: 'radar_leaderboard'
+};
+
+function getRankTitle(score) {
+  if (score >= 50) return '🌟 AIR MARSHAL';
+  if (score >= 30) return '🦅 TOP GUN ACE';
+  if (score >= 20) return '🚀 FLIGHT COMMANDER';
+  if (score >= 10) return '🎯 KINETIC SQUADRON';
+  if (score >= 5)  return '⚡ DEFENCE OPERATOR';
+  return '🔰 CADET PILOT';
+}
+
+window.selectCallsignPreset = (preset) => {
+  const input = document.getElementById('uav-pilot-name');
+  if (input) {
+    input.value = preset;
+    localStorage.setItem('priyam_c2_pilot_name', preset);
+  }
+};
+
+window.updateDossierCallsign = (val) => {
+  if (val) {
+    localStorage.setItem('priyam_c2_pilot_name', val.trim().toUpperCase());
+  }
+};
+
+window.scrollToLeaderboard = () => {
+  const deck = document.getElementById('radar-leaderboard-deck');
+  if (deck) {
+    deck.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+};
+
+window.fetchRadarLeaderboard = async (forceRefresh = false) => {
+  const tbody = document.getElementById('glb-table-body');
+  if (!tbody) return;
+
+  if (forceRefresh) {
+    tbody.innerHTML = `<tr><td colspan="4" class="glb-loading">🔄 Fetching live pilot telemetry from Supabase Cloud...</td></tr>`;
+  }
+
+  try {
+    const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}?select=id,player_name,score,rank_title,created_at&order=score.desc,created_at.asc&limit=15`;
+    const res = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'apikey': SUPABASE_CONFIG.anonKey,
+        'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(`Supabase returned status ${res.status}`);
+    }
+
+    const rows = await res.json();
+    const mySavedName = (localStorage.getItem('priyam_c2_pilot_name') || '').toUpperCase();
+
+    // 1. Update Top 3 Champions Podium Cards
+    const goldName = document.getElementById('podium-gold-name');
+    const goldScore = document.getElementById('podium-gold-score');
+    const goldBadge = document.getElementById('podium-gold-badge');
+
+    const silverName = document.getElementById('podium-silver-name');
+    const silverScore = document.getElementById('podium-silver-score');
+    const silverBadge = document.getElementById('podium-silver-badge');
+
+    const bronzeName = document.getElementById('podium-bronze-name');
+    const bronzeScore = document.getElementById('podium-bronze-score');
+    const bronzeBadge = document.getElementById('podium-bronze-badge');
+
+    if (Array.isArray(rows) && rows.length > 0) {
+      if (goldName && rows[0]) {
+        goldName.textContent = (rows[0].player_name || 'PILOT').toUpperCase();
+        if (goldScore) goldScore.textContent = `${rows[0].score || 0} KILLS`;
+        if (goldBadge) goldBadge.textContent = rows[0].rank_title || getRankTitle(rows[0].score);
+      }
+      if (silverName && rows[1]) {
+        silverName.textContent = (rows[1].player_name || 'PILOT').toUpperCase();
+        if (silverScore) silverScore.textContent = `${rows[1].score || 0} KILLS`;
+        if (silverBadge) silverBadge.textContent = rows[1].rank_title || getRankTitle(rows[1].score);
+      } else if (silverName) {
+        silverName.textContent = 'VACANT';
+      }
+      if (bronzeName && rows[2]) {
+        bronzeName.textContent = (rows[2].player_name || 'PILOT').toUpperCase();
+        if (bronzeScore) bronzeScore.textContent = `${rows[2].score || 0} KILLS`;
+        if (bronzeBadge) bronzeBadge.textContent = rows[2].rank_title || getRankTitle(rows[2].score);
+      } else if (bronzeName) {
+        bronzeName.textContent = 'VACANT';
+      }
+    }
+
+    if (!Array.isArray(rows) || rows.length === 0) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="4" class="glb-loading">
+            No global sorties logged yet. Complete a simulation and transmit your callsign to claim Rank #1! 🚀
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tbody.innerHTML = rows.map((entry, idx) => {
+      const rankNum = idx + 1;
+      let rankBadge = `#${rankNum}`;
+      let rowClass = '';
+      if (rankNum === 1) { rankBadge = '🥇 #1'; rowClass = 'glb-rank-1'; }
+      else if (rankNum === 2) { rankBadge = '🥈 #2'; rowClass = 'glb-rank-2'; }
+      else if (rankNum === 3) { rankBadge = '🥉 #3'; rowClass = 'glb-rank-3'; }
+
+      const callsign = (entry.player_name || 'ANONYMOUS').toUpperCase();
+      const score = entry.score || 0;
+      const rankTitle = entry.rank_title || getRankTitle(score);
+      const isMe = mySavedName && callsign === mySavedName;
+      if (isMe) rowClass += ' glb-row--my-score';
+
+      return `
+        <tr class="${rowClass.trim()}">
+          <td style="font-weight:700;">${rankBadge}</td>
+          <td style="color:#00F0FF; font-weight:700;">
+            ${callsign} ${isMe ? '<span style="font-size:0.625rem; color:#10B981; margin-left:4px;">(YOU)</span>' : ''}
+          </td>
+          <td style="font-weight:700;">${score} KILLS</td>
+          <td><span class="glb-tag">${rankTitle}</span></td>
+        </tr>
+      `;
+    }).join('');
+
+  } catch (err) {
+    console.warn('Supabase leaderboard fetch fallback:', err);
+    const localBest = parseInt(localStorage.getItem('priyam_c2_highscore') || '0', 10);
+    const savedName = (localStorage.getItem('priyam_c2_pilot_name') || 'COMMANDER').toUpperCase();
+    
+    tbody.innerHTML = `
+      <tr class="glb-rank-1">
+        <td style="font-weight:700;">🥇 #1 (LOCAL)</td>
+        <td style="color:#00F0FF; font-weight:700;">${savedName} <span style="font-size:0.625rem; color:#10B981;">(YOU)</span></td>
+        <td style="font-weight:700;">${localBest} KILLS</td>
+        <td><span class="glb-tag">${getRankTitle(localBest)}</span></td>
+      </tr>
+      <tr>
+        <td colspan="4" class="glb-loading" style="font-size:0.75rem; color:#94A3B8;">
+          📡 Cloud sync standing by (Ensure 'radar_leaderboard' table exists in Supabase). Local records active.
+        </td>
+      </tr>
+    `;
+  }
+};
+
+window.submitRadarLeaderboardScore = async () => {
+  const input = document.getElementById('uav-pilot-name');
+  const btn = document.getElementById('uav-submit-score-btn');
+  const status = document.getElementById('uav-submit-status');
+  const finalScore = state.intercepted;
+
+  let callsign = input ? input.value.trim() : '';
+  if (!callsign) callsign = 'PILOT-' + Math.floor(1000 + Math.random() * 9000);
+
+  localStorage.setItem('priyam_c2_pilot_name', callsign);
+  const rankTitle = getRankTitle(finalScore);
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'TRANSMITTING...';
+  }
+  if (status) {
+    status.style.color = '#38BDF8';
+    status.textContent = 'Transmitting sortie telemetry to Supabase C2 Network...';
+  }
+
+  try {
+    const endpoint = `${SUPABASE_CONFIG.url}/rest/v1/${SUPABASE_CONFIG.table}`;
+    const payload = {
+      player_name: callsign,
+      score: finalScore,
+      rank_title: rankTitle
+    };
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_CONFIG.anonKey,
+        'Authorization': `Bearer ${SUPABASE_CONFIG.anonKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      throw new Error(`HTTP error ${res.status}`);
+    }
+
+    if (status) {
+      status.style.color = '#22C55E';
+      status.textContent = `✓ Callsign ${callsign} immortalized in Global Hall of Fame!`;
+    }
+    if (btn) {
+      btn.textContent = '✓ TRANSMITTED';
+    }
+
+    // Re-fetch global leaderboard
+    window.fetchRadarLeaderboard(false);
+
+    if (typeof window.showAvatarThought === 'function') {
+      window.setAvatarMood?.('happy', 3500);
+      window.showAvatarThought(`Callsign ${callsign.toUpperCase()} confirmed on Global Leaderboard! 🚀`, "HALL OF FAME", "🏆 RANKED", 3500);
+    }
+
+  } catch (err) {
+    console.warn('Score submission error:', err);
+    if (status) {
+      status.style.color = '#F59E0B';
+      status.textContent = `✓ Logged locally! (Cloud sync pending table creation in Supabase)`;
+    }
+    if (btn) {
+      btn.textContent = '✓ LOGGED LOCAL';
+    }
+    window.fetchRadarLeaderboard(false);
+  }
+};
+
+// Auto-load leaderboard on start
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => window.fetchRadarLeaderboard(false));
+} else {
+  window.fetchRadarLeaderboard(false);
 }
 
 /* ==========================================================================
@@ -5492,11 +5886,12 @@ function initRoamingPriyamAvatar() {
 
   if (!container || !charBody) return;
 
-  // Preload all outfit WebP sprites into browser memory for 0ms instant costume switches
+  // Preload and decode all outfit WebP sprites into browser GPU memory for 0ms instant costume switches
   if (window.AVATAR_SPRITES) {
     Object.values(window.AVATAR_SPRITES).forEach(url => {
       const pImg = new Image();
       pImg.src = url;
+      if (pImg.decode) pImg.decode().catch(() => {});
     });
   }
 
@@ -6066,8 +6461,7 @@ function initRoamingPriyamAvatar() {
     const isProjOpen = projModal && !projModal.classList.contains('hidden');
     const isCmdOpen = cmdModal && !cmdModal.classList.contains('hidden');
     const isMenuOpen = mobileDrawer && !mobileDrawer.classList.contains('hidden');
-    const isGame = isGameActive();
-    return isAiOpen || isProjOpen || isCmdOpen || isMenuOpen || isGame;
+    return isAiOpen || isProjOpen || isCmdOpen || isMenuOpen;
   }
 
   function isInputFocused() {
@@ -6170,10 +6564,15 @@ function initRoamingPriyamAvatar() {
   function getScrollWaypoint() {
     const w = window.innerWidth;
     const h = window.innerHeight;
-    const { w: avW, h: avH, isMobile } = getAvatarDimensions();
+    const { w: avW, h: avH, isMobile, isTablet } = getAvatarDimensions();
 
-    // 1. DYNAMIC FINAL DOCK: Exactly above the "Talk to Priyuum (AI Clone)" button and middle of it
-    let dockTargetX = w - avW - 35;
+    const leftRailX = isTablet ? 30 : 65;
+    const rightRailX = isTablet ? (w - avW - 22) : (w - avW - 35);
+    const exitLeftX = -(avW + 60);
+    const exitRightX = w + 60;
+
+    // 1. DYNAMIC FINAL DOCK: Exactly above the "Talk to Priyam (AI Clone)" button
+    let dockTargetX = rightRailX;
     let dockTargetY = h - avH - 75;
     const triggerEl = document.getElementById('priyam-ai-trigger');
     if (triggerEl) {
@@ -6181,15 +6580,16 @@ function initRoamingPriyamAvatar() {
       if (rect && rect.width > 0 && rect.height > 0) {
         const triggerCenterX = rect.left + rect.width * 0.5;
         dockTargetX = triggerCenterX - avW * 0.5;
-        dockTargetY = rect.top - avH - 4;
+        dockTargetY = rect.top - avH - 6;
       }
     }
 
     // 2. FIXED OBSERVATION PERCH DURING 360° SURGE BOTTLE SCROLL ANIMATION
-    const fixedSurgeX = isMobile ? (w - avW - 12) : (w * 0.84 - avW * 0.5);
-    const fixedSurgeY = isMobile ? 70 : 165;
+    const fixedSurgeX = isMobile ? (w - avW - 12) : rightRailX;
+    const fixedSurgeY = isMobile ? 70 : (isTablet ? 140 : 165);
 
     const surgeEl = document.getElementById('surge');
+    let isSurgeSticky = false;
     if (surgeEl) {
       const scrollBody = surgeEl.querySelector('.surge-scroll-body') || surgeEl;
       const rect = scrollBody.getBoundingClientRect();
@@ -6199,8 +6599,12 @@ function initRoamingPriyamAvatar() {
       const totalScrollable = scrollBody.offsetHeight - viewportH;
 
       if (totalScrollable > 0 && rect.top <= stickyTop + 15 && rect.bottom >= viewportH + stickyTop - 15) {
-        return { x: fixedSurgeX, y: fixedSurgeY, isFixed: true };
+        isSurgeSticky = true;
       }
+    }
+
+    if (isSurgeSticky) {
+      return { x: fixedSurgeX, y: fixedSurgeY, isFixed: true, isRight: true };
     }
 
     // Section live viewport bounds
@@ -6217,17 +6621,20 @@ function initRoamingPriyamAvatar() {
     const contactRect = contactEl ? contactEl.getBoundingClientRect() : { top: h * 5, bottom: h * 6, height: h };
 
     if (isMobile) {
-      // Mobile: Keep avatar docked cleanly along the right edge/margin rail so it NEVER cuts through text
-      const rightRailX = w - avW - 14;
+      // Mobile: Keep avatar docked cleanly along the right edge rail so it NEVER cuts through text
+      const mobileRailX = w - avW - 12;
       
       // 1. In Contact / Footer: Dock right above the AI trigger button
       if (contactRect.top <= h * 0.70) {
-        return { x: dockTargetX, y: dockTargetY };
+        const cT = Math.max(0, Math.min(1, (h * 0.70 - contactRect.top) / Math.max(1, contactRect.height * 0.6)));
+        const mX = mobileRailX + (dockTargetX - mobileRailX) * cT;
+        const mY = 68 + (dockTargetY - 68) * cT;
+        return { x: mX, y: mY, isFixed: false };
       }
       
-      // 2. In Hero Section: Perch in the top-right corner over the vector wireframe
+      // 2. In Hero Section: Perch in the top-right corner
       if (heroRect.top >= -50) {
-        return { x: rightRailX, y: 68 };
+        return { x: mobileRailX, y: 68 };
       }
 
       // 3. In SURGE Section: Sit nicely beside the bottle at top-right
@@ -6235,91 +6642,99 @@ function initRoamingPriyamAvatar() {
         const scrollBody = surgeEl.querySelector('.surge-scroll-body') || surgeEl;
         const rect = scrollBody.getBoundingClientRect();
         if (rect.top <= 120 && rect.bottom >= 120) {
-          return { x: rightRailX, y: 68, isFixed: true };
+          return { x: mobileRailX, y: 68, isFixed: true };
         }
       }
 
-      // 4. In Fun Zone / Radar Game: Stay at bottom right above trigger button so canvas & touch controls are 100% unobstructed
+      // 4. In Fun Zone / Radar Game: Stay docked at bottom right above trigger button
       if (funRect.top < h * 0.80 && funRect.bottom > h * 0.15) {
         return { x: dockTargetX, y: dockTargetY, isFixed: true };
       }
 
-      // 5. General Scrolling on Mobile: Smoothly glide on the right margin rail
+      // 5. General Scrolling on Mobile: Smoothly glide along the right rail
       const scrollProgress = Math.max(0, Math.min(1, (window.scrollY || 0) / Math.max(1, document.documentElement.scrollHeight - h)));
       const mY = 68 + scrollProgress * (dockTargetY - 68);
-      const mX = rightRailX + (dockTargetX - rightRailX) * Math.pow(scrollProgress, 2);
-      return clampPosition(mX, mY);
+      return clampPosition(mobileRailX, mY);
     }
 
-    // DESKTOP & LAPTOP SECTION-ANCHORED WAYPOINTS
-    // Phase 1: Hero Section
-    if (heroRect.bottom > h * 0.35) {
-      const heroT = Math.max(0, Math.min(1, -heroRect.top / Math.max(1, heroRect.height - h * 0.35)));
-      const isTablet = w <= 900;
-      const startX = isTablet ? (w * 0.80 - avW * 0.5) : 65;
-      const startY = isTablet ? 75 : 85;
-      const endX = w * 0.82 - avW * 0.5;
-      const endY = 135;
-      const midX = isTablet ? (w * 0.80 - avW * 0.5) : (w * 0.42);
-      const midY = 105;
+    // ==================== DESKTOP & TABLET VIEWPORTS ====================
 
-      const qX = (1 - heroT) * (1 - heroT) * startX + 2 * (1 - heroT) * heroT * midX + heroT * heroT * endX;
-      const qY = (1 - heroT) * (1 - heroT) * startY + 2 * (1 - heroT) * heroT * midY + heroT * heroT * endY;
-      return { x: qX, y: qY };
+    // Phase 1: Hero Section (Strictly Left Rail)
+    if (heroRect.bottom > h * 0.20 && projRect.top > h * 0.90) {
+      const heroT = Math.max(0, Math.min(1, -heroRect.top / Math.max(1, heroRect.height)));
+      const curY = 85 + heroT * 95; // 85px -> 180px
+      return { x: leftRailX, y: curY, isLeft: true };
     }
 
-    // Phase 2: About Me (Left margin rail -> smooth exit past left edge)
-    if (aboutRect.top < h * 0.80 && projRect.top > h * 0.55) {
+    // Phase 2: About Me Section (Strictly Left Rail)
+    if (projRect.top > h * 0.70) {
       const aboutT = Math.max(0, Math.min(1, (h * 0.80 - aboutRect.top) / Math.max(1, aboutRect.height)));
-      if (aboutT < 0.65) {
-        return { x: 65, y: 190 + aboutT * 30 };
+      const curY = 180 + aboutT * 40; // 180px -> 220px
+      return { x: leftRailX, y: curY, isLeft: true };
+    }
+
+    // Phase 3: Transition from About (Left) to Projects (Right)
+    // Smooth off-screen exit on the left, and smooth off-screen entry on the right!
+    if (projRect.top <= h * 0.70 && projRect.top > h * 0.25) {
+      const transProgress = (h * 0.70 - projRect.top) / (h * 0.45); // 0.0 to 1.0
+      const t = Math.max(0, Math.min(1, transProgress));
+
+      if (t < 0.5) {
+        // Exiting Left: Accelerate off-screen past left edge
+        const tExit = t / 0.5; // 0.0 to 1.0
+        const easeExit = tExit * tExit;
+        const curX = leftRailX - easeExit * (leftRailX - exitLeftX);
+        return { x: curX, y: 220, isTransition: true, isLeft: true, isOffscreen: curX < -avW };
       } else {
-        const exitT = (aboutT - 0.65) / 0.35;
-        const outX = 65 - exitT * 215; // 65px -> -150px (off-screen left)
-        return { x: outX, y: 220, isWarp: true };
+        // Entering Right: Decelerate onto right rail from off-screen right
+        const tEnter = (t - 0.5) / 0.5; // 0.0 to 1.0
+        const easeEnter = 1 - Math.pow(1 - tEnter, 2);
+        const curX = exitRightX - easeEnter * (exitRightX - rightRailX);
+        return { x: curX, y: 220, isTransition: true, isRight: true, isOffscreen: curX > w };
       }
     }
 
-    // Phase 3: Projects (Enters from right edge -> right margin rail)
-    if (projRect.top <= h * 0.55 && (!surgeEl || surgeEl.getBoundingClientRect().top > h * 0.50)) {
-      const projT = Math.max(0, Math.min(1, (h * 0.55 - projRect.top) / Math.max(1, projRect.height)));
-      const targetRailX = w * 0.84 - avW * 0.5;
-      if (projT < 0.22) {
-        const enterT = projT / 0.22;
-        const inX = (w + 150) - enterT * (150 + (w - targetRailX));
-        return { x: inX, y: 230, isWarp: true };
-      } else {
-        return { x: targetRailX, y: 230 };
-      }
+    // Phase 4: Projects Section (Strictly Right Rail)
+    if (projRect.bottom > h * 0.30 && contactRect.top > h * 0.75) {
+      return { x: rightRailX, y: 220, isRight: true };
     }
 
-    // Phase 4: SURGE Exit -> Defence & Radar Area
-    if (contactRect.top > h * 0.65) {
-      const radT = funRect.top < h * 0.85 ? Math.max(0, Math.min(1, (h * 0.85 - funRect.top) / Math.max(1, funRect.height))) : 0;
-      const targetRadarX = w * 0.78 - avW * 0.5;
-      const curX = fixedSurgeX + (targetRadarX - fixedSurgeX) * radT;
-      const curY = fixedSurgeY + (190 - fixedSurgeY) * radT;
-      return { x: curX, y: curY };
+    // Phase 5: Fun Zone / Radar / Defence Section (Strictly Right Rail)
+    if (contactRect.top > h * 0.60) {
+      return { x: rightRailX, y: 190, isRight: true };
     }
 
-    // Phase 5: Contact & Footer (Dock directly centered above AI button)
-    const contactT = Math.max(0, Math.min(1, (h * 0.65 - contactRect.top) / Math.max(1, contactRect.height - h * 0.35)));
-    const curX = (w * 0.78 - avW * 0.5) + (dockTargetX - (w * 0.78 - avW * 0.5)) * contactT;
-    const curY = 190 + (dockTargetY - 190) * contactT;
-    return { x: curX, y: curY };
+    // Phase 6: Contact Section & Final Dock (Glides down along right to dock right above AI chat button)
+    const contactT = Math.max(0, Math.min(1, (h * 0.60 - contactRect.top) / Math.max(1, contactRect.height * 0.55)));
+    const easeDock = contactT * contactT * (3 - 2 * contactT);
+    const curX = rightRailX + (dockTargetX - rightRailX) * easeDock;
+    const curY = 190 + (dockTargetY - 190) * easeDock;
+    return { x: curX, y: curY, isRight: true, isDocked: contactT > 0.85 };
   }
 
   function updateCharacterDirection() {
-    const { w: avW } = getAvatarDimensions();
+    const { w: avW, isMobile } = getAvatarDimensions();
     const charCenterX = posX + avW * 0.5;
     const deltaX = mouseX - charCenterX;
 
-    if (Math.abs(velX) > 0.8) {
-      if (velX > 0.8) facingRight = true;
-      else if (velX < -0.8) facingRight = false;
+    if (Math.abs(velX) > 0.7) {
+      // While moving with velocity: face the direction of flight
+      if (velX > 0.7) facingRight = true;
+      else if (velX < -0.7) facingRight = false;
+    } else if (!isMobile) {
+      // When stationary on Desktop:
+      // If on left rail (x < w * 0.4), face right towards the content (unless cursor is far left)
+      if (posX < window.innerWidth * 0.40) {
+        if (deltaX < -40) facingRight = false;
+        else facingRight = true;
+      } else {
+        // If on right rail (x > w * 0.6), face left towards the content (unless cursor is far right)
+        if (deltaX > 40) facingRight = true;
+        else facingRight = false;
+      }
     } else {
-      if (deltaX > 30) facingRight = true;
-      else if (deltaX < -30) facingRight = false;
+      // Mobile: face inward towards content
+      facingRight = false;
     }
   }
 
@@ -6330,26 +6745,34 @@ function initRoamingPriyamAvatar() {
     const h = window.innerHeight;
     const { w: avatarW, isMobile } = getAvatarDimensions();
 
+    // If avatar is currently exiting off-screen, fade out bubble cleanly
+    if (currentX < 8 || currentX > w - avatarW - 8) {
+      bubble.style.opacity = '0';
+      bubble.style.pointerEvents = 'none';
+      return;
+    } else {
+      bubble.style.opacity = '';
+      bubble.style.pointerEvents = '';
+    }
+
     bubble.classList.remove('bubble-below', 'bubble-right-side', 'bubble-left-side', 'bubble-above');
 
     if (isMobile) {
-      // On mobile screens:
-      // If near bottom of screen, show bubble above avatar
       if (currentY > h - 180) {
         bubble.classList.add('bubble-above');
       } else if (currentX > w * 0.40) {
-        // If on the right side of mobile screen, show bubble to the left of avatar!
         bubble.classList.add('bubble-left-side');
       } else {
         bubble.classList.add('bubble-right-side');
       }
     } else {
-      // Desktop / Tablet
       if (currentY < 130) {
         bubble.classList.add('bubble-below');
-      } else if (currentX < 120) {
+      } else if (currentX < w * 0.40) {
+        // On Left Rail: speech bubble opens to the RIGHT of the character
         bubble.classList.add('bubble-right-side');
-      } else if (currentX > w - avatarW - 120) {
+      } else {
+        // On Right Rail: speech bubble opens to the LEFT of the character
         bubble.classList.add('bubble-left-side');
       }
     }
@@ -6472,22 +6895,39 @@ function initRoamingPriyamAvatar() {
       targetX = wp.x;
       targetY = wp.y;
 
-      // Seamless Screen-Edge Wrap & Fast-Jump Handling
-      if (targetX > window.innerWidth * 0.5 && posX < 0) {
-        posX = window.innerWidth + 150;
-        charBody.classList.add('avatar-warp-poof');
-        setTimeout(() => charBody.classList.remove('avatar-warp-poof'), 350);
-      } else if (targetX < 0 && posX > window.innerWidth) {
-        posX = -150;
-        charBody.classList.add('avatar-warp-poof');
-        setTimeout(() => charBody.classList.remove('avatar-warp-poof'), 350);
-      } else if (Math.abs(targetX - posX) > window.innerWidth * 0.65 && !wp.isWarp) {
-        posX = targetX;
-        posY = targetY;
+      const { w: avW, isMobile } = getAvatarDimensions();
+      const exitLeftX = -(avW + 60);
+      const exitRightX = window.innerWidth + 60;
+
+      // ==================== OFF-SCREEN SIDE WRAP & ANTI-CENTER GUARD ====================
+      let effectiveTargetX = targetX;
+
+      if (!isMobile) {
+        const isPosLeft = posX < window.innerWidth * 0.45;
+        const isPosRight = posX > window.innerWidth * 0.55;
+        const isTargetLeft = targetX < window.innerWidth * 0.45;
+        const isTargetRight = targetX > window.innerWidth * 0.55;
+
+        // Transition: Left -> Right
+        if (isPosLeft && isTargetRight) {
+          effectiveTargetX = exitLeftX;
+          if (posX <= -avW - 10) {
+            posX = exitRightX;
+            effectiveTargetX = targetX;
+          }
+        }
+        // Transition: Right -> Left
+        else if (isPosRight && isTargetLeft) {
+          effectiveTargetX = exitRightX;
+          if (posX >= window.innerWidth + 10) {
+            posX = exitLeftX;
+            effectiveTargetX = targetX;
+          }
+        }
       }
 
-      const smoothRate = wp.isFixed ? 0.22 : 0.16;
-      const dx = targetX - posX;
+      const smoothRate = wp.isFixed ? 0.20 : 0.14;
+      const dx = effectiveTargetX - posX;
       const dy = targetY - posY;
 
       posX += dx * smoothRate;
@@ -6495,7 +6935,8 @@ function initRoamingPriyamAvatar() {
       velX = dx * smoothRate;
       velY = dy * smoothRate;
 
-      if (wp.x >= 0 && wp.x <= window.innerWidth && !wp.isWarp) {
+      // Only clamp when inside visible viewport bounds and not currently in offscreen wrap
+      if (!wp.isTransition && effectiveTargetX >= 0 && effectiveTargetX <= window.innerWidth && posX >= 0 && posX <= window.innerWidth - avW) {
         const clamped = clampPosition(posX, posY);
         posX = clamped.x;
         posY = clamped.y;

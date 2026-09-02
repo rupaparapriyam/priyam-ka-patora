@@ -645,15 +645,23 @@ button { font-family: inherit; }
 
 /* Mark Zuckerberg Style Simple & Funny Business Card */
 .hero-tilted-card {
-  transform: rotate(-3.5deg);
-  transform-origin: center right;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   cursor: pointer;
-  will-change: transform;
+  display: block;
+  padding: 0.5rem 0.25rem;
 }
 
-.hero-tilted-card:hover {
-  transform: rotate(0deg) translateY(-8px) scale(1.02);
+.tilted-card-inner.zuck-simple-card {
+  transform: rotate(-3.5deg);
+  transform-origin: center right;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.hero-tilted-card:hover .tilted-card-inner.zuck-simple-card {
+  transform: rotate(0deg) translateY(-6px);
+  box-shadow: 0 26px 52px -12px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.08);
 }
 
 .zuck-simple-card {
@@ -668,13 +676,8 @@ button { font-family: inherit; }
   justify-content: space-between;
   border: 1px solid rgba(0,0,0,0.15);
   box-shadow: 0 16px 36px -8px rgba(0,0,0,0.16), 0 2px 6px rgba(0,0,0,0.06);
-  transition: box-shadow 0.35s ease;
   position: relative;
   border-radius: 2px;
-}
-
-.hero-tilted-card:hover .zuck-simple-card {
-  box-shadow: 0 26px 52px -12px rgba(0,0,0,0.22), 0 4px 12px rgba(0,0,0,0.08);
 }
 
 [data-theme="dark"] .zuck-simple-card {
@@ -684,7 +687,7 @@ button { font-family: inherit; }
   box-shadow: 0 16px 36px -8px rgba(0,0,0,0.5);
 }
 
-[data-theme="dark"] .hero-tilted-card:hover .zuck-simple-card {
+[data-theme="dark"] .hero-tilted-card:hover .tilted-card-inner.zuck-simple-card {
   box-shadow: 0 26px 52px -12px rgba(0,0,0,0.7), 0 4px 12px rgba(0,0,0,0.3);
 }
 
@@ -1774,6 +1777,385 @@ button { font-family: inherit; }
 .touch-ctrl-btn--boost:active {
   background: #14B8A6;
   color: #030508;
+}
+
+/* ==================== TACTICAL SCORE SUBMISSION & GLOBAL LEADERBOARD ==================== */
+.uav-score-submit-card {
+  width: 100%;
+  max-width: 440px;
+  background: rgba(11, 19, 34, 0.94);
+  border: 1px solid rgba(0, 240, 255, 0.35);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 12px rgba(0, 240, 255, 0.05);
+  border-radius: 10px;
+  padding: 1rem;
+  margin: 0.5rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.uav-dossier-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.4rem;
+}
+
+.uav-dossier-tag {
+  color: #38BDF8;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+}
+
+.uav-dossier-rank {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  background: rgba(0, 240, 255, 0.12);
+  color: #00F0FF;
+  border: 1px solid rgba(0, 240, 255, 0.3);
+}
+
+.uav-callsign-chips {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.uav-chip-label {
+  font-size: 0.625rem;
+  color: #64748B;
+  letter-spacing: 0.06em;
+}
+
+.uav-chip {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  background: rgba(15, 23, 42, 0.8);
+  color: #94A3B8;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.uav-chip:hover {
+  background: rgba(0, 240, 255, 0.15);
+  color: #00F0FF;
+  border-color: #00F0FF;
+  transform: translateY(-1px);
+}
+
+.uav-submit-inputs {
+  display: flex;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.uav-callsign-input {
+  flex: 1;
+  background: #030712;
+  border: 1px solid #334155;
+  border-radius: 6px;
+  padding: 0.6rem 0.85rem;
+  color: #00F0FF;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.uav-callsign-input:focus {
+  border-color: #00F0FF;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+}
+
+.uav-callsign-input::placeholder {
+  color: #475569;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.uav-btn-submit {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.6rem 0.95rem;
+  background: linear-gradient(135deg, #0284C7 0%, #00F0FF 100%);
+  color: #030712;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
+}
+
+.uav-btn-submit:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.6);
+}
+
+.uav-submit-status {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: #22C55E;
+  margin: 0;
+  min-height: 14px;
+}
+
+.uav-action-btns {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.uav-btn-secondary {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.75rem 1.25rem;
+  background: rgba(30, 41, 59, 0.8);
+  color: #38BDF8;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.uav-btn-secondary:hover {
+  background: #1E293B;
+  color: #FFF;
+  border-color: #00F0FF;
+}
+
+/* Global Leaderboard Deck */
+.game-leaderboard-deck {
+  max-width: 960px;
+  margin: 1.5rem auto 0 auto;
+  background: #06080D;
+  border: 1px solid #1E293B;
+  border-radius: 12px;
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.glb-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glb-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 3vw, 1.8rem);
+  color: #F8FAFC;
+  margin: 0.15rem 0 0 0;
+}
+
+.glb-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.glb-live-badge {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #10B981;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.glb-dot {
+  width: 7px;
+  height: 7px;
+  background: #10B981;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #10B981;
+  animation: glbDotPulse 1.8s infinite ease-in-out;
+}
+
+@keyframes glbDotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.glb-refresh-btn {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.35rem 0.65rem;
+  background: #0F172A;
+  color: #94A3B8;
+  border: 1px solid #334155;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.glb-refresh-btn:hover {
+  background: #1E293B;
+  color: #FFF;
+  border-color: #00F0FF;
+}
+
+/* Top 3 Champions Podium Grid */
+.glb-podium-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 640px) {
+  .glb-podium-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.glb-podium-card {
+  background: #080D18;
+  border: 1px solid #1E293B;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.35rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.glb-podium-card:hover {
+  transform: translateY(-2px);
+}
+
+.glb-podium--gold {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: linear-gradient(180deg, rgba(245, 158, 11, 0.08) 0%, #080D18 100%);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.12);
+}
+
+.glb-podium--silver {
+  border-color: rgba(226, 232, 240, 0.3);
+  background: linear-gradient(180deg, rgba(226, 232, 240, 0.05) 0%, #080D18 100%);
+}
+
+.glb-podium--bronze {
+  border-color: rgba(205, 127, 50, 0.3);
+  background: linear-gradient(180deg, rgba(205, 127, 50, 0.05) 0%, #080D18 100%);
+}
+
+.glb-podium-rank {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #94A3B8;
+}
+
+.glb-podium--gold .glb-podium-rank { color: #F59E0B; }
+.glb-podium--silver .glb-podium-rank { color: #E2E8F0; }
+.glb-podium--bronze .glb-podium-rank { color: #CD7F32; }
+
+.glb-podium-name {
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #00F0FF;
+  margin: 0.15rem 0;
+  letter-spacing: 0.04em;
+}
+
+.glb-podium-score {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #FFF;
+}
+
+.glb-table-container {
+  overflow-x: auto;
+  border: 1px solid #1E293B;
+  border-radius: 6px;
+  background: #030508;
+}
+
+.glb-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+}
+
+.glb-table th {
+  background: #0B101B;
+  color: #64748B;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  border-bottom: 1px solid #1E293B;
+}
+
+.glb-table td {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  color: #E2E8F0;
+}
+
+.glb-table tr:hover td {
+  background: rgba(0, 240, 255, 0.03);
+}
+
+.glb-rank-1 td { color: #F59E0B; font-weight: 700; background: rgba(245, 158, 11, 0.05); }
+.glb-rank-2 td { color: #E2E8F0; font-weight: 700; background: rgba(226, 232, 240, 0.03); }
+.glb-rank-3 td { color: #CD7F32; font-weight: 700; background: rgba(205, 127, 50, 0.03); }
+
+.glb-row--my-score td {
+  background: rgba(0, 240, 255, 0.08) !important;
+  border-left: 3px solid #00F0FF;
+}
+
+.glb-tag {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  background: rgba(56, 189, 248, 0.12);
+  color: #38BDF8;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+}
+
+.glb-loading {
+  text-align: center;
+  padding: 1.5rem !important;
+  color: #64748B;
+  font-style: italic;
 }
 
 /* ==========================================================================
@@ -4042,9 +4424,17 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
   }
 
   .hero-tilted-card {
-    transform: rotate(-1deg);
     width: 100%;
     max-width: 360px;
+    padding: 0.25rem 0;
+  }
+
+  .hero-tilted-card .tilted-card-inner.zuck-simple-card {
+    transform: rotate(-1.5deg);
+  }
+
+  .hero-tilted-card:hover .tilted-card-inner.zuck-simple-card {
+    transform: rotate(0deg) translateY(-4px);
   }
 
   .zuck-simple-card {
@@ -4849,8 +5239,8 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
 }
 
 .avatar-bubble.bubble-right-side {
-  bottom: 8%;
-  top: auto;
+  top: 14px;
+  bottom: auto;
   left: calc(100% + 8px);
   right: auto;
   transform: translateY(0) scale(0.92);
