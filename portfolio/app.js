@@ -2661,9 +2661,9 @@ function initUavFlightGame() {
       lastGameMilestoneAnnounced = 50;
       window.setAvatarMood?.('happy', 5000);
       const msg = is18
-        ? "50 KILLS! PURE AIR MARSHAL DOMINANCE! Incredible piloting bc! 👑🚀"
+        ? "50 KILLS! PURE COMBAT DOMINANCE! Incredible piloting bc! 👑🚀"
         : "50 KILLS! IMMORTAL AIR DEFENCE! You just set a legendary score! 👑🌟";
-      window.showAvatarThought(msg, "RADAR C2", "🌟 AIR MARSHAL", 4500);
+      window.showAvatarThought(msg, "RADAR C2", "👑 LEGENDARY", 4500);
     }
   }
 
@@ -3097,10 +3097,7 @@ function initUavFlightGame() {
         title.innerHTML = `🏆 TOP 3 RECORD: <span style="color:#FFE600;">${finalScore} KILLS</span>`;
       }
       if (desc) {
-        desc.textContent = `Sensational combat sortie! Enter your name below to claim your Top 3 Hall of Fame podium spot.`;
-      }
-      if (rankBadgeEl) {
-        rankBadgeEl.textContent = getRankTitle(finalScore);
+        desc.textContent = `Sensational combat sortie! Enter your callsign below to claim your Top 3 Hall of Fame podium spot.`;
       }
       if (callsignInput) {
         callsignInput.value = localStorage.getItem('priyam_c2_pilot_name') || '';
@@ -3111,7 +3108,7 @@ function initUavFlightGame() {
         submitBtn.textContent = '[ 🚀 SAVE TO TOP 3 HALL OF FAME ]';
       }
       if (submitStatus) {
-        submitStatus.textContent = '⭐ Enter your name to immortalize your score in the Top 3.';
+        submitStatus.textContent = '⭐ Enter your callsign to log your score in the Top 3.';
         submitStatus.style.color = '#FFE600';
       }
     } else {
@@ -3124,7 +3121,7 @@ function initUavFlightGame() {
         title.textContent = `SECTOR COMPROMISED · ${reason}`;
       }
       if (desc) {
-        desc.textContent = `Tactical Air Defence intercepted ${finalScore} incoming hypersonic threats. Top 3 Hall of Fame threshold is ${top3Cutoff + 1} kills. Re-arm batteries and defend again to claim a Top 3 rank!`;
+        desc.textContent = `Tactical Air Defence intercepted ${finalScore} incoming hypersonic threats. Top 3 Hall of Fame threshold is ${top3Cutoff + 1} kills. Re-arm batteries and defend again!`;
       }
     }
 
@@ -3151,7 +3148,7 @@ function initUavFlightGame() {
         window.setAvatarMood?.('happy', 5500);
         const banter = is18
           ? `DAMN! ${finalScore} INTERCEPTS! Bhai pure clutch god! Top gun defense level! SIUUU! 👑🔥`
-          : `ABSOLUTE CLUTCH RUN! 👑 ${finalScore} intercepts! That was legendary tactical C2 defense! Stand tall Air Marshal! 🚀🔥`;
+          : `ABSOLUTE CLUTCH RUN! 👑 ${finalScore} intercepts! That was legendary tactical C2 defense! Stand tall! 🚀🔥`;
         window.showAvatarThought(banter, "RADAR C2", "👑 LEGEND", 5200);
       }
     }
@@ -3494,20 +3491,11 @@ const SUPABASE_CONFIG = {
   table: 'radar_leaderboard'
 };
 
-function getRankTitle(score) {
-  if (score >= 50) return '🌟 AIR MARSHAL';
-  if (score >= 30) return '🦅 TOP GUN ACE';
-  if (score >= 20) return '🚀 FLIGHT COMMANDER';
-  if (score >= 10) return '🎯 KINETIC SQUADRON';
-  if (score >= 5)  return '⚡ DEFENCE OPERATOR';
-  return '🔰 CADET PILOT';
-}
-
 // ==================== TOP 3 PILOT HALL OF FAME LEADERBOARD ENGINE ====================
 const DEFAULT_TOP_3_HALL_OF_FAME = [
-  { player_name: 'PRIYAM', score: 111, rank_title: '🌟 AIR MARSHAL' },
-  { player_name: 'MAVERICK', score: 48, rank_title: '🦅 TOP GUN ACE' },
-  { player_name: 'GHOST', score: 26, rank_title: '🚀 FLIGHT COMMANDER' }
+  { player_name: 'PRIYAM', score: 111 },
+  { player_name: 'MAVERICK', score: 48 },
+  { player_name: 'GHOST', score: 26 }
 ];
 
 function getTop3Leaderboard() {
@@ -3516,21 +3504,23 @@ function getTop3Leaderboard() {
     if (raw) {
       let parsed = JSON.parse(raw);
       if (Array.isArray(parsed) && parsed.length > 0) {
-        // Prune old test scores for PRIYAM under 111
-        parsed = parsed.filter(e => !(e && e.player_name === 'PRIYAM' && e.score < 111));
-        const priyamEntry = parsed.find(e => e && e.player_name === 'PRIYAM');
+        parsed = parsed
+          .filter(e => !(e && e.player_name === 'PRIYAM' && e.score < 111))
+          .map(e => ({ player_name: (e.player_name || 'PILOT').toUpperCase(), score: Number(e.score) || 0 }));
+        
+        const priyamEntry = parsed.find(e => e.player_name === 'PRIYAM');
         if (!priyamEntry) {
-          parsed.unshift({ player_name: 'PRIYAM', score: 111, rank_title: '🌟 AIR MARSHAL' });
+          parsed.unshift({ player_name: 'PRIYAM', score: 111 });
         } else if (priyamEntry.score < 111) {
           priyamEntry.score = 111;
-          priyamEntry.rank_title = '🌟 AIR MARSHAL';
         }
-        // Ensure standard Top 3 roster slots are populated
+
         for (const def of DEFAULT_TOP_3_HALL_OF_FAME) {
           if (!parsed.some(e => e.player_name === def.player_name)) {
-            parsed.push(def);
+            parsed.push({ player_name: def.player_name, score: def.score });
           }
         }
+
         const clean = parsed
           .filter(e => e && typeof e.score === 'number' && e.player_name)
           .sort((a, b) => b.score - a.score)
@@ -3549,6 +3539,7 @@ function getTop3Leaderboard() {
 function saveTop3Leaderboard(list) {
   const clean = list
     .filter(e => e && typeof e.score === 'number' && e.player_name)
+    .map(e => ({ player_name: (e.player_name || 'PILOT').toUpperCase(), score: Number(e.score) || 0 }))
     .sort((a, b) => b.score - a.score)
     .slice(0, 3);
   localStorage.setItem('priyam_radar_top3_hall_of_fame', JSON.stringify(clean));
@@ -3566,83 +3557,27 @@ function renderTop3DOM(top3List) {
   const top3 = (top3List || getTop3Leaderboard()).slice(0, 3);
   const mySavedName = (localStorage.getItem('priyam_c2_pilot_name') || '').toUpperCase();
 
-  const goldName = document.getElementById('podium-gold-name');
-  const goldScore = document.getElementById('podium-gold-score');
-  const goldBadge = document.getElementById('podium-gold-badge');
+  const slots = [
+    { card: document.getElementById('podium-card-1'), name: document.getElementById('podium-gold-name'), score: document.getElementById('podium-gold-score') },
+    { card: document.getElementById('podium-card-2'), name: document.getElementById('podium-silver-name'), score: document.getElementById('podium-silver-score') },
+    { card: document.getElementById('podium-card-3'), name: document.getElementById('podium-bronze-name'), score: document.getElementById('podium-bronze-score') }
+  ];
 
-  const silverName = document.getElementById('podium-silver-name');
-  const silverScore = document.getElementById('podium-silver-score');
-  const silverBadge = document.getElementById('podium-silver-badge');
-
-  const bronzeName = document.getElementById('podium-bronze-name');
-  const bronzeScore = document.getElementById('podium-bronze-score');
-  const bronzeBadge = document.getElementById('podium-bronze-badge');
-
-  const tbody = document.getElementById('glb-table-body');
-
-  // 1. Update 3 Podium Cards
-  if (goldName) {
-    if (top3[0]) {
-      goldName.textContent = top3[0].player_name.toUpperCase();
-      if (goldScore) goldScore.textContent = `${top3[0].score} KILLS`;
-      if (goldBadge) goldBadge.textContent = top3[0].rank_title || getRankTitle(top3[0].score);
-    } else {
-      goldName.textContent = 'VACANT';
-      if (goldScore) goldScore.textContent = '0 KILLS';
+  slots.forEach((slot, idx) => {
+    const entry = top3[idx];
+    if (slot.name) {
+      if (entry) {
+        const isMe = mySavedName && entry.player_name === mySavedName;
+        slot.name.innerHTML = `${entry.player_name}${isMe ? ' <span class="glb-me-tag">(YOU)</span>' : ''}`;
+        if (slot.score) slot.score.textContent = `${entry.score} KILLS`;
+        slot.card?.classList.toggle('glb-podium--me', !!isMe);
+      } else {
+        slot.name.textContent = 'VACANT';
+        if (slot.score) slot.score.textContent = '---';
+        slot.card?.classList.remove('glb-podium--me');
+      }
     }
-  }
-
-  if (silverName) {
-    if (top3[1]) {
-      silverName.textContent = top3[1].player_name.toUpperCase();
-      if (silverScore) silverScore.textContent = `${top3[1].score} KILLS`;
-      if (silverBadge) silverBadge.textContent = top3[1].rank_title || getRankTitle(top3[1].score);
-    } else {
-      silverName.textContent = 'VACANT';
-      if (silverScore) silverScore.textContent = '0 KILLS';
-    }
-  }
-
-  if (bronzeName) {
-    if (top3[2]) {
-      bronzeName.textContent = top3[2].player_name.toUpperCase();
-      if (bronzeScore) bronzeScore.textContent = `${top3[2].score} KILLS`;
-      if (bronzeBadge) bronzeBadge.textContent = top3[2].rank_title || getRankTitle(top3[2].score);
-    } else {
-      bronzeName.textContent = 'VACANT';
-      if (bronzeScore) bronzeScore.textContent = '0 KILLS';
-    }
-  }
-
-  // 2. Render Strictly Top 3 Rows in Table
-  if (tbody) {
-    if (top3.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="4" class="glb-loading">No Top 3 records logged yet. Claim Rank #1 now!</td></tr>`;
-      return;
-    }
-
-    const rankBadges = ['🥇 #1', '🥈 #2', '🥉 #3'];
-    const rankClasses = ['glb-rank-1', 'glb-rank-2', 'glb-rank-3'];
-
-    tbody.innerHTML = top3.map((entry, idx) => {
-      const callsign = (entry.player_name || 'PILOT').toUpperCase();
-      const score = entry.score || 0;
-      const rankTitle = entry.rank_title || getRankTitle(score);
-      const isMe = mySavedName && callsign === mySavedName;
-      const rowClass = `${rankClasses[idx] || ''} ${isMe ? 'glb-row--my-score' : ''}`.trim();
-
-      return `
-        <tr class="${rowClass}">
-          <td style="font-weight:700;">${rankBadges[idx] || `#${idx + 1}`}</td>
-          <td style="color:#00F0FF; font-weight:700;">
-            ${callsign} ${isMe ? '<span style="font-size:0.625rem; color:#10B981; margin-left:4px;">(YOU)</span>' : ''}
-          </td>
-          <td style="font-weight:700;">${score} KILLS</td>
-          <td><span class="glb-tag">${rankTitle}</span></td>
-        </tr>
-      `;
-    }).join('');
-  }
+  });
 }
 
 window.getTop3Leaderboard = getTop3Leaderboard;
@@ -3674,24 +3609,23 @@ window.submitRadarLeaderboardScore = () => {
     return;
   }
 
-  let name = input ? input.value.trim() : '';
+  let name = input ? input.value.trim().toUpperCase() : '';
   if (!name) name = 'PILOT-' + Math.floor(100 + Math.random() * 900);
 
   localStorage.setItem('priyam_c2_pilot_name', name);
-  const rankTitle = getRankTitle(finalScore);
 
   if (btn) {
     btn.disabled = true;
-    btn.textContent = '✓ SAVED TO HALL OF FAME';
+    btn.textContent = '✓ LOGGED IN TOP 3';
   }
   if (status) {
-    status.style.color = '#22C55E';
-    status.textContent = `✓ ${name.toUpperCase()} immortalized in Top 3 Hall of Fame!`;
+    status.style.color = '#10B981';
+    status.textContent = `✓ ${name} IMMORTALIZED IN TOP 3`;
   }
 
   // 1. Authoritative Local Top 3 Update
   const current = getTop3Leaderboard();
-  current.push({ player_name: name, score: finalScore, rank_title: rankTitle });
+  current.push({ player_name: name, score: finalScore });
   const updatedTop3 = saveTop3Leaderboard(current);
 
   // 2. Immediate Direct DOM Render (0ms latency)
@@ -3700,7 +3634,7 @@ window.submitRadarLeaderboardScore = () => {
   // 3. Avatar reaction
   if (typeof window.showAvatarThought === 'function') {
     window.setAvatarMood?.('happy', 3500);
-    window.showAvatarThought(`🏆 ${name.toUpperCase()} is officially in the Top 3 Hall of Fame!`, "HALL OF FAME", "🏆 TOP 3", 3500);
+    window.showAvatarThought(`🏆 ${name} is officially in the Top 3 Hall of Fame!`, "HALL OF FAME", "🏆 TOP 3", 3500);
   }
 
   // 4. Smooth scroll to show the user their ranking
@@ -3721,8 +3655,7 @@ window.submitRadarLeaderboardScore = () => {
       },
       body: JSON.stringify({
         player_name: name,
-        score: finalScore,
-        rank_title: rankTitle
+        score: finalScore
       })
     }).catch(() => {});
   } catch (_) {}
@@ -5280,10 +5213,6 @@ function initPriyamAiClone() {
     }
   };
 
-  syncSettingsUI();
-  window.setPriyamAiMode(priyamAiMode, false);
-  window.clearPriyamChat();
-
   // Toggle Drawer Open / Close
   window.togglePriyamChat = (forceOpen) => {
     if (!drawer) return;
@@ -6015,6 +5944,10 @@ function initPriyamAiClone() {
   function escapeHtml(str) {
     return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   }
+
+  syncSettingsUI();
+  window.setPriyamAiMode(priyamAiMode, false);
+  window.clearPriyamChat();
 }
 
 /* ==========================================================================
