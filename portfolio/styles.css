@@ -100,6 +100,216 @@ button { font-family: inherit; }
 
 .hidden { display: none !important; }
 
+/* ==========================================================================
+   EDITORIAL MINIMALIST PRELOADER
+   Warm Paper / Deep Carbon · Zero Radius · Precision 1px Hairlines
+   Swiss Typographic Minimalism · No Neon · Pure Editorial Restraint
+   ========================================================================== */
+
+body.preloader-active {
+  overflow: hidden !important;
+  height: 100vh !important;
+}
+
+.site-preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999999;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: var(--paper, #F5F3EE);
+  background-image: 
+    linear-gradient(to right, var(--grid-line, rgba(0, 0, 0, 0.05)) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line, rgba(0, 0, 0, 0.05)) 1px, transparent 1px);
+  background-size: var(--grid-size, 32px) var(--grid-size, 32px);
+  color: var(--ink, #0A0A0A);
+  font-family: var(--font-mono, monospace);
+  padding: clamp(1.25rem, 4vw, 3rem);
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  pointer-events: auto;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+  will-change: transform;
+}
+
+/* Slide-Up Exit Animation (Revealing the page like an editorial blind) */
+.site-preloader.loaded {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+/* Top Metadata Bar */
+.preloader-meta-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: clamp(0.6875rem, 1.4vw, 0.8125rem);
+  letter-spacing: 0.14em;
+  font-weight: 700;
+  border-bottom: 1px solid var(--line, #D4D0C8);
+  padding-bottom: 1rem;
+}
+
+.preloader-meta-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.preloader-brand {
+  color: var(--ink, #0A0A0A);
+}
+
+.preloader-slash {
+  color: var(--ink-dim, #999990);
+}
+
+.preloader-tag {
+  color: var(--ink-muted, #666660);
+}
+
+.preloader-meta-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--ink-muted, #666660);
+  font-size: clamp(0.625rem, 1.2vw, 0.75rem);
+}
+
+.preloader-sep {
+  color: var(--line-dark, #B8B4AC);
+}
+
+/* Centerpiece: Pure Editorial Typography & Hairline Progress */
+.preloader-center-editorial {
+  width: 100%;
+  max-width: 680px;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.preloader-num-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-start;
+  line-height: 0.82;
+}
+
+.preloader-huge-num {
+  font-family: var(--font-display, 'Bebas Neue', sans-serif);
+  font-size: clamp(5.5rem, 16vw, 11rem);
+  font-weight: 400;
+  color: var(--ink, #0A0A0A);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.preloader-unit {
+  font-family: var(--font-display, 'Bebas Neue', sans-serif);
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  color: var(--ink-dim, #999990);
+  margin-left: 0.35rem;
+}
+
+/* 1px Precision Hairline Track */
+.preloader-rule-track {
+  width: 100%;
+  height: 1px;
+  background: var(--line, #D4D0C8);
+  margin-top: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.preloader-rule-fill {
+  height: 100%;
+  background: var(--ink, #0A0A0A);
+  width: 0%;
+  transition: width 0.08s linear;
+}
+
+.preloader-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+  font-size: clamp(0.625rem, 1.2vw, 0.75rem);
+  letter-spacing: 0.12em;
+  font-family: var(--font-mono, monospace);
+  color: var(--ink-muted, #666660);
+  text-transform: uppercase;
+}
+
+.preloader-step-label {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 75%;
+}
+
+.preloader-ratio {
+  font-weight: 700;
+  color: var(--ink, #0A0A0A);
+}
+
+/* Bottom Footer Bar */
+.preloader-footer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border-top: 1px solid var(--line, #D4D0C8);
+  padding-top: 1rem;
+  font-size: clamp(0.58rem, 1.1vw, 0.6875rem);
+  letter-spacing: 0.1em;
+  color: var(--ink-dim, #999990);
+}
+
+.preloader-copyright {
+  text-transform: uppercase;
+}
+
+.preloader-skip-minimal {
+  background: transparent;
+  border: 1px solid var(--line, #D4D0C8);
+  color: var(--ink, #0A0A0A);
+  font-family: var(--font-mono, monospace);
+  font-size: clamp(0.6rem, 1.1vw, 0.7rem);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+  border-radius: 0;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  outline: none;
+}
+
+.preloader-skip-minimal:hover {
+  background: var(--ink, #0A0A0A);
+  color: var(--paper, #F5F3EE);
+  border-color: var(--ink, #0A0A0A);
+}
+
+.preloader-skip-minimal:active {
+  transform: scale(0.97);
+}
+
+@media (max-width: 640px) {
+  .preloader-meta-right {
+    display: none;
+  }
+  .preloader-copyright {
+    display: none;
+  }
+  .preloader-footer-bar {
+    justify-content: flex-end;
+  }
+}
+
 /* Top scroll progress */
 .top-scroll-progress {
   position: fixed;
@@ -1533,338 +1743,893 @@ button { font-family: inherit; }
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Dark Flight Deck & Tactical Simulator Styling */
-.game-card-wrapper {
-  background: var(--paper-card);
-  border: 1px solid var(--line);
-  padding: clamp(1rem, 2.5vw, 1.75rem);
+/* ==================== 1. VCR COMBO CRT TELEVISION SET ==================== */
+.retro-arcade-terminal {
+  max-width: 960px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-width: 960px;
-  margin: 0 auto;
+}
+
+/* TV Cabinet: Warm vintage beige/cream (NOT black, matching site paper design) */
+.vcr-tv-cabinet {
+  background: linear-gradient(180deg, #F5F1E8 0%, #EDE7DC 60%, #E5DFD2 100%);
+  border: 2px solid var(--line);
+  border-radius: 22px 22px 12px 12px;
+  padding: 1rem 1.25rem 0.85rem 1.25rem;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.1), inset 0 2px 0 rgba(255, 255, 255, 0.9), inset 0 -3px 0 #D8D1C2;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  position: relative;
+}
+
+/* Top Molded Cooling Grille Slats */
+.tv-top-grille {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding-bottom: 0.15rem;
+}
+
+.tv-top-grille span {
+  display: block;
+  width: 26px;
+  height: 3px;
+  background: #D5CEBF;
   border-radius: 2px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
-.game-card--dark {
-  background: #090C12;
-  border: 1px solid #1E2636;
-  color: #F8FAFC;
-  box-shadow: none;
+/* Top White Vintage Inventory Sticker (Like CRT-071 in reference image) */
+.tv-sticker-crt {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  background: #FAFAF9;
+  color: #0F172A;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 900;
+  padding: 0.15rem 0.5rem;
+  border: 1.5px solid #0F172A;
+  border-radius: 2px;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.15);
+  transform: rotate(-1.5deg);
+  letter-spacing: 0.08em;
+  user-select: none;
+  z-index: 6;
 }
 
-.game-header-bar {
+/* TV Screen Bezel Section (Molded Chamfered Bevel) */
+.tv-screen-section {
+  background: #E0DACB;
+  border: 2px solid #C8C0B0;
+  padding: 0.75rem;
+  border-radius: 18px;
+  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.12), inset 0 -2px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Recessed Curved CRT Glass Viewport */
+.tv-crt-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  min-height: 460px;
+  max-height: 500px;
+  background: #02060E;
+  border: 4px solid #141A24;
+  border-radius: 26px;
+  overflow: hidden;
+  box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.95), inset 0 0 16px rgba(0, 240, 255, 0.12), 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+#drone-game-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16 / 10;
+  background: #02060E;
+  cursor: crosshair;
+}
+
+/* Authentic Phosphor Scanlines */
+.crt-scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%);
+  background-size: 100% 4px;
+  z-index: 3;
+  opacity: 0.65;
+}
+
+/* Curved Screen Glass Reflection / Glare */
+.crt-glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 65% 20%, rgba(255, 255, 255, 0.08) 0%, transparent 55%);
+  z-index: 4;
+}
+
+/* Screen Corner Vignette Curve */
+.crt-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.9);
+  border-radius: 24px;
+  z-index: 5;
+}
+
+/* TV Center Brand Script (Matching Symphonic in reference image) */
+.tv-brand-center {
+  text-align: center;
+  padding: 0.2rem 0 0.05rem 0;
+}
+
+.tv-script-logo {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  color: #475569;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Built-In VCR Cassette Slot (Like 18 MICRON 4 HEAD // VHS HQ in reference image) */
+.tv-vcr-slot {
+  background: #18202C;
+  border: 1.5px solid #334155;
+  border-radius: 4px;
+  padding: 0.3rem 0.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  box-shadow: inset 0 3px 6px rgba(0, 0, 0, 0.6);
+}
+
+.vcr-door {
+  flex: 1;
+  background: #0F172A;
+  border: 1px solid #334155;
+  border-radius: 3px;
+  padding: 0.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.vcr-arrow {
+  color: #64748B;
+  font-size: 0.5rem;
+}
+
+.vcr-head-label {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  font-weight: 800;
+  color: #94A3B8;
+  letter-spacing: 0.1em;
+}
+
+.vcr-eject-btn {
+  background: #1E293B;
+  border: 1px solid #475569;
+  color: #94A3B8;
+  border-radius: 3px;
+  font-size: 0.6rem;
+  padding: 0.2rem 0.4rem;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  transition: all 0.08s ease;
+}
+
+.vcr-eject-btn:active {
+  transform: translateY(1px);
+}
+
+/* Front AV Composite Panel & Buttons (Like reference image) */
+.tv-front-av-panel {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
   gap: 0.75rem;
-  border-bottom: 1px solid #1A202C;
-  padding-bottom: 0.75rem;
+  background: #E4DEC5;
+  border: 1.5px solid #C4BCAC;
+  border-radius: 8px;
+  padding: 0.4rem 0.75rem;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
-.game-title {
-  font-family: var(--font-display);
-  font-size: clamp(1.4rem, 3.2vw, 2.2rem);
-  letter-spacing: 0.04em;
-  color: #F8FAFC;
-  margin-top: 0.15rem;
-  line-height: 1;
-}
-
-.flight-hud-pills {
+.tv-av-inputs {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
+  gap: 0.75rem;
 }
 
-.hud-pill-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: #101520;
-  border: 1px solid #222C3E;
-  padding: 0.35rem 0.65rem;
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  border-radius: 0;
-}
-
-.hud-pill-lbl {
-  color: #64748B;
-  font-size: 0.625rem;
-  letter-spacing: 0.06em;
-  font-weight: 700;
-}
-
-.hud-pill-val {
-  color: #00F0FF;
-  font-weight: 800;
-  letter-spacing: 0.04em;
-}
-
-.hud-pill-badge--gold {
-  border-color: rgba(255, 230, 0, 0.35);
-}
-
-.hud-pill-badge--gold .hud-pill-val {
-  color: #FFE600;
-}
-
-.game-score-badge {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  padding: 0.35rem 0.65rem;
-  background: #101520;
-  color: #00F0FF;
-  border: 1px solid #222C3E;
-  border-radius: 0;
-}
-
-#uav-hud-high {
-  color: #FFE600;
-  border-color: rgba(255, 230, 0, 0.3);
-}
-
-.audio-toggle-btn {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  padding: 0.35rem 0.65rem;
-  background: #101520;
-  color: #94A3B8;
-  border: 1px solid #222C3E;
-  cursor: pointer;
-  border-radius: 0;
-  transition: all 0.15s ease;
-}
-
-.audio-toggle-btn:hover {
-  color: #FFF;
-  border-color: #00F0FF;
-}
-
-.audio-toggle-btn.btn--paused {
-  background: rgba(245, 158, 11, 0.15);
-  color: #F59E0B;
-  border-color: #F59E0B;
-  animation: pausePulse 1.5s infinite ease-in-out;
-}
-
-@keyframes pausePulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
-
-/* UAV Flight Simulator Telemetry Row */
-.uav-telemetry-bar {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1px;
-  background: #1E2636;
-  border: 1px solid #1E2636;
-  border-radius: 0;
-  overflow: hidden;
-  width: 100%;
-}
-
-.uav-tele-item {
-  background: #080B10;
-  padding: 0.55rem 0.8rem;
+.tv-speaker-slats {
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
+  gap: 3px;
+  width: 32px;
 }
 
-.uav-tval {
-  font-family: var(--font-mono);
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #F8FAFC;
-}
-
-/* UAV Canvas Viewport */
-.uav-canvas-container {
-  position: relative;
+.tv-speaker-slats span {
+  display: block;
   width: 100%;
-  aspect-ratio: 2 / 1;
-  min-height: 400px;
-  background: #04060A;
-  border: 1px solid #1E2636;
-  border-radius: 0;
+  height: 2px;
+  background: #A8A08E;
+  border-radius: 1px;
+}
+
+/* Yellow & White RCA Composite Jacks (Brass outer ring, colored insulator, dark pin hole) */
+.rca-jack-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rca-jack {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  font-weight: 800;
+  color: #64748B;
+}
+
+.rca-port {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #D97706; /* authentic brass socket ring */
+  box-shadow: inset 0 0 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.rca-port::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 4.5px;
+  height: 4.5px;
+  border-radius: 50%;
+  background: #020617;
+}
+
+.rca-port.yellow { background: #EAB308; }
+.rca-port.white { background: #F8FAFC; }
+
+/* Mini Physical TV Deck Buttons */
+.tv-deck-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.tv-mini-btn {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  font-weight: 800;
+  color: var(--ink);
+  background: #EDE7DC;
+  border: 1px solid #BDB4A2;
+  padding: 0.2rem 0.45rem;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 0 #9E9584;
+  transition: all 0.08s ease;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.tv-mini-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #9E9584;
+}
+
+.btn-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 4px var(--green);
+}
+
+/* TV Bottom Telemetry Strip */
+.tv-telemetry-strip {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 6px;
   overflow: hidden;
 }
 
-#drone-game-canvas,
-#ecom-game-canvas {
-  display: block;
-  width: 100%;
-  height: 100%;
-  aspect-ratio: 2 / 1;
-  background: #04060A;
-  cursor: crosshair;
+.tv-tele-cell {
+  background: var(--paper);
+  padding: 0.45rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
 }
 
+.tv-tele-cell .mono-label {
+  font-size: 0.5625rem;
+  color: var(--ink-dim);
+  letter-spacing: 0.08em;
+}
+
+.tv-tele-val {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.tv-tele-cell--kills .tv-tele-val { color: var(--ink); font-weight: 800; }
+.tv-tele-cell--record .tv-tele-val { color: var(--amber); font-weight: 800; }
+
+/* In-TV Screen Overlays (Authentic Retro CRT On-Screen Display - ZERO SCROLLING) */
 .uav-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(4, 6, 10, 0.92);
-  backdrop-filter: blur(8px);
+  background: rgba(2, 6, 14, 0.88);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.5rem 0.75rem;
+  padding: 0.35rem 0.5rem;
   text-align: center;
   z-index: 10;
-  overflow-y: auto;
+  overflow: hidden !important; /* NO SCROLLBAR AT ALL */
 }
 
 .uav-overlay.hidden { display: none; }
 
 .uav-overlay-box {
-  max-width: 420px;
-  width: 100%;
+  max-width: 380px;
+  width: 90%;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 0.3rem;
   align-items: center;
+  background: rgba(8, 14, 24, 0.95);
+  border: 1.5px solid #00F0FF;
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  box-shadow: 0 0 18px rgba(0, 240, 255, 0.25), inset 0 0 12px rgba(0, 240, 255, 0.08);
+}
+
+.uav-overlay-tag {
+  font-size: 0.55rem;
+  letter-spacing: 0.08em;
+  color: var(--amber);
+  margin: 0;
 }
 
 .uav-overlay-title {
   font-family: var(--font-display);
-  font-size: clamp(1.3rem, 3vw, 1.85rem);
+  font-size: 1.15rem;
   line-height: 1.05;
-  color: #EF4444;
+  color: #FFFFFF;
   letter-spacing: 0.04em;
   margin: 0;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.35);
 }
 
 .uav-overlay-desc {
-  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
   color: #94A3B8;
   line-height: 1.35;
   margin: 0;
-  max-width: 380px;
+  text-align: center;
+}
+
+.uav-overlay-desc strong {
+  color: #F8FAFC;
+}
+
+.uav-action-btns {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.25rem;
+  width: 100%;
+  justify-content: center;
 }
 
 .uav-btn-primary {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  padding: 0.55rem 1rem;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0.35rem 0.75rem;
   background: #00F0FF;
-  color: #04060A;
-  border: none;
-  border-radius: 0;
+  color: #040914;
+  border: 1px solid #00F0FF;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.35);
+  transition: all 0.12s ease;
+  white-space: nowrap;
 }
 
 .uav-btn-primary:hover {
   background: #38BDF8;
-  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.5);
 }
 
-/* UAV Controls Bar */
-.uav-controls-bar {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  width: 100%;
-}
-
-.uav-key-hints {
-  color: #64748B;
-  font-size: 0.65rem;
-  letter-spacing: 0.06em;
-}
-
-.uav-touch-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  width: 100%;
-}
-
-.uav-touch-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.35rem;
-  width: 100%;
-}
-
-.uav-touch-row:last-child {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.touch-ctrl-btn {
+.uav-btn-secondary {
   font-family: var(--font-mono);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  padding: 0.55rem 0.4rem;
-  background: #0F141F;
-  color: #CBD5E1;
-  border: 1px solid #1E2638;
-  border-radius: 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 0.35rem 0.65rem;
+  background: rgba(15, 23, 42, 0.85);
+  color: #94A3B8;
+  border: 1px solid #334155;
+  border-radius: 4px;
   cursor: pointer;
-  text-align: center;
   transition: all 0.12s ease;
-  user-select: none;
-  display: inline-flex;
+  white-space: nowrap;
+}
+
+.uav-btn-secondary:hover {
+  color: #FFFFFF;
+  border-color: #64748B;
+}
+
+/* Tactical Pilot Dossier Card for Top 3 */
+.uav-score-submit-card {
+  width: 100%;
+  max-width: 320px;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid #F59E0B;
+  border-radius: 4px;
+  padding: 0.35rem 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin: 0.1rem 0;
+}
+
+.uav-dossier-tag {
+  font-size: 0.5rem;
+  color: #F59E0B;
+}
+
+.uav-submit-inputs {
+  display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.35rem;
 }
 
-.ctrl-kbd {
+.uav-callsign-input {
+  flex: 1;
+  background: #020617;
+  border: 1px solid #475569;
+  color: #FFFFFF;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  outline: none;
+}
+
+.uav-callsign-input:focus {
+  border-color: #00F0FF;
+  box-shadow: 0 0 6px rgba(0, 240, 255, 0.4);
+}
+
+.uav-btn-submit {
+  background: #F59E0B;
+  color: #020617;
   font-family: var(--font-mono);
   font-size: 0.58rem;
-  font-weight: 700;
-  color: #64748B;
-  background: #060910;
-  border: 1px solid #222C3E;
-  padding: 0.05rem 0.25rem;
-  border-radius: 0;
-  line-height: 1.2;
+  font-weight: 800;
+  padding: 0.2rem 0.45rem;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
-.touch-ctrl-btn:hover .ctrl-kbd,
-.touch-ctrl-btn:active .ctrl-kbd {
-  color: #00F0FF;
-  border-color: #00F0FF;
+/* ==================== 2. ICONIC SNES / SUPER FAMICOM GAMEPAD ==================== */
+.snes-controller-deck {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  margin-top: 0.5rem;
 }
 
-.ctrl-txt {
-  font-family: inherit;
+/* Cable leading up from controller to the TV RCA jacks */
+.snes-cable-junction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.touch-ctrl-btn:hover,
-.touch-ctrl-btn:active {
-  background: #182030;
-  color: #00F0FF;
-  border-color: #00F0FF;
+.snes-cable-wire {
+  width: 4px;
+  height: 22px;
+  background: #334155;
+  border-radius: 2px;
 }
 
-.touch-ctrl-btn--primary {
-  border-color: #00F0FF;
-  color: #00F0FF;
-  background: rgba(0, 240, 255, 0.08);
+.snes-cable-plug {
+  width: 18px;
+  height: 8px;
+  background: #0F172A;
+  border-radius: 3px 3px 0 0;
 }
 
-.touch-ctrl-btn--primary .ctrl-kbd {
-  color: #00F0FF;
-  border-color: rgba(0, 240, 255, 0.4);
+/* Authentic Dog-Bone SNES Controller Chassis */
+.snes-chassis {
+  width: 100%;
+  max-width: 820px;
+  background: var(--paper-card);
+  border: 2px solid var(--line);
+  border-radius: 54px;
+  padding: 0.75rem 1.5rem 1.25rem 1.5rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.09), inset 0 2px 0 rgba(255, 255, 255, 0.9);
+  position: relative;
+}
+
+/* Top Edge [L] and [R] Shoulder Buttons */
+.snes-shoulder-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  padding: 0 1rem;
+}
+
+.snes-shoulder-btn {
+  background: linear-gradient(180deg, var(--paper) 0%, var(--paper-dark) 100%);
+  border: 1.5px solid var(--line-dark);
+  border-radius: 16px 16px 4px 4px;
+  padding: 0.35rem 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 4px 0 var(--line-dark);
+  transition: all 0.08s ease;
+  user-select: none;
+}
+
+.snes-shoulder-btn:active,
+.snes-shoulder-btn.gp-btn-active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 var(--line-dark);
+}
+
+.snes-sh-key {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: var(--ink-dim);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 0.08rem 0.3rem;
+  border-radius: 3px;
+}
+
+.snes-sh-title {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+}
+
+/* Controller Faceplate Layout: D-Pad, Center, 4-Button Cluster */
+.snes-faceplate {
+  display: grid;
+  grid-template-columns: 180px 1fr 280px;
+  gap: 1.25rem;
+  align-items: center;
+  background: var(--paper-dark);
+  border: 1px solid var(--line);
+  border-radius: 36px;
+  padding: 1rem 1.25rem;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* Left Wing: Directional Cross D-Pad in Circular Well */
+.snes-dpad-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.snes-dpad-well {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.snes-cross-dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 68px;
+}
+
+.snes-dpad-mid {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.snes-dpad-arm {
+  width: 22px;
+  height: 22px;
+  background: #1E293B;
+  color: #94A3B8;
+  font-size: 0.625rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid #0F172A;
+  box-shadow: 0 3px 0 #020617;
+  user-select: none;
+  transition: all 0.08s ease;
+}
+
+.snes-dpad-arm:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #020617;
+  color: #FFFFFF;
+}
+
+.snes-dpad-center {
+  width: 22px;
+  height: 22px;
+  background: #0F172A;
+}
+
+.snes-ctrl-hint {
+  font-size: 0.52rem;
+  color: var(--ink-dim);
+  text-align: center;
+}
+
+/* Center Section: Brand Script + Angled Rubber Pills */
+.snes-center-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.snes-brand-script {
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.snes-pills-wrap {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.snes-pill-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.snes-rubber-pill {
+  width: 38px;
+  height: 12px;
+  background: #1E293B;
+  border: 1px solid #0F172A;
+  border-radius: 6px;
+  cursor: pointer;
+  transform: rotate(-28deg);
+  box-shadow: 0 3px 0 #020617, 0 4px 6px rgba(0, 0, 0, 0.15);
+  transition: all 0.08s ease;
+}
+
+.snes-rubber-pill:active {
+  transform: rotate(-28deg) translateY(2px);
+  box-shadow: 0 1px 0 #020617;
+}
+
+.snes-pill-lbl {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  color: var(--ink-dim);
+  text-align: center;
+  line-height: 1.25;
+}
+
+.snes-pill-lbl strong {
+  color: var(--ink);
+}
+
+/* Right Wing: Dark Circular Bezel with 4 Colorful 3D Buttons (X, Y, A, B) */
+.snes-action-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.snes-buttons-bezel {
+  width: 240px;
+  height: 175px;
+  border-radius: 87px;
+  background: var(--paper-card);
+  border: 1.5px solid var(--line);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.snes-btn-slot {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Diamond Positions matching SNES layout */
+.slot-x { top: 12px; left: 68px; }
+.slot-y { top: 58px; left: 16px; }
+.slot-a { top: 58px; right: 16px; }
+.slot-b { bottom: 12px; left: 68px; }
+
+/* Heavy 3D Convex Dome Buttons */
+.snes-round-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+  position: relative;
+}
+
+.snes-btn-cap {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 900;
+  color: #FFFFFF;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Button Convex 3D Styling by Color */
+/* Blue Button (X) */
+.btn-blue {
+  background: radial-gradient(circle at 35% 30%, #60A5FA 0%, #2563EB 70%, #1D4ED8 100%);
+  border: 1.5px solid #1E40AF;
+  box-shadow: 0 5px 0 #1E3A8A, 0 8px 12px rgba(37, 99, 235, 0.3);
+}
+
+/* Green Button (Y) */
+.btn-green {
+  background: radial-gradient(circle at 35% 30%, #4ADE80 0%, #16A34A 70%, #15803D 100%);
+  border: 1.5px solid #166534;
+  box-shadow: 0 5px 0 #14532D, 0 8px 12px rgba(22, 163, 74, 0.3);
+}
+
+/* Red Button (A) */
+.btn-red {
+  background: radial-gradient(circle at 35% 30%, #F87171 0%, #DC2626 70%, #B91C1C 100%);
+  border: 1.5px solid #991B1B;
+  box-shadow: 0 5px 0 #7F1D1D, 0 8px 12px rgba(220, 38, 38, 0.3);
+}
+
+/* Yellow Button (B) */
+.btn-yellow {
+  background: radial-gradient(circle at 35% 30%, #FDE047 0%, #EAB308 70%, #CA8A04 100%);
+  border: 1.5px solid #A16207;
+  box-shadow: 0 5px 0 #713F12, 0 8px 12px rgba(234, 179, 8, 0.3);
+}
+.btn-yellow .snes-btn-cap { color: #1E293B; text-shadow: none; }
+
+/* 3D Press Down Effect on Click or Physical Keypress */
+.snes-round-btn:active,
+.snes-round-btn.gp-btn-active {
+  transform: translateY(4px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.4);
+}
+
+.snes-btn-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.snes-key-tag {
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  font-weight: 800;
+  color: var(--ink-dim);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  padding: 0.05rem 0.2rem;
+  border-radius: 3px;
+  width: fit-content;
+}
+
+.snes-pwr-name {
+  font-family: var(--font-mono);
+  font-size: 0.52rem;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: 0.02em;
 }
 
 .roaming-avatar-wrap.avatar-in-combat {
   opacity: 0.08 !important;
   pointer-events: none !important;
 }
+
+/* Tablet & Intermediate Screen Ergonomics (Single-Screen Fit) */
+@media (max-width: 960px) and (min-width: 641px) {
+  .snes-faceplate {
+    grid-template-columns: 120px 1fr 220px;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 28px;
+  }
+  .snes-dpad-well {
+    width: 78px;
+    height: 78px;
+  }
+  .snes-cross-dpad {
+    width: 58px;
+  }
+  .snes-dpad-arm {
+    width: 19px;
+    height: 19px;
+  }
+  .snes-dpad-center {
+    width: 19px;
+    height: 19px;
+  }
+  .snes-buttons-bezel {
+    width: 210px;
+    height: 155px;
+  }
+}
+
 
 /* Tactical Score Submission Dossier */
 .uav-score-submit-card {
@@ -1999,11 +2764,13 @@ button { font-family: inherit; }
 /* ==================== GLOBAL LEADERBOARD DECK (EDITORIAL TOP 3) ==================== */
 .game-leaderboard-deck {
   max-width: 960px;
-  margin: 1.25rem auto 0 auto;
-  background: #090C12;
-  border: 1px solid #1E2636;
-  border-radius: 2px;
-  padding: clamp(0.85rem, 2vw, 1.35rem);
+  margin: 1.5rem auto 0 auto;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 0;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 
 .glb-header {
@@ -2012,16 +2779,16 @@ button { font-family: inherit; }
   align-items: center;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin-bottom: 0.85rem;
-  padding-bottom: 0.65rem;
-  border-bottom: 1px solid #1A202C;
+  background: var(--paper-dark);
+  border-bottom: 1px solid var(--line);
+  padding: 0.85rem 1.25rem;
 }
 
 .glb-title {
   font-family: var(--font-display);
   font-size: clamp(1.3rem, 2.6vw, 1.75rem);
   letter-spacing: 0.04em;
-  color: #F8FAFC;
+  color: var(--ink);
   margin: 0;
   line-height: 1;
 }
@@ -2036,7 +2803,7 @@ button { font-family: inherit; }
   font-family: var(--font-mono);
   font-size: 0.65rem;
   font-weight: 700;
-  color: #10B981;
+  color: var(--green);
   display: flex;
   align-items: center;
   gap: 0.35rem;
@@ -2045,7 +2812,7 @@ button { font-family: inherit; }
 .glb-dot {
   width: 6px;
   height: 6px;
-  background: #10B981;
+  background: var(--green);
   border-radius: 50%;
   animation: glbDotPulse 1.8s infinite ease-in-out;
 }
@@ -2059,81 +2826,71 @@ button { font-family: inherit; }
   font-family: var(--font-mono);
   font-size: 0.65rem;
   font-weight: 700;
-  padding: 0.3rem 0.6rem;
-  background: #101520;
-  color: #94A3B8;
-  border: 1px solid #242D3E;
+  padding: 0.35rem 0.75rem;
+  background: var(--paper);
+  color: var(--ink);
+  border: 1px solid var(--line);
   border-radius: 0;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .glb-refresh-btn:hover {
-  background: #1A2234;
-  color: #00F0FF;
-  border-color: #00F0FF;
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
 }
 
 /* Top 3 Podium Grid (Desktop) */
 .glb-podium-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.65rem;
+  gap: 1px;
+  background: var(--line);
 }
 
 .glb-podium-card {
-  background: #0C1018;
-  border: 1px solid #1E2638;
+  background: var(--paper);
+  border: none;
   border-radius: 0;
-  padding: 0.85rem 1rem;
+  padding: 1.15rem 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 0.35rem;
+  gap: 0.5rem;
   position: relative;
-  transition: transform 0.15s ease, border-color 0.15s ease;
+  transition: background 0.15s ease;
 }
 
 .glb-podium-card:hover {
-  transform: translateY(-1px);
+  background: var(--paper-card);
 }
 
 .glb-podium--gold {
-  border-color: rgba(255, 230, 0, 0.4);
-  background: linear-gradient(180deg, rgba(255, 230, 0, 0.05) 0%, #0C1018 100%);
-}
-
-.glb-podium--silver {
-  border-color: rgba(203, 213, 225, 0.3);
-}
-
-.glb-podium--bronze {
-  border-color: rgba(217, 119, 6, 0.3);
+  background: var(--paper-card);
 }
 
 .glb-podium-meta {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.2rem;
 }
 
 .glb-podium-rank {
   font-family: var(--font-mono);
   font-size: 0.625rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  color: #64748B;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
 }
 
-.glb-podium--gold .glb-podium-rank { color: #FFE600; }
-.glb-podium--silver .glb-podium-rank { color: #CBD5E1; }
-.glb-podium--bronze .glb-podium-rank { color: #F59E0B; }
+.glb-podium--gold .glb-podium-rank { color: var(--amber); }
 
 .glb-podium-name {
   font-family: var(--font-mono);
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 800;
-  color: #F8FAFC;
+  color: var(--ink);
   margin: 0;
   letter-spacing: 0.04em;
   white-space: nowrap;
@@ -2143,19 +2900,21 @@ button { font-family: inherit; }
 
 .glb-podium-score {
   font-family: var(--font-display);
-  font-size: 1.75rem;
+  font-size: 1.85rem;
   line-height: 1;
-  color: #FFF;
+  color: var(--ink);
   letter-spacing: 0.02em;
 }
 
-.glb-podium--gold .glb-podium-score { color: #FFE600; }
+.glb-podium--gold .glb-podium-score {
+  color: var(--amber);
+}
 
 .glb-me-tag {
   font-family: var(--font-mono);
   font-size: 0.625rem;
   font-weight: 700;
-  color: #10B981;
+  color: var(--green);
 }
 
 .glb-podium--me {
@@ -5068,131 +5827,343 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
   }
 
   .game-card-wrapper {
-    padding: 0.85rem 0.65rem;
-    gap: 0.65rem;
+    padding: 0;
+    gap: 0;
     border-radius: 0;
   }
 
   .game-header-bar {
     gap: 0.4rem;
-    padding-bottom: 0.5rem;
+    padding: 0.75rem 0.85rem;
+    background: var(--paper-dark);
+    border-bottom: 1px solid var(--line);
   }
 
   .game-title {
     font-size: 1.35rem;
     line-height: 1.05;
+    color: var(--ink);
   }
 
   .flight-hud-pills {
     gap: 0.3rem;
   }
 
-  .game-score-badge {
-    font-size: 0.625rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0;
+  /* ==================== RETRO CRT TV & GAMEPAD ON MOBILE ==================== */
+  .retro-arcade-terminal {
+    gap: 1rem;
   }
 
-  .audio-toggle-btn {
-    font-size: 0.625rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0;
+  /* ==================== RETRO CRT TV & GAMEPAD ON MOBILE (SINGLE-SCREEN FIT) ==================== */
+  #fun-zone {
+    padding: 1rem 0 1.75rem 0 !important;
   }
 
-  .uav-telemetry-bar {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 1px;
-    border-radius: 0;
+  #fun-zone .section-head {
+    margin-bottom: 0.65rem;
   }
 
-  .uav-tele-item {
-    padding: 0.4rem 0.55rem;
+  #fun-zone .section-display {
+    font-size: 1.45rem;
+    line-height: 1.1;
+    margin-bottom: 0.15rem;
   }
 
-  .uav-tele-item .mono-label {
-    font-size: 0.58rem;
+  #fun-zone .section-lead {
+    display: none; /* Hide bulky paragraph on mobile so TV starts right at the top */
   }
 
-  .uav-tval {
-    font-size: 0.8125rem;
-  }
-
-  .uav-canvas-container {
+  .retro-arcade-terminal {
+    gap: 0.35rem;
     width: 100%;
-    aspect-ratio: 2 / 1;
-    height: auto;
-    border-radius: 0;
-    overflow: hidden;
+  }
+
+  .retro-tv-chassis {
+    padding: 0.35rem 0.45rem 0.45rem 0.45rem;
+    border-radius: 8px 8px 4px 4px;
+    gap: 0.3rem;
+  }
+
+  .tv-screw {
+    display: none; /* Keep screen bezel clean on small mobile */
+  }
+
+  /* ==================== VCR COMBO CRT TV & SNES GAMEPAD ON MOBILE (SINGLE-SCREEN FIT) ==================== */
+  #fun-zone {
+    padding: 0.85rem 0 1.5rem 0 !important;
+  }
+
+  #fun-zone .section-head {
+    margin-bottom: 0.5rem;
+  }
+
+  #fun-zone .section-display {
+    font-size: 1.35rem;
+    line-height: 1.1;
+    margin-bottom: 0.1rem;
+  }
+
+  #fun-zone .section-lead {
+    display: none; /* Hide bulky paragraph on mobile so TV starts right at the top */
+  }
+
+  .retro-arcade-terminal {
+    gap: 0.3rem;
+    width: 100%;
+  }
+
+  /* Compact VCR CRT TV Cabinet */
+  .vcr-tv-cabinet {
+    padding: 0.35rem 0.45rem 0.45rem 0.45rem;
+    border-radius: 12px;
+    gap: 0.25rem;
+  }
+
+  .tv-sticker-crt {
+    top: 4px;
+    right: 8px;
+    font-size: 0.48rem;
+    padding: 0.08rem 0.3rem;
+  }
+
+  .tv-screen-section {
+    padding: 0.3rem;
+    border-radius: 10px;
+  }
+
+  /* 195px Screen Viewport: Keeps TV + Remote fully visible within ~420px total height */
+  .tv-crt-viewport {
+    width: 100%;
+    height: 195px;
+    min-height: 195px;
+    max-height: 205px;
+    aspect-ratio: auto;
+    border-radius: 14px;
+    border-width: 2.5px;
   }
 
   #drone-game-canvas {
     width: 100%;
     height: 100%;
-    aspect-ratio: 2 / 1;
-    max-height: none;
-    min-height: 0;
+    aspect-ratio: auto;
     display: block;
   }
 
+  /* Compact In-TV Screen Overlay on Mobile (ZERO SCROLLING) */
+  .uav-overlay {
+    overflow: hidden !important;
+    padding: 0.2rem !important;
+  }
+
   .uav-overlay-box {
-    max-width: 92%;
-    gap: 0.45rem;
+    max-width: 290px !important;
+    width: 95% !important;
+    padding: 0.4rem 0.55rem !important;
+    gap: 0.2rem !important;
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3) !important;
+  }
+
+  .uav-overlay-tag {
+    font-size: 0.48rem !important;
   }
 
   .uav-overlay-title {
-    font-size: 1.25rem;
+    font-size: 0.88rem !important;
+    line-height: 1.05 !important;
   }
 
   .uav-overlay-desc {
-    font-size: 0.72rem;
-    line-height: 1.35;
+    font-size: 0.54rem !important;
+    line-height: 1.2 !important;
   }
 
-  .uav-btn-primary {
-    width: 100%;
-    padding: 0.65rem 1rem;
-    min-height: 40px;
+  .uav-action-btns {
+    margin-top: 0.15rem !important;
+    gap: 0.35rem !important;
+  }
+
+  .uav-btn-primary,
+  .uav-btn-secondary {
+    font-size: 0.58rem !important;
+    padding: 0.2rem 0.5rem !important;
+  }
+
+  .uav-score-submit-card {
+    max-width: 270px !important;
+    padding: 0.25rem 0.45rem !important;
+    gap: 0.15rem !important;
+  }
+
+  .uav-callsign-input {
+    font-size: 0.56rem !important;
+    padding: 0.15rem 0.35rem !important;
+  }
+
+  .uav-btn-submit {
+    font-size: 0.54rem !important;
+    padding: 0.15rem 0.4rem !important;
+  }
+
+  .tv-brand-center {
+    padding: 0;
+  }
+
+  .tv-script-logo {
     font-size: 0.75rem;
-    border-radius: 0;
-    touch-action: manipulation;
   }
 
-  .uav-key-hints {
+  /* Compact VCR Slot */
+  .tv-vcr-slot {
+    padding: 0.15rem 0.45rem;
+  }
+
+  .vcr-door {
+    padding: 0.15rem 0.35rem;
+  }
+
+  .vcr-head-label {
+    font-size: 0.48rem;
+  }
+
+  /* Compact Front AV Strip */
+  .tv-front-av-panel {
+    padding: 0.2rem 0.45rem;
+    gap: 0.35rem;
+  }
+
+  .tv-speaker-slats {
+    width: 20px;
+    gap: 2px;
+  }
+
+  .rca-jack-group {
+    gap: 0.35rem;
+  }
+
+  .rca-port {
+    width: 10px;
+    height: 10px;
+  }
+
+  .rca-lbl {
     display: none;
   }
 
-  .uav-touch-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    width: 100%;
+  .tv-mini-btn {
+    font-size: 0.48rem;
+    padding: 0.12rem 0.3rem;
   }
 
-  .uav-touch-row {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.25rem;
-    width: 100%;
+  /* Slim 6-column Telemetry Ticker */
+  .tv-telemetry-strip {
+    grid-template-columns: repeat(6, 1fr);
+    border-radius: 4px;
   }
 
-  .uav-touch-row:last-child {
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.25rem;
+  .tv-tele-cell {
+    padding: 0.2rem 0.15rem;
+    align-items: center;
+    text-align: center;
   }
 
-  .touch-ctrl-btn {
-    min-height: 38px;
-    padding: 0.45rem 0.15rem;
+  .tv-tele-cell .mono-label {
+    font-size: 0.46rem;
+    letter-spacing: 0.02em;
+  }
+
+  .tv-tele-val {
     font-size: 0.65rem;
-    border-radius: 0;
-    font-weight: 700;
-    touch-action: manipulation;
   }
 
-  .touch-ctrl-btn:active {
-    background: #1E2638;
-    color: #00F0FF;
-    border-color: #00F0FF;
+  /* Compact SNES Controller on Mobile */
+  .snes-controller-deck {
+    margin-top: 0.25rem;
+  }
+
+  .snes-cable-wire {
+    height: 10px;
+  }
+
+  .snes-chassis {
+    padding: 0.35rem 0.55rem 0.55rem 0.55rem;
+    border-radius: 28px;
+  }
+
+  .snes-shoulder-row {
+    margin-bottom: 0.35rem;
+    padding: 0 0.25rem;
+  }
+
+  .snes-shoulder-btn {
+    padding: 0.2rem 0.55rem;
+    border-radius: 10px 10px 3px 3px;
+  }
+
+  .snes-sh-key {
+    font-size: 0.5rem;
+    padding: 0.05rem 0.2rem;
+  }
+
+  .snes-sh-title {
+    font-size: 0.55rem;
+  }
+
+  .snes-faceplate {
+    grid-template-columns: 85px 1fr;
+    gap: 0.45rem;
+    padding: 0.4rem 0.55rem;
+    border-radius: 20px;
+  }
+
+  .snes-dpad-section {
+    display: none; /* Hidden on small mobile to give maximum thumb room to buttons & pills */
+  }
+
+  .snes-center-section {
+    gap: 0.4rem;
+  }
+
+  .snes-brand-script {
+    font-size: 1.1rem;
+  }
+
+  .snes-rubber-pill {
+    width: 26px;
+    height: 9px;
+  }
+
+  .snes-pill-lbl {
+    font-size: 0.44rem;
+  }
+
+  /* 4-Button Cluster on Mobile */
+  .snes-buttons-bezel {
+    width: 175px;
+    height: 130px;
+    border-radius: 65px;
+  }
+
+  .slot-x { top: 8px; left: 46px; }
+  .slot-y { top: 44px; left: 8px; }
+  .slot-a { top: 44px; right: 8px; }
+  .slot-b { bottom: 8px; left: 46px; }
+
+  .snes-round-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .snes-btn-cap {
+    font-size: 0.65rem;
+  }
+
+  .snes-key-tag {
+    font-size: 0.44rem;
+    padding: 0.02rem 0.15rem;
+  }
+
+  .snes-pwr-name {
+    font-size: 0.44rem;
   }
 
   .pl-station-grid {
