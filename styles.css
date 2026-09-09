@@ -7196,17 +7196,23 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
 }
 
 /* ==================== TABLET & MOBILE RESPONSIVE OPTIMIZATIONS ==================== */
+/* Completely remove the avatar thought/speech chat bubble on phone and tablet to prevent text occlusion */
+@media (max-width: 1024px) {
+  .avatar-bubble,
+  .avatar-bubble.comic-pixel-bubble,
+  #avatar-thought-bubble {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: none !important;
+  }
+}
+
 @media (max-width: 900px) {
   .avatar-character {
     width: 98px;
     height: 109px;
-  }
-  .avatar-bubble.comic-pixel-bubble {
-    max-width: 175px;
-    padding: 0.35rem 0.55rem;
-  }
-  .comic-bubble-text {
-    font-size: 0.68rem;
   }
   .wardrobe-popup-panel {
     width: 270px;
@@ -7223,12 +7229,6 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
   }
   .avatar-character:active {
     transform: scale(0.95);
-  }
-  .avatar-bubble.comic-pixel-bubble {
-    max-width: 175px;
-    min-width: 110px;
-    padding: 0.35rem 0.55rem;
-    bottom: calc(100% + 8px);
   }
   .comic-badge {
     font-size: 0.5rem;

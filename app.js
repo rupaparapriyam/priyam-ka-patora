@@ -7044,6 +7044,11 @@ function initRoamingPriyamAvatar() {
   // ==================== SMART ADAPTIVE SPEECH BUBBLE ====================
   function updateBubblePlacement(currentX, currentY) {
     if (!bubble) return;
+    if (window.innerWidth <= 1024) {
+      bubble.style.display = 'none';
+      bubble.classList.remove('active');
+      return;
+    }
     const w = window.innerWidth;
     const h = window.innerHeight;
     const { w: avatarW, isMobile } = getAvatarDimensions();
@@ -7082,6 +7087,8 @@ function initRoamingPriyamAvatar() {
   }
 
   window.showAvatarThought = (msg, tag = 'PRIYAM · LIVE', mood = 'OBSERVING', duration = 3800) => {
+    // Completely disable avatar speech bubbles on phones and tablets to prevent occluding content
+    if (window.innerWidth <= 1024) return;
     if (!bubble || !bubbleMsg || !isAvatarEnabled) return;
     if (isReadingActive()) return;
 
