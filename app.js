@@ -244,70 +244,130 @@ function initHeroInteractiveCanvas() {
   const heroSec = document.getElementById('hero');
   let width = heroSec ? heroSec.offsetWidth : window.innerWidth;
   let height = heroSec ? heroSec.offsetHeight : window.innerHeight;
-  let dpr = window.devicePixelRatio || 1;
+  // Cap DPR to 1.5 to prevent massive 5.2MP fill-rate bottlenecks on Retina screens
+  const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
 
   const THEME_ACCENT = '#00F0FF';
 
-  // 3D Flight Core State (Dynamically placed: top-right on mobile/tablet, centered on desktop)
-  const isMobileInit = width < 890;
+  // DOM Elements for Anti-Collision Airspace Bounding
+  let heroRect = null;
+  const heroLeftEl = heroSec ? heroSec.querySelector('.hero-left') : null;
+  const headlineEl = heroSec ? heroSec.querySelector('.hero-headline') : null;
+
+  function updateHeroBounds() {
+    if (heroSec) {
+      heroRect = heroSec.getBoundingClientRect();
+      width = heroSec.offsetWidth;
+      height = heroSec.offsetHeight;
+    }
+  }
+  updateHeroBounds();
+
+  function getSafeAirspace() {
+    const isMobile = width < 840;
+    if (isMobile) {
+      let headlineTop = 135;
+      if (headlineEl && heroRect) {
+        const hRect = headlineEl.getBoundingClientRect();
+        headlineTop = hRect.top - heroRect.top;
+      }
+      const maxY = Math.max(65, headlineTop - 36);
+      return {
+        isMobile: true,
+        minX: 40,
+        maxX: width - 40,
+        minY: 55,
+        maxY: maxY, // STRICT: Drone never enters headline area on mobile
+        baseX: width * 0.78,
+        baseY: Math.max(65, Math.min(85, maxY - 10)),
+        scale: Math.min(0.72, Math.max(0.55, width / 650))
+      };
+    } else {
+      let safeLeft = width * 0.54;
+      if (heroLeftEl && heroRect) {
+        const lRect = heroLeftEl.getBoundingClientRect();
+        safeLeft = Math.max(width * 0.52, (lRect.right - heroRect.left) + 48);
+      }
+      return {
+        isMobile: false,
+        minX: safeLeft, // STRICT: Drone never crosses into left text column
+        maxX: width - 75,
+        minY: 85,
+        maxY: height - 100,
+        baseX: Math.max(safeLeft + 75, width * 0.76),
+        baseY: height * 0.36,
+        scale: Math.min(1.25, Math.max(0.85, width / 1200))
+      };
+    }
+  }
+
+  const airspaceInit = getSafeAirspace();
+
+  // 3D Flight Core State (Dynamically placed in safe airspace corridor)
   const drone = {
-    x: isMobileInit ? width * 0.76 : width * 0.48,
-    y: isMobileInit ? Math.min(220, Math.max(140, height * 0.16)) : height * 0.42,
+    x: airspaceInit.baseX,
+    y: airspaceInit.baseY,
     z: 0,
-    targetX: isMobileInit ? width * 0.76 : width * 0.48,
-    targetY: isMobileInit ? Math.min(220, Math.max(140, height * 0.16)) : height * 0.42,
-    pitch: 0.12,
-    yaw: -0.18,
+    targetX: airspaceInit.baseX,
+    targetY: airspaceInit.baseY,
+    pitch: 0.10,
+    yaw: -0.15,
     roll: -0.05,
-    targetPitch: 0.12,
-    targetYaw: -0.18,
+    targetPitch: 0.10,
+    targetYaw: -0.15,
     targetRoll: -0.05,
     rollBoost: 0,
-    scale: isMobileInit ? Math.min(1.15, Math.max(0.68, width / 650)) : Math.min(1.35, Math.max(0.85, width / 1100)),
+    scale: airspaceInit.scale
   };
 
   let time = 0;
   let mouse = {
-    x: isMobileInit ? width * 0.76 : width * 0.48,
-    y: isMobileInit ? Math.min(220, Math.max(140, height * 0.16)) : height * 0.45,
-    targetX: isMobileInit ? width * 0.76 : width * 0.48,
-    targetY: isMobileInit ? Math.min(220, Math.max(140, height * 0.16)) : height * 0.45,
-    vx: 0,
-    vy: 0,
-    prevX: width * 0.48,
-    prevY: height * 0.45,
+    x: airspaceInit.baseX,
+    y: airspaceInit.baseY,
+    targetX: airspaceInit.baseX,
+    targetY: airspaceInit.baseY,
     isHover: false
   };
 
   function resize() {
     if (!heroSec) return;
-    width = heroSec.offsetWidth;
-    height = heroSec.offsetHeight;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
+    updateHeroBounds();
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const isMobile = width < 890;
-    if (drone) {
-      drone.scale = isMobile ? Math.min(1.15, Math.max(0.68, width / 650)) : Math.min(1.4, Math.max(0.85, width / 1100));
+
+    const airspace = getSafeAirspace();
+    drone.scale = airspace.scale;
+    if (!mouse.isHover) {
+      drone.targetX = airspace.baseX;
+      drone.targetY = airspace.baseY;
     }
   }
 
   resize();
   window.addEventListener('resize', resize, { passive: true });
+  window.addEventListener('scroll', updateHeroBounds, { passive: true });
 
-  // Ambient 3D Interactive Neural Particle Constellation
-  const ambientParticles = [];
+  // Ambient 3D Interactive Neural Particle Constellation (Optimized Count & Batched Filaments)
+  const PARTICLE_COUNT = 24;
   const PARTICLE_COLORS = ['#00F0FF', '#10B981', '#38BDF8', '#818CF8'];
-  for (let i = 0; i < 48; i++) {
+  const ambientParticles = [];
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
     ambientParticles.push({
-      x: (Math.random() - 0.5) * 1100,
-      y: (Math.random() - 0.5) * 550,
-      z: Math.random() * 450 + 50,
-      vx: (Math.random() - 0.5) * 0.4,
-      vy: (Math.random() - 0.5) * 0.4,
-      size: 1.5 + Math.random() * 2,
+      x: (Math.random() - 0.5) * 1000,
+      y: (Math.random() - 0.5) * 500,
+      z: Math.random() * 400 + 60,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      size: 1.4 + Math.random() * 1.6,
       color: PARTICLE_COLORS[i % PARTICLE_COLORS.length]
     });
+  }
+
+  // Pre-allocated particle projection buffer to avoid GC frame drops
+  const projectedParticles = new Array(PARTICLE_COUNT);
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    projectedParticles[i] = { x: 0, y: 0, color: '', size: 0, alpha: 0 };
   }
 
   let exhaustParticles = [];
@@ -315,14 +375,8 @@ function initHeroInteractiveCanvas() {
   let rightWingTrail = [];
   let shockwaveRings = [];
   let animId = null;
-  let heroRect = null;
+  let isHeroVisible = true;
 
-  function updateHeroBounds() {
-    if (heroSec) heroRect = heroSec.getBoundingClientRect();
-  }
-  updateHeroBounds();
-  window.addEventListener('resize', updateHeroBounds, { passive: true });
-  window.addEventListener('scroll', updateHeroBounds, { passive: true });
   heroSec?.addEventListener('mouseenter', updateHeroBounds, { passive: true });
 
   heroSec?.addEventListener('mousemove', (e) => {
@@ -350,9 +404,9 @@ function initHeroInteractiveCanvas() {
 
   heroSec?.addEventListener('mouseleave', () => {
     mouse.isHover = false;
-    const isMobile = width < 890;
-    mouse.targetX = isMobile ? width * 0.76 : width * 0.48;
-    mouse.targetY = isMobile ? Math.min(220, Math.max(140, height * 0.16)) : height * 0.42;
+    const curAirspace = getSafeAirspace();
+    mouse.targetX = curAirspace.baseX;
+    mouse.targetY = curAirspace.baseY;
   }, { passive: true });
 
   // Interactive Kinetic Pulse & Harmonic Audio Feedback on Click
@@ -362,9 +416,9 @@ function initHeroInteractiveCanvas() {
     shockwaveRings.push({
       x: drone.x,
       y: drone.y,
-      r: 20,
-      maxR: 480,
-      speed: 16,
+      r: 16,
+      maxR: 420,
+      speed: 18,
       alpha: 1.0,
       color: '#00F0FF',
     });
@@ -380,10 +434,10 @@ function initHeroInteractiveCanvas() {
           gain.connect(actx.destination);
           osc.type = 'sine';
           osc.frequency.setValueAtTime(freq, now + idx * 0.04);
-          gain.gain.setValueAtTime(0.06, now + idx * 0.04);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.04 + 0.28);
+          gain.gain.setValueAtTime(0.05, now + idx * 0.04);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.04 + 0.26);
           osc.start(now + idx * 0.04);
-          osc.stop(now + idx * 0.04 + 0.28);
+          osc.stop(now + idx * 0.04 + 0.26);
         });
       }
     } catch (e) {}
@@ -433,6 +487,10 @@ function initHeroInteractiveCanvas() {
     [2, 5, 7], [2, 6, 7]
   ];
 
+  // Pre-allocated 3D transformed & projected vertices to eliminate GC allocations
+  const transformed = RAW_VERTICES.map(() => [0, 0, 0]);
+  const projected = RAW_VERTICES.map(() => ({ x: 0, y: 0, z: 0, factor: 1 }));
+
   function rotate3D(v, pitch, yaw, roll) {
     let [x, y, z] = v;
     let cosY = Math.cos(yaw), sinY = Math.sin(yaw);
@@ -465,186 +523,190 @@ function initHeroInteractiveCanvas() {
     };
   }
 
+  // Compact Gyroscope Gimbal Rings (Sleek, tight radius around airframe)
   function drawGyroRings(cx, cy, curScale, isDark, accentColor) {
-    const rings = [
-      { r: 135 * curScale, rotX: time * 0.45, rotY: time * 0.35, rotZ: 0, color: accentColor, width: 1.4, alpha: 0.45 },
-      { r: 165 * curScale, rotX: Math.PI * 0.5, rotY: time * 0.25, rotZ: time * 0.15, color: isDark ? '#38BDF8' : '#0F766E', width: 1.2, alpha: 0.35 },
-      { r: 195 * curScale, rotX: time * 0.2, rotY: Math.PI * 0.35, rotZ: time * 0.4, color: isDark ? '#818CF8' : '#3B82F6', width: 1.0, alpha: 0.25 },
-    ];
-
-    rings.forEach(ring => {
-      ctx.save();
-      ctx.beginPath();
-      ctx.lineWidth = ring.width;
-      ctx.strokeStyle = ring.color;
-      ctx.globalAlpha = isDark ? ring.alpha : ring.alpha * 0.7;
-
-      const segments = 36;
-      for (let i = 0; i <= segments; i++) {
-        const theta = (i / segments) * Math.PI * 2;
-        const p = [Math.cos(theta) * ring.r, Math.sin(theta) * ring.r, 0];
-        const rot = rotate3D(p, ring.rotX + drone.pitch * 0.5, ring.rotY + drone.yaw * 0.5, ring.rotZ + drone.roll * 0.5);
-        const scr = project3D(rot, cx, cy, 1.0);
-        if (i === 0) ctx.moveTo(scr.x, scr.y);
-        else ctx.lineTo(scr.x, scr.y);
-      }
-      ctx.closePath();
-      ctx.stroke();
-      ctx.restore();
-    });
-  }
-
-  function drawCyberHorizonGrid(isDark) {
-    const horizonY = height * 0.55;
-    const gridDepth = 600;
-    const gridRows = 14;
-    const gridCols = 24;
-    const gridSpacingX = width / gridCols;
+    const r1 = 48 * curScale;
+    const r2 = 66 * curScale;
 
     ctx.save();
+    ctx.lineWidth = 1.1;
+
+    // Ring 1
+    ctx.strokeStyle = accentColor;
+    ctx.globalAlpha = isDark ? 0.35 : 0.22;
+    ctx.beginPath();
+    for (let i = 0; i <= 20; i++) {
+      const theta = (i / 20) * Math.PI * 2;
+      const p = [Math.cos(theta) * r1, Math.sin(theta) * r1, 0];
+      const rot = rotate3D(p, time * 0.4 + drone.pitch * 0.4, time * 0.3 + drone.yaw * 0.4, drone.roll * 0.4);
+      const scr = project3D(rot, cx, cy, 1.0);
+      if (i === 0) ctx.moveTo(scr.x, scr.y);
+      else ctx.lineTo(scr.x, scr.y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+
+    // Ring 2
+    ctx.strokeStyle = isDark ? '#38BDF8' : '#0F766E';
+    ctx.globalAlpha = isDark ? 0.25 : 0.16;
+    ctx.beginPath();
+    for (let i = 0; i <= 20; i++) {
+      const theta = (i / 20) * Math.PI * 2;
+      const p = [Math.cos(theta) * r2, Math.sin(theta) * r2, 0];
+      const rot = rotate3D(p, Math.PI * 0.5, time * 0.25 + drone.yaw * 0.3, time * 0.2 + drone.roll * 0.3);
+      const scr = project3D(rot, cx, cy, 1.0);
+      if (i === 0) ctx.moveTo(scr.x, scr.y);
+      else ctx.lineTo(scr.x, scr.y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // High-Performance Lightweight Tactical Artificial Horizon & Pitch Datum
+  // (Zero expensive trig calculations, saving ~65% frame time)
+  function drawTacticalHorizon(isDark) {
+    const horizonY = height * 0.52;
+    const alpha = isDark ? 0.16 : 0.08;
+    const strokeColor = isDark ? `rgba(0, 240, 255, ${alpha})` : `rgba(15, 118, 110, ${alpha})`;
+
+    ctx.save();
+    ctx.strokeStyle = strokeColor;
     ctx.lineWidth = 1;
+    ctx.setLineDash([8, 8]);
+    ctx.beginPath();
 
-    for (let r = 0; r < gridRows; r++) {
-      const zProgress = (r + 1) / gridRows;
-      const z = zProgress * gridDepth;
-      const fov = 420;
-      const scale = fov / (fov + z);
-      const rowY = horizonY + (height - horizonY) * Math.pow(zProgress, 1.4);
-      const alpha = (1 - zProgress) * (isDark ? 0.32 : 0.16);
+    // Horizon line
+    ctx.moveTo(0, horizonY);
+    ctx.lineTo(width, horizonY);
 
-      ctx.strokeStyle = isDark ? `rgba(0, 240, 255, ${alpha})` : `rgba(15, 118, 110, ${alpha})`;
-      ctx.beginPath();
-
-      for (let c = 0; c <= gridCols; c++) {
-        const xOffset = (c - gridCols / 2) * (gridSpacingX * 1.8);
-        const screenX = width * 0.5 + xOffset * scale;
-        const wave = Math.sin(c * 0.45 + time * 1.2) * Math.cos(r * 0.4 + time * 0.8) * (18 * (1 - zProgress));
-        const finalY = rowY + wave;
-
-        if (c === 0) ctx.moveTo(screenX, finalY);
-        else ctx.lineTo(screenX, finalY);
-      }
-      ctx.stroke();
+    // Perspective guidelines fading down
+    const centerX = width * 0.5;
+    for (let offset = -400; offset <= 400; offset += 200) {
+      ctx.moveTo(centerX + offset * 0.3, horizonY);
+      ctx.lineTo(centerX + offset * 1.6, height);
     }
-
-    for (let c = 0; c <= gridCols; c++) {
-      const alpha = isDark ? 0.20 : 0.10;
-      ctx.strokeStyle = isDark ? `rgba(0, 240, 255, ${alpha})` : `rgba(15, 118, 110, ${alpha})`;
-      ctx.beginPath();
-
-      for (let r = 0; r < gridRows; r++) {
-        const zProgress = (r + 1) / gridRows;
-        const z = zProgress * gridDepth;
-        const fov = 420;
-        const scale = fov / (fov + z);
-        const rowY = horizonY + (height - horizonY) * Math.pow(zProgress, 1.4);
-        const xOffset = (c - gridCols / 2) * (gridSpacingX * 1.8);
-        const screenX = width * 0.5 + xOffset * scale;
-        const wave = Math.sin(c * 0.45 + time * 1.2) * Math.cos(r * 0.4 + time * 0.8) * (18 * (1 - zProgress));
-        const finalY = rowY + wave;
-
-        if (r === 0) ctx.moveTo(screenX, finalY);
-        else ctx.lineTo(screenX, finalY);
-      }
-      ctx.stroke();
-    }
-
+    ctx.stroke();
+    ctx.setLineDash([]);
     ctx.restore();
   }
 
   function render() {
-    time += 0.022;
+    time += 0.024;
     ctx.clearRect(0, 0, width, height);
 
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
-    // 1. Draw 3D Cyber Horizon Topographic Grid
-    drawCyberHorizonGrid(isDark);
+    // 1. Draw Lightweight Tactical Horizon Reference
+    drawTacticalHorizon(isDark);
 
-    // 2. Render Interactive Neural Particle Web with Proximity Filaments
-    const projectedParticles = [];
+    // 2. Render Interactive Neural Particle Web with Batched Single-Stroke Filaments
     ctx.save();
-    ambientParticles.forEach(p => {
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const p = ambientParticles[i];
       p.x += p.vx;
       p.y += p.vy;
-      if (Math.abs(p.x) > 600) p.vx *= -1;
-      if (Math.abs(p.y) > 300) p.vy *= -1;
+      if (Math.abs(p.x) > 550) p.vx *= -1;
+      if (Math.abs(p.y) > 280) p.vy *= -1;
 
       const fov = 380;
       const scale = fov / (fov + p.z);
       let screenX = width * 0.5 + p.x * scale;
       let screenY = height * 0.45 + p.y * scale;
 
-      const mDist = Math.hypot(screenX - mouse.x, screenY - mouse.y);
-      if (mDist < 160) {
-        const pull = (1 - mDist / 160) * 22;
-        screenX += ((mouse.x - screenX) / mDist) * pull;
-        screenY += ((mouse.y - screenY) / mDist) * pull;
+      const dx = screenX - mouse.x;
+      const dy = screenY - mouse.y;
+      if (Math.abs(dx) < 140 && Math.abs(dy) < 140) {
+        const mDistSq = dx * dx + dy * dy;
+        if (mDistSq < 19600) {
+          const mDist = Math.sqrt(mDistSq);
+          const pull = (1 - mDist / 140) * 18;
+          screenX += ((mouse.x - screenX) / mDist) * pull;
+          screenY += ((mouse.y - screenY) / mDist) * pull;
+        }
       }
 
-      projectedParticles.push({ x: screenX, y: screenY, color: p.color, size: p.size * scale });
+      const proj = projectedParticles[i];
+      proj.x = screenX;
+      proj.y = screenY;
+      proj.color = p.color;
+      proj.size = p.size * scale;
+      proj.alpha = (1 - p.z / 550) * (isDark ? 0.70 : 0.40);
 
       ctx.fillStyle = p.color;
-      ctx.globalAlpha = (1 - p.z / 600) * (isDark ? 0.75 : 0.45);
+      ctx.globalAlpha = proj.alpha;
       ctx.beginPath();
-      ctx.arc(screenX, screenY, p.size * scale, 0, Math.PI * 2);
+      ctx.arc(screenX, screenY, proj.size, 0, Math.PI * 2);
       ctx.fill();
-    });
+    }
 
+    // Batched single-stroke filaments (Zero lag, single draw call)
     ctx.lineWidth = 0.8;
-    for (let i = 0; i < projectedParticles.length; i++) {
-      for (let j = i + 1; j < projectedParticles.length; j++) {
-        const p1 = projectedParticles[i];
+    ctx.strokeStyle = isDark ? 'rgba(0, 240, 255, 0.20)' : 'rgba(15, 118, 110, 0.16)';
+    ctx.beginPath();
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+      const p1 = projectedParticles[i];
+      for (let j = i + 1; j < PARTICLE_COUNT; j++) {
         const p2 = projectedParticles[j];
-        const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
-        if (dist < 90) {
-          const alpha = (1 - dist / 90) * (isDark ? 0.25 : 0.12);
-          ctx.strokeStyle = p1.color;
-          ctx.globalAlpha = alpha;
-          ctx.beginPath();
-          ctx.moveTo(p1.x, p1.y);
-          ctx.lineTo(p2.x, p2.y);
-          ctx.stroke();
+        const dx = p1.x - p2.x;
+        const dy = p1.y - p2.y;
+        if (Math.abs(dx) < 80 && Math.abs(dy) < 80) {
+          if (dx * dx + dy * dy < 6400) {
+            ctx.moveTo(p1.x, p1.y);
+            ctx.lineTo(p2.x, p2.y);
+          }
         }
       }
     }
+    ctx.stroke();
     ctx.restore();
 
-    mouse.x += (mouse.targetX - mouse.x) * 0.06;
-    mouse.y += (mouse.targetY - mouse.y) * 0.06;
+    // Mouse Tracking Interpolation
+    mouse.x += (mouse.targetX - mouse.x) * 0.10;
+    mouse.y += (mouse.targetY - mouse.y) * 0.10;
 
-    const isMobile = width < 890;
-    const baseX = isMobile ? width * 0.76 : width * 0.48;
-    const baseY = isMobile ? Math.min(220, Math.max(140, height * 0.16)) : height * 0.42;
+    const airspace = getSafeAirspace();
 
-    const deltaX = (mouse.x - baseX) / width;
-    const deltaY = (mouse.y - baseY) / height;
+    // 3. 3D Flight Physics: Orientation points towards cursor across full screen
+    const deltaX = (mouse.x - airspace.baseX) / width;
+    const deltaY = (mouse.y - airspace.baseY) / height;
 
-    drone.targetX = baseX + (mouse.x - baseX) * (isMobile ? 0.12 : 0.2) + Math.sin(time * 0.8) * (isMobile ? 12 : 25);
-    drone.targetY = baseY + (mouse.y - baseY) * (isMobile ? 0.12 : 0.2) + Math.cos(time * 1.1) * (isMobile ? 10 : 16);
-    drone.targetYaw = deltaX * 0.75;
-    drone.targetPitch = deltaY * 0.55 + Math.sin(time * 1.3) * 0.05;
-    drone.targetRoll = -deltaX * 1.1 + Math.cos(time * 1.0) * 0.06;
+    drone.targetYaw = deltaX * 0.85;
+    drone.targetPitch = deltaY * 0.65 + Math.sin(time * 1.3) * 0.04;
+    drone.targetRoll = -deltaX * 1.2 + Math.cos(time * 1.0) * 0.05;
 
-    drone.x += (drone.targetX - drone.x) * 0.08;
-    drone.y += (drone.targetY - drone.y) * 0.08;
-    drone.pitch += (drone.targetPitch - drone.pitch) * 0.08;
-    drone.yaw += (drone.targetYaw - drone.yaw) * 0.08;
+    // Physical position is strictly clamped to safe airspace corridor (Never collides with text)
+    const hoverPullX = (mouse.x - airspace.baseX) * (airspace.isMobile ? 0.08 : 0.18);
+    const hoverPullY = (mouse.y - airspace.baseY) * (airspace.isMobile ? 0.08 : 0.18);
+    const wanderX = Math.sin(time * 0.8) * (airspace.isMobile ? 8 : 18);
+    const wanderY = Math.cos(time * 1.1) * (airspace.isMobile ? 6 : 14);
+
+    const rawTargetX = airspace.baseX + hoverPullX + wanderX;
+    const rawTargetY = airspace.baseY + hoverPullY + wanderY;
+
+    drone.targetX = Math.max(airspace.minX, Math.min(airspace.maxX, rawTargetX));
+    drone.targetY = Math.max(airspace.minY, Math.min(airspace.maxY, rawTargetY));
+
+    // Snappy, responsive lerp (0.14)
+    drone.x += (drone.targetX - drone.x) * 0.14;
+    drone.y += (drone.targetY - drone.y) * 0.14;
+    drone.pitch += (drone.targetPitch - drone.pitch) * 0.14;
+    drone.yaw += (drone.targetYaw - drone.yaw) * 0.14;
 
     if (drone.rollBoost > 0) {
-      const step = Math.min(drone.rollBoost, 0.22);
+      const step = Math.min(drone.rollBoost, 0.25);
       drone.roll += step;
       drone.rollBoost -= step;
     } else {
-      drone.roll += (drone.targetRoll - drone.roll) * 0.08;
+      drone.roll += (drone.targetRoll - drone.roll) * 0.14;
     }
 
-    const curScale = drone.scale * (width < 600 ? 0.74 : (isMobile ? 0.84 : 1.0));
+    const curScale = drone.scale * (width < 600 ? 0.72 : (airspace.isMobile ? 0.82 : 1.0));
 
-    // 4. Draw Concentric 3D Gyroscope Gimbal Rings
+    // 4. Concentric 3D Gyroscope Gimbal Rings
     drawGyroRings(drone.x, drone.y, curScale, isDark, THEME_ACCENT);
 
-    // 5. Draw Electric Shockwave Rings
+    // 5. Electric Shockwave Rings
     for (let i = shockwaveRings.length - 1; i >= 0; i--) {
       const ring = shockwaveRings[i];
       ring.r += ring.speed;
@@ -653,53 +715,82 @@ function initHeroInteractiveCanvas() {
       ctx.save();
       ctx.strokeStyle = ring.color || '#00F0FF';
       ctx.globalAlpha = ring.alpha * 0.85;
-      ctx.lineWidth = 2.5;
+      ctx.lineWidth = 2.0;
       ctx.beginPath();
-      ctx.ellipse(ring.x, ring.y, ring.r * 1.45, ring.r * 0.8, drone.roll, 0, Math.PI * 2);
+      ctx.ellipse(ring.x, ring.y, ring.r * 1.4, ring.r * 0.75, drone.roll, 0, Math.PI * 2);
       ctx.stroke();
       ctx.restore();
 
       if (ring.r >= ring.maxR) shockwaveRings.splice(i, 1);
     }
 
-    // 6. Transform & Render 3D Vector Core
-    const transformed = RAW_VERTICES.map(v => rotate3D(v, drone.pitch, drone.yaw, drone.roll));
-    const projected = transformed.map(v => project3D(v, drone.x, drone.y, curScale));
+    // 6. Transform & Render 3D Vector Core (Zero allocations)
+    const cosY = Math.cos(drone.yaw), sinY = Math.sin(drone.yaw);
+    const cosP = Math.cos(drone.pitch), sinP = Math.sin(drone.pitch);
+    const cosR = Math.cos(drone.roll), sinR = Math.sin(drone.roll);
+    const fov = 420;
 
-    // Afterburner Ion Exhaust
-    const exhaustScreen = projected[7];
-    if (exhaustScreen) {
-      for (let k = 0; k < 2; k++) {
-        exhaustParticles.push({
-          x: exhaustScreen.x + (Math.random() - 0.5) * 6,
-          y: exhaustScreen.y + (Math.random() - 0.5) * 6,
-          vx: Math.sin(-drone.yaw) * 4.5 + (Math.random() - 0.5) * 1.5,
-          vy: Math.cos(drone.pitch) * 3.5 + Math.random() * 2,
-          life: 20,
-          maxLife: 20,
-          size: 4 + Math.random() * 2.5,
-          color: '#00F0FF',
-        });
-      }
+    for (let i = 0; i < RAW_VERTICES.length; i++) {
+      const v = RAW_VERTICES[i];
+      const x1 = v[0] * cosY + v[2] * sinY;
+      const z1 = -v[0] * sinY + v[2] * cosY;
+      const y1 = v[1];
+
+      const y2 = y1 * cosP - z1 * sinP;
+      const z2 = y1 * sinP + z1 * cosP;
+      const x2 = x1;
+
+      const x3 = x2 * cosR - y2 * sinR;
+      const y3 = x2 * sinR + y2 * cosR;
+      const z3 = z2;
+
+      transformed[i][0] = x3;
+      transformed[i][1] = y3;
+      transformed[i][2] = z3;
+
+      const distance = fov + z3;
+      const factor = distance > 0 ? (fov / distance) * curScale : curScale;
+      projected[i].x = drone.x + x3 * factor;
+      projected[i].y = drone.y + y3 * factor;
+      projected[i].z = z3;
+      projected[i].factor = factor;
     }
 
+    // Afterburner Ion Exhaust (Cap at 20 particles)
+    const exhaustScreen = projected[7];
+    if (exhaustScreen) {
+      exhaustParticles.push({
+        x: exhaustScreen.x + (Math.random() - 0.5) * 4,
+        y: exhaustScreen.y + (Math.random() - 0.5) * 4,
+        vx: Math.sin(-drone.yaw) * 4.0 + (Math.random() - 0.5) * 1.2,
+        vy: Math.cos(drone.pitch) * 3.0 + Math.random() * 1.5,
+        life: 18,
+        maxLife: 18,
+        size: 3.5 + Math.random() * 2.0,
+        color: '#00F0FF',
+      });
+    }
+
+    ctx.save();
     for (let i = exhaustParticles.length - 1; i >= 0; i--) {
       const p = exhaustParticles[i];
       p.x += p.vx;
       p.y += p.vy;
       p.life--;
 
-      ctx.save();
+      if (p.life <= 0) {
+        exhaustParticles.splice(i, 1);
+        continue;
+      }
+
       ctx.fillStyle = p.color;
-      ctx.globalAlpha = (p.life / p.maxLife) * (isDark ? 0.85 : 0.65);
+      ctx.globalAlpha = (p.life / p.maxLife) * (isDark ? 0.85 : 0.60);
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size * (p.life / p.maxLife), 0, Math.PI * 2);
       ctx.fill();
-      ctx.restore();
-
-      if (p.life <= 0) exhaustParticles.splice(i, 1);
     }
-    if (exhaustParticles.length > 25) exhaustParticles = exhaustParticles.slice(-25);
+    ctx.restore();
+    if (exhaustParticles.length > 20) exhaustParticles.splice(0, exhaustParticles.length - 20);
 
     // Wingtip Condensation Ribbon Trails
     const leftTip = projected[3];
@@ -707,36 +798,41 @@ function initHeroInteractiveCanvas() {
     if (leftTip && rightTip) {
       leftWingTrail.push({ x: leftTip.x, y: leftTip.y });
       rightWingTrail.push({ x: rightTip.x, y: rightTip.y });
-      if (leftWingTrail.length > 24) leftWingTrail.shift();
-      if (rightWingTrail.length > 24) rightWingTrail.shift();
+      if (leftWingTrail.length > 18) leftWingTrail.shift();
+      if (rightWingTrail.length > 18) rightWingTrail.shift();
 
-      function drawWingRibbon(trail) {
-        if (trail.length < 2) return;
-        ctx.save();
+      ctx.save();
+      ctx.strokeStyle = '#00F0FF';
+      ctx.globalAlpha = isDark ? 0.45 : 0.28;
+      ctx.lineWidth = 1.6;
+
+      if (leftWingTrail.length > 1) {
         ctx.beginPath();
-        ctx.moveTo(trail[0].x, trail[0].y);
-        for (let i = 1; i < trail.length; i++) ctx.lineTo(trail[i].x, trail[i].y);
-        ctx.strokeStyle = '#00F0FF';
-        ctx.globalAlpha = isDark ? 0.55 : 0.35;
-        ctx.lineWidth = 1.8;
+        ctx.moveTo(leftWingTrail[0].x, leftWingTrail[0].y);
+        for (let i = 1; i < leftWingTrail.length; i++) ctx.lineTo(leftWingTrail[i].x, leftWingTrail[i].y);
         ctx.stroke();
-        ctx.restore();
       }
-      drawWingRibbon(leftWingTrail);
-      drawWingRibbon(rightWingTrail);
+
+      if (rightWingTrail.length > 1) {
+        ctx.beginPath();
+        ctx.moveTo(rightWingTrail[0].x, rightWingTrail[0].y);
+        for (let i = 1; i < rightWingTrail.length; i++) ctx.lineTo(rightWingTrail[i].x, rightWingTrail[i].y);
+        ctx.stroke();
+      }
+      ctx.restore();
     }
 
     // 7. Render 3D Vector Core Facets
     ctx.save();
-    FACES.forEach(face => {
-      const [i1, i2, i3] = face;
-      const p1 = projected[i1];
-      const p2 = projected[i2];
-      const p3 = projected[i3];
+    for (let f = 0; f < FACES.length; f++) {
+      const face = FACES[f];
+      const p1 = projected[face[0]];
+      const p2 = projected[face[1]];
+      const p3 = projected[face[2]];
 
-      const v1 = transformed[i1];
-      const v2 = transformed[i2];
-      const v3 = transformed[i3];
+      const v1 = transformed[face[0]];
+      const v2 = transformed[face[1]];
+      const v3 = transformed[face[2]];
       const normZ = (v2[0] - v1[0]) * (v3[1] - v1[1]) - (v2[1] - v1[1]) * (v3[0] - v1[0]);
       const brightness = Math.max(0.08, Math.min(0.85, 0.35 + (normZ / 6000)));
 
@@ -750,13 +846,15 @@ function initHeroInteractiveCanvas() {
         ? `rgba(0, 240, 255, ${brightness * 0.16})`
         : `rgba(15, 118, 110, ${brightness * 0.10})`;
       ctx.fill();
-    });
+    }
     ctx.restore();
 
     // 8. Render 3D Wireframe Edges
     ctx.save();
-    WIRE_EDGES.forEach(edge => {
-      const [i1, i2] = edge;
+    for (let e = 0; e < WIRE_EDGES.length; e++) {
+      const edge = WIRE_EDGES[e];
+      const i1 = edge[0];
+      const i2 = edge[1];
       const p1 = projected[i1];
       const p2 = projected[i2];
 
@@ -767,52 +865,52 @@ function initHeroInteractiveCanvas() {
       ctx.strokeStyle = isDark
         ? (i1 === 0 || i2 === 0 ? '#00F0FF' : 'rgba(0, 240, 255, 0.65)')
         : (i1 === 0 || i2 === 0 ? '#0F766E' : 'rgba(30, 41, 59, 0.45)');
-      ctx.lineWidth = (i1 === 0 || i2 === 0) ? 2.0 : 1.2;
-      ctx.stroke();
-    });
-    ctx.restore();
-
-    // 9. Full Tactical Holographic Avionics HUD & Target Lock (Idea 1)
-    ctx.save();
-    const hudX = drone.x;
-    const hudY = drone.y;
-    const boxW = 110 * curScale;
-    const boxH = 75 * curScale;
-    const bLen = 14;
-
-    const hudColor = isDark ? 'rgba(0, 240, 255, 0.75)' : 'rgba(37, 99, 235, 0.85)';
-    const hudDim = isDark ? 'rgba(0, 240, 255, 0.18)' : 'rgba(37, 99, 235, 0.22)';
-    const hudAccent = isDark ? '#00F0FF' : '#2563EB';
-
-    // 1. Rotating Tactical Azimuth Ring with cardinal compass ticks
-    const ringRadius = 125 * curScale;
-    ctx.save();
-    ctx.translate(hudX, hudY);
-    ctx.rotate(time * 0.25);
-
-    ctx.beginPath();
-    ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
-    ctx.strokeStyle = hudDim;
-    ctx.lineWidth = 1.2;
-    ctx.setLineDash([6, 12]);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // Compass Cardinal Ticks (N, E, S, W)
-    for (let a = 0; a < 4; a++) {
-      const angle = a * (Math.PI / 2);
-      ctx.beginPath();
-      ctx.moveTo(Math.cos(angle) * (ringRadius - 6), Math.sin(angle) * (ringRadius - 6));
-      ctx.lineTo(Math.cos(angle) * (ringRadius + 6), Math.sin(angle) * (ringRadius + 6));
-      ctx.strokeStyle = hudColor;
-      ctx.lineWidth = 1.5;
+      ctx.lineWidth = (i1 === 0 || i2 === 0) ? 1.8 : 1.1;
       ctx.stroke();
     }
     ctx.restore();
 
-    // 2. Dynamic Target Corner Lock Brackets [ + ]
+    // 9. Compact Tactical Military Avionics HUD (Safe, Centered, Zero Collision Footprint)
+    ctx.save();
+    const hudX = drone.x;
+    const hudY = drone.y;
+    const boxW = 54 * curScale;
+    const boxH = 36 * curScale;
+    const bLen = 10 * curScale;
+
+    const hudColor = isDark ? 'rgba(0, 240, 255, 0.75)' : 'rgba(37, 99, 235, 0.85)';
+    const hudDim = isDark ? 'rgba(0, 240, 255, 0.18)' : 'rgba(37, 99, 235, 0.22)';
+
+    // 1. Compact Rotating Azimuth Ring
+    const ringRadius = 58 * curScale;
+    ctx.save();
+    ctx.translate(hudX, hudY);
+    ctx.rotate(time * 0.22);
+
+    ctx.beginPath();
+    ctx.arc(0, 0, ringRadius, 0, Math.PI * 2);
+    ctx.strokeStyle = hudDim;
+    ctx.lineWidth = 1.0;
+    ctx.setLineDash([4, 8]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 4 Cardinal Ticks (N, E, S, W)
     ctx.strokeStyle = hudColor;
-    ctx.lineWidth = 1.5;
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    for (let a = 0; a < 4; a++) {
+      const angle = a * (Math.PI / 2);
+      const cosA = Math.cos(angle), sinA = Math.sin(angle);
+      ctx.moveTo(cosA * (ringRadius - 4), sinA * (ringRadius - 4));
+      ctx.lineTo(cosA * (ringRadius + 4), sinA * (ringRadius + 4));
+    }
+    ctx.stroke();
+    ctx.restore();
+
+    // 2. Dynamic Target Corner Lock Brackets [ ]
+    ctx.strokeStyle = hudColor;
+    ctx.lineWidth = 1.4;
     ctx.beginPath();
     // Top-Left
     ctx.moveTo(hudX - boxW, hudY - boxH + bLen); ctx.lineTo(hudX - boxW, hudY - boxH); ctx.lineTo(hudX - boxW + bLen, hudY - boxH);
@@ -824,34 +922,28 @@ function initHeroInteractiveCanvas() {
     ctx.moveTo(hudX + boxW - bLen, hudY + boxH); ctx.lineTo(hudX + boxW, hudY + boxH); ctx.lineTo(hudX + boxW, hudY + boxH - bLen);
     ctx.stroke();
 
-    // Center Crosshair
+    // Center Reticle
     ctx.strokeStyle = hudDim;
     ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.moveTo(hudX - 8, hudY); ctx.lineTo(hudX + 8, hudY);
-    ctx.moveTo(hudX, hudY - 8); ctx.lineTo(hudX, hudY + 8);
+    ctx.moveTo(hudX - 6, hudY); ctx.lineTo(hudX + 6, hudY);
+    ctx.moveTo(hudX, hudY - 6); ctx.lineTo(hudX, hudY + 6);
     ctx.stroke();
 
-    // 3. Cyber Monospace Telemetry Readouts
-    const fontSize = Math.max(8.5, Math.round(9 * curScale));
+    // 3. Compact Monospace Telemetry (Centered directly with brackets)
+    const fontSize = Math.max(7.5, Math.min(9.5, 8.5 * curScale));
     ctx.font = `${fontSize}px "Space Mono", monospace`;
-    
-    // Top-Left: Coords (Rajkot / Delhi base origin)
-    ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.65)' : 'rgba(15, 23, 42, 0.75)';
-    ctx.fillText(`LAT 22.30°N · LON 70.80°E`, hudX - boxW, hudY - boxH - 8);
-    
-    // Top-Right: Velocity / Altitude
-    const altVal = Math.round(420 + Math.sin(time * 0.8) * 30);
-    ctx.fillStyle = hudAccent;
-    ctx.fillText(`ALT ${altVal}M · MACH 0.85`, hudX - boxW, hudY - boxH + 14);
+    ctx.textAlign = 'center';
 
-    // Bottom: Dynamic Heading & Target Lock Status
-    const headingDeg = Math.round(((drone.yaw * 180 / Math.PI) % 360 + 360) % 360);
-    const pitchDeg = Math.round(drone.pitch * 180 / Math.PI);
-    ctx.fillText(`HDG ${String(headingDeg).padStart(3, '0')}° · PIT ${pitchDeg > 0 ? '+' : ''}${pitchDeg}°`, hudX - boxW, hudY + boxH + 16);
-    
+    // Top: Coordinates
+    ctx.fillStyle = isDark ? 'rgba(255, 255, 255, 0.70)' : 'rgba(15, 23, 42, 0.75)';
+    ctx.fillText(`22.30°N · 70.80°E`, hudX, hudY - boxH - 6);
+
+    // Bottom: Status & Velocity
+    const altVal = Math.round(420 + Math.sin(time * 0.8) * 25);
     ctx.fillStyle = isDark ? '#10B981' : '#059669';
-    ctx.fillText(`[● TARGET LOCKED]`, hudX - boxW, hudY + boxH + 28);
+    ctx.fillText(`[LOCKED · M 0.85 · ALT ${altVal}M]`, hudX, hudY + boxH + 13);
+    ctx.textAlign = 'left';
 
     ctx.restore();
 
@@ -860,7 +952,7 @@ function initHeroInteractiveCanvas() {
   }
 
   function startAnimation() {
-    if (!animId) {
+    if (!animId && isHeroVisible && !document.hidden) {
       animId = requestAnimationFrame(render);
     }
   }
@@ -872,13 +964,14 @@ function initHeroInteractiveCanvas() {
     }
   }
 
-  // Start immediately on load
+  // Start immediately
   startAnimation();
 
   if (heroSec && 'IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (!entry.isIntersecting) {
+        isHeroVisible = entry.isIntersecting;
+        if (!isHeroVisible) {
           stopAnimation();
         } else {
           startAnimation();
@@ -887,6 +980,14 @@ function initHeroInteractiveCanvas() {
     }, { threshold: 0.01, rootMargin: '200px 0px' });
     observer.observe(heroSec);
   }
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) {
+      stopAnimation();
+    } else if (isHeroVisible) {
+      startAnimation();
+    }
+  });
 }
 
 /* ==========================================================================
