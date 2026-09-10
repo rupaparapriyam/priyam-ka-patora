@@ -658,6 +658,8 @@ body.preloader-active {
   height: 100%;
   pointer-events: none;
   z-index: 1;
+  contain: strict;
+  will-change: transform;
 }
 
 .hero-grid-bg {
