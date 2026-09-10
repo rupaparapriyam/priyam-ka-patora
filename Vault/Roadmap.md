@@ -4,7 +4,7 @@ tags: [plan]
 
 # Roadmap & Prioritization
 
-**Last updated**: 2026-08-28 — after re-verification pass across all five startup ideas + the one general idea.
+**Last updated**: 2026-09-10 — see the update section at the foot of this file. **The 2026-08-28 ranking below is superseded**: Pathology Lab (now shipped as **Kliniqo**) is still #1 but for different reasons and at a different price, and **Ecommerce Hub has moved from #2 to 🔴 dead**. Read the 2026-09-10 section before acting on anything below it.
 
 This file is the "what do I actually do, in what order" view. It doesn't replace each idea's own research file — it just ranks them and tells you where to spend the next block of hours. Full evidence lives in each idea's own `.md` file, linked below.
 
@@ -65,3 +65,90 @@ Priyam described an evolved version of idea 01 (AI Chatbot Assistant): a simpler
 **Verdict: 🔴 High risk, not recommended ahead of the current top two.** It bundles three separate markets: a crowded-but-narrow-wedge-viable agent-builder space (n8n, Gumloop, Dify, Chatbase already funded/profitable there), a genuinely hard enterprise DLP market requiring SOC2/ISO27001 and long sales cycles, and a capital-intensive private-AI-infra play ($150k-500k in GPU hardware for a mid-size company). Only the agent-builder UI layer is realistically buildable via vibe coding — the security/compliance/infra layers are not.
 
 **Ranking is unchanged at the top**: Pathology Lab Ops Assistant is still #1, Ecommerce Hub still #2. This evolved idea ranks below both — it doesn't have Pathology Lab's working prototype + paying customer, and unlike Ecommerce Hub, it requires enterprise trust/security certification just to start selling, which a solo founder can't get to quickly. If pursued at all, the only defensible starting point within it is a narrow-niche personal/consumer agent tool (not the "OS" version), and even that lands in already-crowded territory.
+
+---
+
+## Update — 2026-09-10: portfolio research pass against an explicit $100M–$1B ambition
+
+Priyam asked for thorough research across the portfolio, stating the goal as *"the next $500m–1bn
+company"*, revised mid-session to *"even 100 million is good"*. He also added three new ideas.
+**Method**: 41 agents across 10 dimensions, ~4.4M tokens, every load-bearing number handed to
+adversarial fact-checkers instructed to refute it. Eleven were corrected, three load-bearing and
+wrong in the direction that flattered the conclusion. Full evidence in each idea's own file.
+
+### The ranking now
+
+1. **[[Startup Ideas/02 - Pathology Lab Ops Assistant/Pathology Lab Ops Assistant|Kliniqo]] — 🟢
+   build and sell, but reprice this month.** It shipped. It is live, multi-tenant, in production at
+   Vaibhav Laboratory with 63,573 results in it. **It is underpriced by ~2.4x**: CrelioHealth's
+   published India ladder is ₹96,000/₹1,80,000/₹3,00,000 a year ex-GST, and Kliniqo's *top* tier
+   (₹1,00,000) sits at 1.04x CrelioHealth's *entry* tier. Recommended card: ₹60,000/₹1,20,000/₹2,40,000.
+2. **[[Startup Ideas/03 - Ecommerce Hub/Ecommerce Hub|Ecommerce Hub]] — 🔴 DEAD. Dropped, not
+   parked.** Third independent pass, and the first to close it on *ceiling* rather than demand.
+   Six named competitors now (SeerFlow hardened to ₹2,499–₹17,999/mo; **Financify on the Shopify App
+   Store ships all three legs of the wedge at $9.99–$19.99/mo**; **Razorpay gives RTO analytics away
+   free**). Demand evidence finally surfaced and falsifies the product: eight named Indian brands
+   complaining publicly, and **every one asks to STOP the RTO loss, not to MEASURE it**. Corrected
+   monopoly ceiling **₹48 crore ($5.1M)**. **Do not run the 15 founder interviews** — they test
+   demand, and the binding question is now ceiling. Do not send the deck to FasterCapital or anyone.
+3. Everything else below is unchanged from 2026-08-28 and still correct.
+
+### The structural finding that governs every idea in this vault
+
+**Vertical SaaS ARPU is set by a roughly fixed 0.5–3% share of the customer's own revenue, not by
+feature count. Building more product does not move the ceiling. Changing the customer's country
+does.**
+
+- **No India-founded software company has ever reached $100M ARR selling subscription software
+  primarily to Indian SMBs.** The empirical ceiling is **Tally at ₹746.58 crore (~$78.5M) after 34
+  years** with a near-monopoly and 3 million paid users. Practo: ₹234 crore after 17 years and $249M
+  raised. Unicommerce's SaaS line: ₹129.2 crore, +10.7%, ~30.6% annual logo churn.
+- Every India-founded vertical SaaS that cleared $1B sells to **Western** customers — Innovaccer
+  $3.45B, Tekion $4B+, Zenoti $1.5B. Indian engineering cost, Western ARPU. **Zero exceptions.**
+- **The payments-attach lever that rescues low-ARPU vertical SaaS is legally unavailable in India**:
+  MDR on UPI and RuPay debit has been **statutorily zero since January 2020**. And Indian OPD
+  diagnostics is out-of-pocket — there is no payer at the counter to bill. (Also note Toast's real
+  multiplier is **1.93x**, not 10x — payments ARR $986M vs subscription $1,061M.)
+- **The most sobering single datapoint**: **CrelioHealth books ₹34.41 crore (~$3.6M) for FY2025** on
+  ~$1.4M of outside capital, ~150 staff, no equity round since 2018. **Attune** raised $17M from
+  Qualcomm/Norwest, targeted 25,000 labs, reached ~200 clients and **under ₹10 crore**. Two funded
+  companies ran this experiment for 10–18 years. Neither cleared $6M. This market funds 150-person
+  companies, not unicorns.
+
+### The three new ideas Priyam raised on 2026-09-10
+
+Being researched in a second pass; results to be written into their own files, not here.
+
+- **Enterprise AI "OS"** — an agent with full computer use, a private company-trained LLM/SLM,
+  plus employee monitoring, employee rating and insider-leak/DLP detection. He cited **[Clicky /
+  HeyClicky](https://www.ycombinator.com/companies/heyclicky)** (YC Spring 2026, SF — voice-driven
+  Mac app, sees your screen, spawns agents, zero setup) as the reference. This is an evolution of
+  [[Startup Ideas/01 - AI Chatbot Assistant/AI Chatbot Assistant|idea 01]], whose Pass 3 rated it
+  🔴 on 2026-08-29 — being re-tested with 2026 evidence, an India/GCC lens, and against the lower bar.
+- **"Palantir but Indian and advanced"** — his own note is that he needs to research it much more.
+  Being researched; the feasibility question (government/defence procurement, forward-deployed
+  engineering, no clearance, no capital, 4–6 hrs/week) matters more than the market-size question.
+- **Ecommerce Hub restated** — first as *"Shopify but with everything built in"*, then clarified the
+  same day as *"dashboard and analysis for every connector together, and then giving them solutions —
+  what they should do to increase profit."* The clarification makes it the analytics-plus-advisory
+  play, which is the **weaker** of the two readings and does not survive the ceiling arithmetic
+  above. See the Ecommerce Hub file's 2026-09-10 section.
+
+### The honest meta-problem
+
+**Five live ideas, ~4–6 hrs/week, and the two decisive experiments in this vault have both been
+planned in detail and left undone.** The six lab interviews (planned Pass 5, 2026-08-28) and the 15
+founder interviews (planned 2026-08-30) are both still at zero. In the same period the portfolio
+produced: an 18-slide deck, a 10-section report, `.md` transcriptions of both, name candidates, a
+FasterCapital outreach draft, a Next.js scaffold built ahead of its own no-code gate — and three new
+ideas. **Every one of those is cheaper and more pleasant than a phone call to a stranger, and none
+of them can produce evidence.** This pattern, not any market factor, is the thing most likely to
+decide whether anything here reaches $100M. Recorded here plainly because the collaboration rules ask
+for honest assessment over optimistic framing.
+
+### What to actually do next
+
+Ten phone calls, one SQL query, and a price change. In that order. The detail — a week-by-week,
+~20–24 hour plan with named contacts, a ₹799 purchase that settles the incumbent question, and five
+emails to US lab directors that resolve the single largest unknown in the portfolio — is in the
+**Claude (2026-09-10)** section of the [[Startup Ideas/02 - Pathology Lab Ops Assistant/Pathology Lab Ops Assistant|Kliniqo file]].

@@ -13,7 +13,8 @@ Priyam Rupapara builds software for messy, physical, real-world operations where
 
 ## Core Projects
 
-### 1. PathLab Ops Assistant (Healthcare Operations)
+### 1. Kliniqo (Rebranded from PathLab Ops — Healthcare Operations)
+- Live Website: https://kliniqo.co.in
 - Working MVP deployed in active diagnostic pathology laboratories.
 - Real-time ASTM E1394 serial machine protocol bridging to ingest automated blood and serum analyzers (CBC, Biochemistry, Electrolytes) without manual data entry.
 - Automated QC validation, range checking, delta checks, and instant report distribution via WhatsApp and PDF.
@@ -24,7 +25,9 @@ Priyam Rupapara builds software for messy, physical, real-world operations where
 - Solves attribution gaps across Razorpay, Cash on Delivery (COD), Return to Origin (RTO) freight penalties, and multi-channel marketing CAC.
 - Real-time unit margin calculation factoring NDR (Non-Delivery Report) workflows and reverse logistics costs.
 
-### 3. SURGE Case Study & Post-Mortem
+### 3. SURGE Men (D2C Brand Case Study & Post-Mortem)
+- Live Website: https://surgemen.in
+- Formulated 7 men's hair styling products alongside cosmetic chemists in Gujarat.
 - Deep operational analysis and post-mortem of an Indian D2C men's grooming brand.
 - Financial teardown of blended CAC, gross margin compression, COD delivery friction, and inventory churn dynamics in the Indian consumer market.
 
