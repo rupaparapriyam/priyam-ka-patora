@@ -1021,12 +1021,19 @@ const PROJECT_REGISTRY = {
     headline: 'Kliniqo (Formerly PathLab Ops)\nYour Lab\'s Missing\nOperational Brain.',
     liveUrl: 'https://kliniqo.co.in',
     liveUrlLabel: 'Visit Live kliniqo.co.in ↗',
+    liveUrlDesc: 'Official production diagnostic lab LIS & ASTM serial hardware bridge live at kliniqo.co.in. Operating in real diagnostic testing workflows.',
     statusPills: [
       { label: '🌐 Live at kliniqo.co.in', style: 'active', url: 'https://kliniqo.co.in' },
       { label: 'Working MVP Tested on Lab Bench', style: 'active' },
       { label: '51/51 Logic Tests Passing', style: 'active' },
       { label: 'Next.js 15 · Prisma (15 Models) · ASTM E1394', style: '' },
       { label: 'Design Partner: Vaibhav Laboratory', style: '' },
+    ],
+    featureHighlights: [
+      { title: 'ASTM E1394 Serial Bridge', desc: 'Direct RS232 hardware tap to haematology & biochemistry analyzers (Sysmex, Mindray). Zero driver installs, zero manual transcription.' },
+      { title: '22 Instant Clinical Derivations', desc: 'Auto-calculates NLR, eGFR, Friedewald LDL, Absolute Eosinophils, and Non-HDL in 3 seconds against age/gender reference ranges.' },
+      { title: '85% Clerical Error Reduction', desc: 'Eliminates thermal slip typing and pirated Word template copy-pasting, preventing dangerous platelet and electrolyte typos.' },
+      { title: 'WhatsApp PDF Dispatch & Recall', desc: 'Sends signed lab reports with verifiable QR hashes in <1s via WhatsApp Cloud API. Automated 90-day diabetic (HbA1c) re-engagement.' }
     ],
     flowNodes: [
       { label: 'Haematology /\nBiochem Analyzer', type: 'node' },
@@ -1069,6 +1076,12 @@ const PROJECT_REGISTRY = {
       { label: 'Solving 60%+ COD & 28% RTO', style: '' },
       { label: 'Shopify · Razorpay · Shiprocket · Meta Ads', style: '' },
     ],
+    featureHighlights: [
+      { title: 'Cross-Silo Attribution Join', desc: 'Joins Shopify orders, Razorpay settlements, Shiprocket logistics tracking, and Meta/Google ad spend into a single ledger.' },
+      { title: 'Real Cash Contribution Margin', desc: 'Calculates true gross and contribution margin per order after deducting forward freight, reverse freight, and COD processing fees.' },
+      { title: 'Serial-RTO Suppression', desc: 'Detects repeat return fraud and serial-RTO pincodes, pushing suppression audiences back into Meta Ads campaigns.' },
+      { title: 'Indian Logistics Connectors', desc: 'Native pre-built webhooks and API connectors for Shiprocket, Delhivery, Bluedart, and Razorpay.' }
+    ],
     barChart: [
       { label: 'Gross Orders Placed', pct: 100, color: '', val: '100%' },
       { label: 'Cash on Delivery (COD)', pct: 64, color: 'amber', val: '~64%' },
@@ -1108,10 +1121,20 @@ const PROJECT_REGISTRY = {
   defence: {
     tag: '[03 · DEFENCE & HARDWARE]',
     headline: 'Autonomous Defence (In)\nEdge Zero-Tolerance\nEnvironments.',
+    liveUrl: '#defence',
+    liveUrlLabel: 'Jump to 3D CAD Schematic ↓',
+    liveUrlClass: 'pm-live-header-banner--surge',
+    liveUrlDesc: 'Interactive 3D CAD schematic and avionics telemetry viewer operating directly on this page.',
     statusPills: [
       { label: 'Avionics Simulation & Telemetry', style: 'active' },
       { label: 'MAVLink Telemetry Protocol', style: '' },
       { label: 'Radar C2 Simulation', style: '' },
+    ],
+    featureHighlights: [
+      { title: 'MAVLink Protocol Packet Parser', desc: 'Real-time telemetry packet decoding from Pixhawk / PX4 autopilot firmware over serial telemetry links.' },
+      { title: 'Radar C2 Spatial Scope', desc: 'Interactive tactical radar scope with target azimuth tracking, speed vectors, and sweep visualization.' },
+      { title: 'Kalman Trajectory Prediction', desc: 'Deterministic lead intercept math computing target velocity vectors and lead angle solutions.' },
+      { title: 'SITL Autopilot Simulation', desc: 'Software-In-The-Loop flight controller integration for autonomous edge mission planning.' }
     ],
     flowNodes: [
       { label: 'Autopilot State\nMachine (SITL)', type: 'node' },
@@ -1170,13 +1193,22 @@ const PROJECT_REGISTRY = {
     headline: 'SURGE Men (Was)\nFull Hair Styling\n& Grooming Line.',
     liveUrl: 'https://surgemen.in',
     liveUrlLabel: 'Visit Live surgemen.in ↗',
-    liveUrlClass: 'pm-live-cta--surge',
+    liveUrlClass: 'pm-live-header-banner--surge',
+    liveUrlDesc: 'Official digital brand storefront live at surgemen.in. Complete men\'s hair styling line, formulation R&D, and custom bottle visualizer.',
     statusPills: [
       { label: '🌐 Live at surgemen.in', style: 'active', url: 'https://surgemen.in' },
       { label: 'Stage 1: Complete Hair Styling Line', style: 'active' },
       { label: 'Personal Sampling & Chemistry R&D', style: 'active' },
       { label: 'Stage 2: Advanced Skincare Roadmap', style: '' },
       { label: 'Paused for Capital Discipline', style: 'amber' },
+    ],
+    featureHighlights: [
+      { title: 'Matte Volumizing Texture Powder', desc: '0.5oz / 15g silica & rice starch formulation in custom matte shaker bottle (inspect 360° bottle visualizer below).' },
+      { title: 'Alcohol-Free Matte Styling Clay', desc: 'Bentonite and kaolin clay matrix providing high hold with a natural, zero-shine matte finish.' },
+      { title: 'Texturizing Sea Salt Spray', desc: 'Ocean minerals, magnesium sulfate, and kelp extract for beach texture, volume, and grip.' },
+      { title: 'Definition Curl Cream & Pomade', desc: 'Argan oil, shea butter moisture curl cream and water-soluble classic hold pomade for versatile hairstyles.' },
+      { title: 'Cosmetic Chemist R&D', desc: 'Worked alongside cosmetic chemists in Gujarat; personally stability-tested all 7 formulations.' },
+      { title: 'Factory MOQ Capital Discipline', desc: 'Paused before committing to 5,000+ unit MOQs per SKU. Real founder discipline avoiding inventory debt.' }
     ],
     flowNodes: [
       { label: 'Stage 1: Full Hair Styling Line\n(Powder, Clay, Spray, Cream)', type: 'node' },
@@ -1210,6 +1242,11 @@ const PROJECT_REGISTRY = {
       { label: 'Live at Family Lab', style: 'active' },
       { label: 'n8n Workflows', style: '' },
       { label: 'WhatsApp Cloud API', style: '' },
+    ],
+    featureHighlights: [
+      { title: 'Instant PDF Dispatch (<1s)', desc: 'As soon as the pathologist signs off in LIS, n8n compiles the verified lab report PDF and sends it directly to the patient on WhatsApp.' },
+      { title: 'Verifiable QR Security Hash', desc: 'Generates an immutable cryptographic verification hash on every report header so doctors can verify authenticity.' },
+      { title: 'Quarterly Diabetic Recall', desc: 'Automated 90-day cron trigger sending personalized HbA1c and lipid profile checkup reminders to chronic patients.' }
     ],
     flowNodes: [
       { label: 'LIS Report Signed\nby Pathologist', type: 'node' },
@@ -1353,7 +1390,45 @@ function buildModalHTML(d, id) {
     parts.push(`<div class="pm-status-row">${pills}</div>`);
   }
 
+  // PROMINENT TOP-LEVEL LIVE PLATFORM HEADER BANNER
+  if (d.liveUrl) {
+    const isAnchor = d.liveUrl.startsWith('#');
+    const targetAttr = isAnchor ? '' : 'target="_blank" rel="noopener noreferrer"';
+    const clickHandler = isAnchor ? `onclick="window.closeProjectDetail(); document.querySelector('${d.liveUrl}')?.scrollIntoView({behavior: 'smooth'});"` : '';
+    parts.push(`
+      <div class="pm-live-header-banner ${d.liveUrlClass || ''}">
+        <div class="pm-lh-left">
+          <div class="pm-lh-badge">
+            <span class="live-pulse-dot"></span>
+            <span>${isAnchor ? 'INTERACTIVE IN-PAGE EXPERIENCE' : 'OFFICIAL LIVE WEB PLATFORM'}</span>
+          </div>
+          <div class="pm-lh-url">${d.liveUrl}</div>
+          <div class="pm-lh-desc">${d.liveUrlDesc || 'Active production system deployed and running live.'}</div>
+        </div>
+        <a href="${d.liveUrl}" ${targetAttr} ${clickHandler} class="pm-lh-btn">
+          <span>${d.liveUrlLabel || 'Open Live Website ↗'}</span>
+        </a>
+      </div>
+    `);
+  }
+
   parts.push('<div class="pm-divider"></div>');
+
+  // CORE SYSTEM CAPABILITIES & LIVE MODULES
+  if (d.featureHighlights?.length) {
+    const featureCards = d.featureHighlights.map(f => `
+      <div class="pm-feature-card">
+        <div class="pm-fc-title"><span>⚡</span><span>${f.title}</span></div>
+        <div class="pm-fc-desc">${f.desc}</div>
+      </div>
+    `).join('');
+    parts.push(`
+      <div>
+        <div class="pm-section-heading">Core System Capabilities &amp; Live Modules</div>
+        <div class="pm-feature-grid">${featureCards}</div>
+      </div>
+    `);
+  }
 
   if (d.flowNodes?.length) {
     const nodes = d.flowNodes.map(n => {
