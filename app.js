@@ -76,15 +76,19 @@ function initScrollProgress() {
   const bar = document.getElementById('scroll-progress');
   if (!bar) return;
 
+  let total = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+  const updateScrollMetrics = () => {
+    total = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+  };
+  window.addEventListener('resize', updateScrollMetrics, { passive: true });
+  window.addEventListener('load', updateScrollMetrics, { passive: true });
+
   let ticking = false;
   window.addEventListener('scroll', () => {
     if (!ticking) {
       requestAnimationFrame(() => {
-        const total = document.documentElement.scrollHeight - window.innerHeight;
-        if (total > 0) {
-          const pct = (window.scrollY / total) * 100;
-          bar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
-        }
+        const pct = (window.scrollY / total) * 100;
+        bar.style.width = `${Math.min(100, Math.max(0, pct))}%`;
         ticking = false;
       });
       ticking = true;
@@ -253,52 +257,56 @@ function initHeroInteractiveCanvas() {
   let heroRect = null;
   const heroLeftEl = heroSec ? heroSec.querySelector('.hero-left') : null;
   const headlineEl = heroSec ? heroSec.querySelector('.hero-headline') : null;
+  let cachedAirspace = null;
 
   function updateHeroBounds() {
     if (heroSec) {
       heroRect = heroSec.getBoundingClientRect();
       width = heroSec.offsetWidth;
       height = heroSec.offsetHeight;
+
+      const isMobile = width < 840;
+      if (isMobile) {
+        let headlineTop = 135;
+        if (headlineEl && heroRect) {
+          const hRect = headlineEl.getBoundingClientRect();
+          headlineTop = hRect.top - heroRect.top;
+        }
+        const maxY = Math.max(65, headlineTop - 36);
+        cachedAirspace = {
+          isMobile: true,
+          minX: 40,
+          maxX: width - 40,
+          minY: 55,
+          maxY: maxY, // STRICT: Drone never enters headline area on mobile
+          baseX: width * 0.78,
+          baseY: Math.max(65, Math.min(85, maxY - 10)),
+          scale: Math.min(0.72, Math.max(0.55, width / 650))
+        };
+      } else {
+        let safeLeft = width * 0.54;
+        if (heroLeftEl && heroRect) {
+          const lRect = heroLeftEl.getBoundingClientRect();
+          safeLeft = Math.max(width * 0.52, (lRect.right - heroRect.left) + 48);
+        }
+        cachedAirspace = {
+          isMobile: false,
+          minX: safeLeft, // STRICT: Drone never crosses into left text column
+          maxX: width - 75,
+          minY: 85,
+          maxY: height - 100,
+          baseX: Math.max(safeLeft + 75, width * 0.76),
+          baseY: height * 0.36,
+          scale: Math.min(1.25, Math.max(0.85, width / 1200))
+        };
+      }
     }
   }
   updateHeroBounds();
 
   function getSafeAirspace() {
-    const isMobile = width < 840;
-    if (isMobile) {
-      let headlineTop = 135;
-      if (headlineEl && heroRect) {
-        const hRect = headlineEl.getBoundingClientRect();
-        headlineTop = hRect.top - heroRect.top;
-      }
-      const maxY = Math.max(65, headlineTop - 36);
-      return {
-        isMobile: true,
-        minX: 40,
-        maxX: width - 40,
-        minY: 55,
-        maxY: maxY, // STRICT: Drone never enters headline area on mobile
-        baseX: width * 0.78,
-        baseY: Math.max(65, Math.min(85, maxY - 10)),
-        scale: Math.min(0.72, Math.max(0.55, width / 650))
-      };
-    } else {
-      let safeLeft = width * 0.54;
-      if (heroLeftEl && heroRect) {
-        const lRect = heroLeftEl.getBoundingClientRect();
-        safeLeft = Math.max(width * 0.52, (lRect.right - heroRect.left) + 48);
-      }
-      return {
-        isMobile: false,
-        minX: safeLeft, // STRICT: Drone never crosses into left text column
-        maxX: width - 75,
-        minY: 85,
-        maxY: height - 100,
-        baseX: Math.max(safeLeft + 75, width * 0.76),
-        baseY: height * 0.36,
-        scale: Math.min(1.25, Math.max(0.85, width / 1200))
-      };
-    }
+    if (!cachedAirspace) updateHeroBounds();
+    return cachedAirspace;
   }
 
   const airspaceInit = getSafeAirspace();
@@ -346,7 +354,6 @@ function initHeroInteractiveCanvas() {
 
   resize();
   window.addEventListener('resize', resize, { passive: true });
-  window.addEventListener('scroll', updateHeroBounds, { passive: true });
 
   // Ambient 3D Interactive Neural Particle Constellation (Optimized Count & Batched Filaments)
   const PARTICLE_COUNT = 24;
@@ -1017,8 +1024,8 @@ function initProjectFilters() {
 
 const PROJECT_REGISTRY = {
   pathlab: {
-    tag: '[01 · DIAGNOSTIC HEALTHCARE · REBRANDED KLINIQO]',
-    headline: 'Kliniqo (Formerly PathLab Ops)\nYour Lab\'s Missing\nOperational Brain.',
+    tag: '[01 · DIAGNOSTIC HEALTHCARE · LIVE PLATFORM]',
+    headline: 'Kliniqo.\nYour Lab\'s Missing\nOperational Brain.',
     liveUrl: 'https://kliniqo.co.in',
     liveUrlLabel: 'Visit Live kliniqo.co.in ↗',
     liveUrlDesc: 'Official production diagnostic lab LIS & ASTM serial hardware bridge live at kliniqo.co.in. Operating in real diagnostic testing workflows.',
@@ -1058,12 +1065,12 @@ const PROJECT_REGISTRY = {
       before: { label: 'Before Kliniqo (Status Quo in India)', text: 'Lab technician manually writes numbers from analyzer thermal printout → types 30+ values into a pirated Word template → manual calculation of NLR/eGFR/Friedewald LDL → 3.7% transcription error rate → manual filing.' },
       after:  { label: 'After Kliniqo (Automated Ingestion)', text: 'ASTM serial stream intercepted in real time → 22 mathematical derivations computed instantly → flags highlighted against age/sex ranges → draft report ready in 3 seconds → WhatsApp delivery & automated diabetic recall.' },
     },
-    bodyText: 'Born on the ground inside my family\'s diagnostic centre (Vaibhav Laboratory) and now officially rebranded as Kliniqo (live at https://kliniqo.co.in). In India, ~85% of total diagnostic error sits in pre- and post-analytical manual data entry. Rather than building speculative "diagnostic AI" that violates CDSCO SaMD regulations, Kliniqo automates the administrative and compliance layer cleanly.',
+    bodyText: 'Born on the ground inside my family\'s diagnostic centre (Vaibhav Laboratory) and live at https://kliniqo.co.in. In India, ~85% of total diagnostic error sits in pre- and post-analytical manual data entry. Rather than building speculative "diagnostic AI" that violates CDSCO SaMD regulations, Kliniqo automates the administrative and compliance layer cleanly.',
     honest: 'Market Reality: Total Indian LIS TAM is ~₹150–300 crore/year growing at ~4%. Incumbents like PathoOne compete on cheap perpetual licences. Kliniqo\'s real wedge is giving the modern cloud-connected LIS software at an affordable price while monetizing on the automated patient recall engine at 15–20% of recovered revenue.',
     timeline: [
       { date: 'Q1 2026', event: 'v0 Architecture & Serial Parser', detail: 'Ingested raw ASTM E1394 streams from CBC machines on family lab bench. Built calculation engine for 22 derived tests.' },
       { date: 'Aug 2026', event: 'Monorepo & 15 Prisma Models', detail: 'Migrated to Next.js 15, Prisma ORM, patient grouping by phone, and NABL QC log tables.' },
-      { date: 'Sep 2026', event: 'Kliniqo Rebrand & Web Presence', detail: 'Officially rebranded as Kliniqo with live portal deployed at kliniqo.co.in.' },
+      { date: 'Sep 2026', event: 'Kliniqo Live Web Presence', detail: 'Live web presence and operational portal deployed at kliniqo.co.in.' },
     ],
     tech: ['Next.js 15', 'Prisma ORM', 'SQLite / Postgres', 'ASTM E1394-97', 'Serial Bridge Agent', 'ABDM Integration', 'NABL QC Logs', 'Tailwind 4'],
   },
@@ -1871,13 +1878,6 @@ function initDroneAvionicsSimulation() {
   resize();
   window.addEventListener('resize', resize, { passive: true });
   window.addEventListener('load', resize, { passive: true });
-  window.addEventListener('scroll', () => {
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    const isNear = rect.top < window.innerHeight + 800 && rect.bottom > -800;
-    if (isNear) startCAD();
-    else stopCAD();
-  }, { passive: true });
 
   if (container && 'IntersectionObserver' in window) {
     const observer = new IntersectionObserver((entries) => {
@@ -1990,28 +1990,60 @@ function initSurgeScrollDrivenBottle() {
   }
   preloadAllFrames();
 
+  const scrollBody = section.querySelector('.surge-scroll-body') || section;
+  const stickyViewport = section.querySelector('.surge-sticky-viewport');
+  let cachedSurgeBodyTop = 0;
+  let cachedSurgeStickyTop = 110;
+  let cachedTotalScrollable = 1000;
+  let isSurgeActive = false;
+  let lastActiveCardIdx = -1;
+
+  function updateSurgeMetrics() {
+    if (!scrollBody) return;
+    const rect = scrollBody.getBoundingClientRect();
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    cachedSurgeBodyTop = rect.top + scrollY;
+    cachedSurgeStickyTop = stickyViewport ? (parseFloat(getComputedStyle(stickyViewport).top) || 110) : 110;
+    const viewportH = stickyViewport ? stickyViewport.offsetHeight : window.innerHeight;
+    cachedTotalScrollable = Math.max(1, (scrollBody.offsetHeight || rect.height) - viewportH);
+  }
+
+  updateSurgeMetrics();
+  window.addEventListener('resize', updateSurgeMetrics, { passive: true });
+  window.addEventListener('load', updateSurgeMetrics, { passive: true });
+
+  if ('IntersectionObserver' in window && section) {
+    const surgeObserver = new IntersectionObserver((entries) => {
+      isSurgeActive = entries[0].isIntersecting;
+      if (isSurgeActive) onScroll();
+    }, { rootMargin: '200px 0px' });
+    surgeObserver.observe(section);
+  } else {
+    isSurgeActive = true;
+  }
+
   let ticking = false;
   function onScroll() {
+    if (!isSurgeActive) return;
     if (!ticking) {
       requestAnimationFrame(() => {
-        const scrollBody = section.querySelector('.surge-scroll-body') || section;
-        const bodyRect = scrollBody.getBoundingClientRect();
-        const stickyViewport = section.querySelector('.surge-sticky-viewport');
-        const stickyTop = stickyViewport ? parseFloat(getComputedStyle(stickyViewport).top) || 0 : 0;
-        const viewportH = stickyViewport ? stickyViewport.offsetHeight : window.innerHeight;
-        const totalScrollable = scrollBody.offsetHeight - viewportH;
+        if (!isSurgeActive) {
+          ticking = false;
+          return;
+        }
+        const scrollY = window.scrollY || window.pageYOffset || 0;
+        const scrolled = (scrollY + cachedSurgeStickyTop) - cachedSurgeBodyTop;
+        const progress = Math.max(0, Math.min(1, scrolled / cachedTotalScrollable));
+        const frameIdx = Math.min(TOTAL_FRAMES - 1, Math.floor(progress * (TOTAL_FRAMES - 1)));
+        if (frameIdx !== currentFrame) {
+          currentFrame = frameIdx;
+          draw(currentFrame);
+        }
 
-        if (totalScrollable > 0) {
-          const scrolled = stickyTop - bodyRect.top;
-          const progress = Math.max(0, Math.min(1, scrolled / totalScrollable));
-          const frameIdx = Math.min(TOTAL_FRAMES - 1, Math.floor(progress * (TOTAL_FRAMES - 1)));
-          if (frameIdx !== currentFrame) {
-            currentFrame = frameIdx;
-            draw(currentFrame);
-          }
-
-          const cardIdx = Math.min(cards.length - 1, Math.floor(progress * cards.length));
+        const cardIdx = Math.min(cards.length - 1, Math.floor(progress * cards.length));
+        if (cardIdx !== lastActiveCardIdx) {
           cards.forEach((c, i) => c?.classList.toggle('active', i === cardIdx));
+          lastActiveCardIdx = cardIdx;
         }
         ticking = false;
       });
@@ -2020,7 +2052,6 @@ function initSurgeScrollDrivenBottle() {
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll, { passive: true });
   setTimeout(onScroll, 60);
 
   // Direct touch & pointer drag to spin bottle on phones, tablets, and desktop
@@ -2065,10 +2096,10 @@ function initSurgeScrollDrivenBottle() {
    7. COMMAND PALETTE (⌘K / Ctrl+K)
    ========================================================================== */
 const COMMAND_ITEMS = [
-  { title: 'Kliniqo — Rebranded PathLab Ops (kliniqo.co.in)', tag: 'Live Site', action: () => window.open('https://kliniqo.co.in', '_blank') },
+  { title: 'Kliniqo — Diagnostic LIS & Serial Hardware Tap (kliniqo.co.in)', tag: 'Live Site', action: () => window.open('https://kliniqo.co.in', '_blank') },
   { title: 'SURGE Grooming — Official Brand Site (surgemen.in)', tag: 'Live Site', action: () => window.open('https://surgemen.in', '_blank') },
   { title: 'A Bit About Priyam (Background & Skills)', tag: 'About', action: () => { window.location.href = '#about'; } },
-  { title: 'Kliniqo / PathLab Ops (Working MVP · kliniqo.co.in)', tag: 'Project', action: () => window.openProjectDetail('pathlab') },
+  { title: 'Kliniqo (Working MVP · kliniqo.co.in)', tag: 'Project', action: () => window.openProjectDetail('pathlab') },
   { title: 'Ecommerce Hub (Pre-Seed D2C Truth Layer)', tag: 'Project', action: () => window.openProjectDetail('ecom') },
   { title: 'Autonomous Defence AI & Edge Telemetry', tag: 'Project', action: () => window.openProjectDetail('defence') },
   { title: 'AI Chatbot Assistant (Unstarted Idea / Vault Teardown)', tag: 'Concept', action: () => window.openProjectDetail('aichatbot') },
@@ -2179,24 +2210,14 @@ function isAnyModalOrOverlayOpen() {
 }
 
 function initFunZone() {
-  initUavFlightGame();
-
-  // Fun Zone Active Visibility State
+  // Fun Zone Active Visibility State managed efficiently via IntersectionObserver
   let isFunZoneVisible = false;
-  window.isFunZoneActive = () => {
-    if (isFunZoneVisible) return true;
-    const funSection = document.getElementById('fun-zone');
-    if (funSection) {
-      const rect = funSection.getBoundingClientRect();
-      return rect.top < window.innerHeight + 300 && rect.bottom > -300;
-    }
-    return false;
-  };
+  window.isFunZoneActive = () => isFunZoneVisible;
 
   window.updateGameAutoLifecycle = () => {
     const isModalOpen = isAnyModalOrOverlayOpen();
     const isTabHidden = document.hidden;
-    const isFunVisible = window.isFunZoneActive();
+    const isFunVisible = isFunZoneVisible;
 
     if (!isFunVisible || isModalOpen || isTabHidden) {
       window.pauseUavGame?.(true);
@@ -2204,9 +2225,6 @@ function initFunZone() {
       window.resumeUavGame?.(true);
     }
   };
-
-  window.addEventListener('scroll', () => window.updateGameAutoLifecycle?.(), { passive: true });
-  window.addEventListener('resize', () => window.updateGameAutoLifecycle?.(), { passive: true });
 
   const funSection = document.getElementById('fun-zone');
   if (funSection && 'IntersectionObserver' in window) {
@@ -2218,6 +2236,9 @@ function initFunZone() {
     }, { threshold: 0.01, rootMargin: '300px 0px' });
     observer.observe(funSection);
   }
+
+  initUavFlightGame();
+  window.updateGameAutoLifecycle?.();
 }
 
 /* ==========================================================================
@@ -3688,7 +3709,9 @@ function initUavFlightGame() {
     }
   };
 
-  animId = requestAnimationFrame(loop);
+  if (typeof window.isFunZoneActive === 'function' && window.isFunZoneActive()) {
+    animId = requestAnimationFrame(loop);
+  }
 }
 
 // ==================== SUPABASE CLOUD RADAR LEADERBOARD ENGINE ====================
@@ -4622,7 +4645,7 @@ const GENZ_LEXICON = MULTILINGUAL_SLANG_LEXICON;
 const RAG_KNOWLEDGE_CORPUS = [
   {
     id: 'pathlab_flagship',
-    title: 'Kliniqo (Rebranded from PathLab Ops): Diagnostic Blood Report Automation',
+    title: 'Kliniqo: Diagnostic Blood Report Automation',
     category: 'projects',
     tags: ['kliniqo', 'kliniqo.co.in', 'pathlab', 'vaibhav', 'lab', 'astm', 'diagnostic', 'blood', 'report', 'platelet', 'cbc', 'clerical', 'errors', 'hospital', 'doctor', 'rajkot', 'machine', 'jugaad', 'taar', 'setting'],
     text: `Kliniqo (originally PathLab Ops, live at https://kliniqo.co.in) was born on the ground inside my family's diagnostic centre (Vaibhav Laboratory) in Rajkot, Gujarat. Every evening at 8 PM, exhausted lab technicians were manually typing test numbers from thermal printer slips into ancient desktop software. One typo and a patient's platelet count was completely ruined!
@@ -5525,7 +5548,7 @@ function initPriyamAiClone() {
 
     if (priyamAiMode === 'serious') {
       startersDiv.innerHTML = `
-        <button class="ai-starter-pill" onclick="window.askPriyamAI('Tell me about Kliniqo (rebranded PathLab Ops) and kliniqo.co.in')">🔬 Kliniqo (kliniqo.co.in)</button>
+        <button class="ai-starter-pill" onclick="window.askPriyamAI('Tell me about Kliniqo and kliniqo.co.in')">🔬 Kliniqo (kliniqo.co.in)</button>
         <button class="ai-starter-pill" onclick="window.askPriyamAI('Tell me about SURGE Men and surgemen.in')">🧴 SURGE Men (surgemen.in)</button>
         <button class="ai-starter-pill" onclick="window.askPriyamAI('Show me the exact ₹835 D2C COD return math')">📊 ₹835 COD Unit Math</button>
         <button class="ai-starter-pill" onclick="window.askPriyamAI('What is your tech stack and engineering philosophy?')">🧠 Tech Stack & Philosophy</button>
@@ -7049,9 +7072,79 @@ function initRoamingPriyamAvatar() {
   // ==================== DYNAMIC SECTION-ANCHORED SCROLL ENGINE ====================
   let currentFlightTilt = 0;
 
+  // High-Performance Cached Section Metrics (Zero getBoundingClientRect in 60 FPS loop)
+  const layoutCache = {
+    w: window.innerWidth,
+    h: window.innerHeight,
+    docHeight: 5000,
+    hero: { top: 0, height: 800 },
+    about: { top: 800, height: 600 },
+    projects: { top: 1400, height: 1200 },
+    surge: { top: 2600, height: 1800, stickyTop: 110, viewportH: 600, totalScrollable: 1200 },
+    funZone: { top: 4400, height: 800 },
+    contact: { top: 5200, height: 700 },
+    trigger: { top: 5600, centerX: window.innerWidth - 80, height: 48, valid: false }
+  };
+
+  function updateGlobalLayoutMetrics() {
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    layoutCache.w = window.innerWidth;
+    layoutCache.h = window.innerHeight;
+    layoutCache.docHeight = Math.max(1, document.documentElement.scrollHeight, document.body.offsetHeight);
+
+    const getElBounds = (id) => {
+      const el = document.getElementById(id);
+      if (!el) return { top: 0, height: 0 };
+      const r = el.getBoundingClientRect();
+      return { top: r.top + scrollY, height: r.height || el.offsetHeight || 0 };
+    };
+
+    layoutCache.hero = getElBounds('hero');
+    layoutCache.about = getElBounds('about');
+    layoutCache.projects = getElBounds('projects');
+    layoutCache.funZone = getElBounds('fun-zone');
+    layoutCache.contact = getElBounds('contact');
+
+    const surgeEl = document.getElementById('surge');
+    if (surgeEl) {
+      const sb = surgeEl.querySelector('.surge-scroll-body') || surgeEl;
+      const r = sb.getBoundingClientRect();
+      const sv = surgeEl.querySelector('.surge-sticky-viewport');
+      const stickyTop = sv ? (parseFloat(getComputedStyle(sv).top) || 110) : 110;
+      const viewportH = sv ? sv.offsetHeight : window.innerHeight;
+      layoutCache.surge = {
+        top: r.top + scrollY,
+        height: r.height || sb.offsetHeight || 0,
+        stickyTop,
+        viewportH,
+        totalScrollable: Math.max(0, (r.height || sb.offsetHeight) - viewportH)
+      };
+    }
+
+    const triggerEl = document.getElementById('priyam-ai-trigger');
+    if (triggerEl) {
+      const r = triggerEl.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) {
+        layoutCache.trigger = {
+          top: r.top + scrollY,
+          centerX: r.left + r.width * 0.5,
+          height: r.height,
+          valid: true
+        };
+      }
+    }
+  }
+
+  updateGlobalLayoutMetrics();
+  window.addEventListener('resize', updateGlobalLayoutMetrics, { passive: true });
+  window.addEventListener('load', updateGlobalLayoutMetrics, { passive: true });
+  if ('onscrollend' in window) {
+    window.addEventListener('scrollend', updateGlobalLayoutMetrics, { passive: true });
+  }
+
   function getScrollWaypoint() {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    const w = layoutCache.w;
+    const h = layoutCache.h;
     const { w: avW, h: avH, isMobile, isTablet } = getAvatarDimensions();
 
     const leftRailX = isTablet ? 30 : 65;
@@ -7059,34 +7152,27 @@ function initRoamingPriyamAvatar() {
     const exitLeftX = -(avW + 60);
     const exitRightX = w + 60;
 
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+
     // 1. DYNAMIC FINAL DOCK: Exactly above the "Talk to Priyam (AI Clone)" button
     let dockTargetX = rightRailX;
     let dockTargetY = h - avH - 75;
-    const triggerEl = document.getElementById('priyam-ai-trigger');
-    if (triggerEl) {
-      const rect = triggerEl.getBoundingClientRect();
-      if (rect && rect.width > 0 && rect.height > 0) {
-        const triggerCenterX = rect.left + rect.width * 0.5;
-        dockTargetX = triggerCenterX - avW * 0.5;
-        dockTargetY = rect.top - avH - 6;
-      }
+    if (layoutCache.trigger.valid) {
+      const triggerTop = layoutCache.trigger.top - scrollY;
+      dockTargetX = layoutCache.trigger.centerX - avW * 0.5;
+      dockTargetY = triggerTop - avH - 6;
     }
 
     // 2. FIXED OBSERVATION PERCH DURING 360° SURGE BOTTLE SCROLL ANIMATION
     const fixedSurgeX = isMobile ? (w - avW - 12) : rightRailX;
     const fixedSurgeY = isMobile ? 70 : (isTablet ? 140 : 165);
 
-    const surgeEl = document.getElementById('surge');
     let isSurgeSticky = false;
-    if (surgeEl) {
-      const scrollBody = surgeEl.querySelector('.surge-scroll-body') || surgeEl;
-      const rect = scrollBody.getBoundingClientRect();
-      const stickyViewport = surgeEl.querySelector('.surge-sticky-viewport');
-      const stickyTop = stickyViewport ? (parseFloat(getComputedStyle(stickyViewport).top) || 0) : 0;
-      const viewportH = stickyViewport ? stickyViewport.offsetHeight : window.innerHeight;
-      const totalScrollable = scrollBody.offsetHeight - viewportH;
-
-      if (totalScrollable > 0 && rect.top <= stickyTop + 15 && rect.bottom >= viewportH + stickyTop - 15) {
+    const surge = layoutCache.surge;
+    if (surge && surge.totalScrollable > 0) {
+      const sTop = surge.top - scrollY;
+      const sBottom = sTop + surge.height;
+      if (sTop <= surge.stickyTop + 15 && sBottom >= surge.viewportH + surge.stickyTop - 15) {
         isSurgeSticky = true;
       }
     }
@@ -7095,18 +7181,12 @@ function initRoamingPriyamAvatar() {
       return { x: fixedSurgeX, y: fixedSurgeY, isFixed: true, isRight: true };
     }
 
-    // Section live viewport bounds
-    const heroEl = document.getElementById('hero');
-    const aboutEl = document.getElementById('about');
-    const projectsEl = document.getElementById('projects');
-    const funZoneEl = document.getElementById('fun-zone');
-    const contactEl = document.getElementById('contact');
-
-    const heroRect = heroEl ? heroEl.getBoundingClientRect() : { top: 0, bottom: h, height: h };
-    const aboutRect = aboutEl ? aboutEl.getBoundingClientRect() : { top: h, bottom: h * 2, height: h };
-    const projRect = projectsEl ? projectsEl.getBoundingClientRect() : { top: h * 2, bottom: h * 3, height: h };
-    const funRect = funZoneEl ? funZoneEl.getBoundingClientRect() : { top: h * 4, bottom: h * 5, height: h };
-    const contactRect = contactEl ? contactEl.getBoundingClientRect() : { top: h * 5, bottom: h * 6, height: h };
+    // Section live viewport bounds (pure arithmetic - zero DOM reflow!)
+    const heroRect = { top: layoutCache.hero.top - scrollY, bottom: layoutCache.hero.top - scrollY + layoutCache.hero.height, height: layoutCache.hero.height };
+    const aboutRect = { top: layoutCache.about.top - scrollY, bottom: layoutCache.about.top - scrollY + layoutCache.about.height, height: layoutCache.about.height };
+    const projRect = { top: layoutCache.projects.top - scrollY, bottom: layoutCache.projects.top - scrollY + layoutCache.projects.height, height: layoutCache.projects.height };
+    const funRect = { top: layoutCache.funZone.top - scrollY, bottom: layoutCache.funZone.top - scrollY + layoutCache.funZone.height, height: layoutCache.funZone.height };
+    const contactRect = { top: layoutCache.contact.top - scrollY, bottom: layoutCache.contact.top - scrollY + layoutCache.contact.height, height: layoutCache.contact.height };
 
     if (isMobile) {
       // Mobile: Keep avatar docked cleanly along the right edge rail so it NEVER cuts through text
@@ -7135,16 +7215,16 @@ function initRoamingPriyamAvatar() {
       }
 
       // 4. In SURGE Section: Sit nicely beside the bottle at top-right
-      if (surgeEl) {
-        const scrollBody = surgeEl.querySelector('.surge-scroll-body') || surgeEl;
-        const rect = scrollBody.getBoundingClientRect();
-        if (rect.top <= 120 && rect.bottom >= 120) {
+      if (surge) {
+        const sTop = surge.top - scrollY;
+        const sBottom = sTop + surge.height;
+        if (sTop <= 120 && sBottom >= 120) {
           return { x: mobileRailX, y: 68, isFixed: true };
         }
       }
 
       // 5. General Scrolling on Mobile: Smoothly glide along the right rail
-      const scrollProgress = Math.max(0, Math.min(1, (window.scrollY || 0) / Math.max(1, document.documentElement.scrollHeight - h)));
+      const scrollProgress = Math.max(0, Math.min(1, scrollY / Math.max(1, layoutCache.docHeight - h)));
       const mY = 68 + scrollProgress * (dockTargetY - 68);
       return clampPosition(mobileRailX, mY);
     }
@@ -7239,15 +7319,20 @@ function initRoamingPriyamAvatar() {
   }
 
   // ==================== SMART ADAPTIVE SPEECH BUBBLE ====================
+  let lastBubblePlacementClass = '';
   function updateBubblePlacement(currentX, currentY) {
     if (!bubble) return;
     if (window.innerWidth <= 1024) {
-      bubble.style.display = 'none';
-      bubble.classList.remove('active');
+      if (bubble.style.display !== 'none') {
+        bubble.style.display = 'none';
+        bubble.classList.remove('active');
+      }
       return;
     }
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    if (!bubble.classList.contains('active')) return;
+
+    const w = layoutCache.w;
+    const h = layoutCache.h;
     const { w: avatarW, isMobile } = getAvatarDimensions();
 
     // If avatar is currently exiting off-screen, fade out bubble cleanly
@@ -7260,26 +7345,21 @@ function initRoamingPriyamAvatar() {
       bubble.style.pointerEvents = '';
     }
 
-    bubble.classList.remove('bubble-below', 'bubble-right-side', 'bubble-left-side', 'bubble-above');
-
+    let targetClass = '';
     if (isMobile) {
-      if (currentY > h - 180) {
-        bubble.classList.add('bubble-above');
-      } else if (currentX > w * 0.40) {
-        bubble.classList.add('bubble-left-side');
-      } else {
-        bubble.classList.add('bubble-right-side');
-      }
+      if (currentY > h - 180) targetClass = 'bubble-above';
+      else if (currentX > w * 0.40) targetClass = 'bubble-left-side';
+      else targetClass = 'bubble-right-side';
     } else {
-      if (currentY < 130) {
-        bubble.classList.add('bubble-below');
-      } else if (currentX < w * 0.40) {
-        // On Left Rail: speech bubble opens to the RIGHT of the character
-        bubble.classList.add('bubble-right-side');
-      } else {
-        // On Right Rail: speech bubble opens to the LEFT of the character
-        bubble.classList.add('bubble-left-side');
-      }
+      if (currentY < 130) targetClass = 'bubble-below';
+      else if (currentX < w * 0.40) targetClass = 'bubble-right-side';
+      else targetClass = 'bubble-left-side';
+    }
+
+    if (targetClass !== lastBubblePlacementClass) {
+      bubble.classList.remove('bubble-below', 'bubble-right-side', 'bubble-left-side', 'bubble-above');
+      if (targetClass) bubble.classList.add(targetClass);
+      lastBubblePlacementClass = targetClass;
     }
   }
 
@@ -7328,7 +7408,7 @@ function initRoamingPriyamAvatar() {
       window.showAvatarThought("HYPERSPACE JUMP! 🏎️💨 Hold onto your viewport!", "5TH WALL", "🏎️ SPEED", 2200);
     }
 
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 90) {
+    if (window.innerHeight + window.scrollY >= layoutCache.docHeight - 90) {
       if (lastSection !== 'bottom-reached' && isAvatarEnabled) {
         lastSection = 'bottom-reached';
         window.showAvatarThought("You reached the footer! I'm floating right here — ping me! ☕✉️", "5TH WALL", "🎉 SIUUU", 3800);
