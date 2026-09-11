@@ -284,32 +284,24 @@ function initHeroInteractiveCanvas() {
           scale: Math.min(0.72, Math.max(0.55, width / 650))
         };
       } else {
-        // Desktop: Center the drone directly in the middle open free space between left headline and right card
-        let leftBoundary = width * 0.38;
-        if (heroLeftEl && heroRect) {
-          const lRect = heroLeftEl.getBoundingClientRect();
-          leftBoundary = Math.max(width * 0.36, (lRect.right - heroRect.left) + 20);
-        }
-        let rightBoundary = width * 0.65;
-        const heroCardEl = heroSec.querySelector('.hero-tilted-card');
-        if (heroCardEl && heroRect) {
-          const cRect = heroCardEl.getBoundingClientRect();
-          rightBoundary = Math.min(width * 0.68, (cRect.left - heroRect.left) - 20);
-        }
-
-        const safeMinX = Math.min(leftBoundary, width * 0.42);
-        const safeMaxX = Math.max(rightBoundary, safeMinX + 120);
-        const centerX = (safeMinX + safeMaxX) * 0.5;
+        // Desktop: Position drone strictly within the open free-space void circled by the user
+        // (Directly in the open void between the top of the headline and the tilted card)
+        const safeBaseX = width * 0.52;
+        const safeBaseY = height * 0.35;
+        const safeMinX = width * 0.46;
+        const safeMaxX = width * 0.58;
+        const safeMinY = height * 0.24;
+        const safeMaxY = height * 0.46;
 
         cachedAirspace = {
           isMobile: false,
           minX: safeMinX, // Strictly clear of left headline
           maxX: safeMaxX, // Strictly clear of right card
-          minY: height * 0.20,
-          maxY: height * 0.65,
-          baseX: centerX, // Centered in middle free space!
-          baseY: height * 0.40,
-          scale: Math.min(1.25, Math.max(0.85, width / 1200))
+          minY: safeMinY,
+          maxY: safeMaxY,
+          baseX: safeBaseX, // Centered directly in the user's circle!
+          baseY: safeBaseY,
+          scale: Math.min(1.08, Math.max(0.78, width / 1300))
         };
       }
     }
@@ -702,11 +694,11 @@ function initHeroInteractiveCanvas() {
     drone.targetPitch = clampedRelY * 0.45 + Math.sin(time * 1.2) * 0.04;
     drone.targetRoll = -clampedRelX * 0.85 + Math.cos(time * 1.0) * 0.05;
 
-    // Physical position floats gracefully in the safe middle free-space corridor
-    const hoverPullX = (mouse.x - airspace.baseX) * (airspace.isMobile ? 0.08 : 0.12);
-    const hoverPullY = (mouse.y - airspace.baseY) * (airspace.isMobile ? 0.08 : 0.12);
-    const wanderX = Math.sin(time * 0.9) * (airspace.isMobile ? 6 : 14);
-    const wanderY = Math.cos(time * 1.1) * (airspace.isMobile ? 5 : 10);
+    // Physical position floats gracefully in the safe user-specified open free-space zone
+    const hoverPullX = (mouse.x - airspace.baseX) * (airspace.isMobile ? 0.06 : 0.08);
+    const hoverPullY = (mouse.y - airspace.baseY) * (airspace.isMobile ? 0.06 : 0.08);
+    const wanderX = Math.sin(time * 0.9) * (airspace.isMobile ? 5 : 8);
+    const wanderY = Math.cos(time * 1.1) * (airspace.isMobile ? 4 : 7);
 
     const rawTargetX = airspace.baseX + hoverPullX + wanderX;
     const rawTargetY = airspace.baseY + hoverPullY + wanderY;
