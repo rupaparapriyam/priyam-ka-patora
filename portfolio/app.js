@@ -272,31 +272,43 @@ function initHeroInteractiveCanvas() {
           const hRect = headlineEl.getBoundingClientRect();
           headlineTop = hRect.top - heroRect.top;
         }
-        const maxY = Math.max(65, headlineTop - 36);
+        const maxY = Math.max(65, headlineTop - 32);
         cachedAirspace = {
           isMobile: true,
-          minX: 40,
-          maxX: width - 40,
-          minY: 55,
-          maxY: maxY, // STRICT: Drone never enters headline area on mobile
-          baseX: width * 0.78,
-          baseY: Math.max(65, Math.min(85, maxY - 10)),
+          minX: width * 0.15,
+          maxX: width * 0.85,
+          minY: 45,
+          maxY: maxY, // Restricted safely above headline on mobile
+          baseX: width * 0.50, // Middle and free space on mobile
+          baseY: Math.max(60, Math.min(80, maxY - 8)),
           scale: Math.min(0.72, Math.max(0.55, width / 650))
         };
       } else {
-        let safeLeft = width * 0.54;
+        // Desktop: Center the drone directly in the middle open free space between left headline and right card
+        let leftBoundary = width * 0.38;
         if (heroLeftEl && heroRect) {
           const lRect = heroLeftEl.getBoundingClientRect();
-          safeLeft = Math.max(width * 0.52, (lRect.right - heroRect.left) + 48);
+          leftBoundary = Math.max(width * 0.36, (lRect.right - heroRect.left) + 20);
         }
+        let rightBoundary = width * 0.65;
+        const heroCardEl = heroSec.querySelector('.hero-tilted-card');
+        if (heroCardEl && heroRect) {
+          const cRect = heroCardEl.getBoundingClientRect();
+          rightBoundary = Math.min(width * 0.68, (cRect.left - heroRect.left) - 20);
+        }
+
+        const safeMinX = Math.min(leftBoundary, width * 0.42);
+        const safeMaxX = Math.max(rightBoundary, safeMinX + 120);
+        const centerX = (safeMinX + safeMaxX) * 0.5;
+
         cachedAirspace = {
           isMobile: false,
-          minX: safeLeft, // STRICT: Drone never crosses into left text column
-          maxX: width - 75,
-          minY: 85,
-          maxY: height - 100,
-          baseX: Math.max(safeLeft + 75, width * 0.76),
-          baseY: height * 0.36,
+          minX: safeMinX, // Strictly clear of left headline
+          maxX: safeMaxX, // Strictly clear of right card
+          minY: height * 0.20,
+          maxY: height * 0.65,
+          baseX: centerX, // Centered in middle free space!
+          baseY: height * 0.40,
           scale: Math.min(1.25, Math.max(0.85, width / 1200))
         };
       }
@@ -420,18 +432,18 @@ function initHeroInteractiveCanvas() {
   let lastPulseTime = 0;
   window.triggerHeroPulse = () => {
     const now = Date.now();
-    if (now - lastPulseTime < 60) return; // Prevent micro-double taps
+    if (now - lastPulseTime < 160) return; // Prevent accidental spam / double fire
     lastPulseTime = now;
 
-    // Supersonic barrel roll impulse: spins immediately and aggressively
+    // Smooth acrobatic barrel roll impulse
     drone.rollBoost += Math.PI * 2;
 
     shockwaveRings.push({
       x: drone.x,
       y: drone.y,
       r: 16,
-      maxR: 480,
-      speed: 26,
+      maxR: 440,
+      speed: 18,
       alpha: 1.0,
       color: '#00F0FF',
     });
@@ -605,7 +617,7 @@ function initHeroInteractiveCanvas() {
   }
 
   function render() {
-    time += 0.034;
+    time += 0.024;
     ctx.clearRect(0, 0, width, height);
 
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -674,28 +686,27 @@ function initHeroInteractiveCanvas() {
     ctx.stroke();
     ctx.restore();
 
-    // High-Bandwidth Snappy Mouse Tracking (Zero latency)
-    mouse.x += (mouse.targetX - mouse.x) * 0.40;
-    mouse.y += (mouse.targetY - mouse.y) * 0.40;
+    // Smooth, Responsive Mouse Tracking
+    mouse.x += (mouse.targetX - mouse.x) * 0.16;
+    mouse.y += (mouse.targetY - mouse.y) * 0.16;
 
     const airspace = getSafeAirspace();
 
-    // 3. 3D Flight Physics: Orientation points dynamically towards cursor relative to drone position
-    // Normalizing by width * 0.35 gives immediate, sensitive banking and heading changes
-    const relX = (mouse.x - drone.x) / (width * 0.35);
-    const relY = (mouse.y - drone.y) / (height * 0.35);
-    const clampedRelX = Math.max(-1.5, Math.min(1.5, relX));
-    const clampedRelY = Math.max(-1.2, Math.min(1.2, relY));
+    // 3. 3D Flight Physics: Orientation points gracefully towards cursor relative to drone position
+    const relX = (mouse.x - drone.x) / (width * 0.40);
+    const relY = (mouse.y - drone.y) / (height * 0.40);
+    const clampedRelX = Math.max(-1.0, Math.min(1.0, relX));
+    const clampedRelY = Math.max(-1.0, Math.min(1.0, relY));
 
-    drone.targetYaw = clampedRelX * 0.95;
-    drone.targetPitch = clampedRelY * 0.75 + Math.sin(time * 1.5) * 0.05;
-    drone.targetRoll = -clampedRelX * 1.55 + Math.cos(time * 1.2) * 0.07;
+    drone.targetYaw = clampedRelX * 0.55;
+    drone.targetPitch = clampedRelY * 0.45 + Math.sin(time * 1.2) * 0.04;
+    drone.targetRoll = -clampedRelX * 0.85 + Math.cos(time * 1.0) * 0.05;
 
-    // Physical position is strictly clamped to safe airspace corridor (Never collides with text)
-    const hoverPullX = (mouse.x - airspace.baseX) * (airspace.isMobile ? 0.10 : 0.22);
-    const hoverPullY = (mouse.y - airspace.baseY) * (airspace.isMobile ? 0.10 : 0.22);
-    const wanderX = Math.sin(time * 1.1) * (airspace.isMobile ? 8 : 18);
-    const wanderY = Math.cos(time * 1.4) * (airspace.isMobile ? 6 : 14);
+    // Physical position floats gracefully in the safe middle free-space corridor
+    const hoverPullX = (mouse.x - airspace.baseX) * (airspace.isMobile ? 0.08 : 0.12);
+    const hoverPullY = (mouse.y - airspace.baseY) * (airspace.isMobile ? 0.08 : 0.12);
+    const wanderX = Math.sin(time * 0.9) * (airspace.isMobile ? 6 : 14);
+    const wanderY = Math.cos(time * 1.1) * (airspace.isMobile ? 5 : 10);
 
     const rawTargetX = airspace.baseX + hoverPullX + wanderX;
     const rawTargetY = airspace.baseY + hoverPullY + wanderY;
@@ -703,19 +714,19 @@ function initHeroInteractiveCanvas() {
     drone.targetX = Math.max(airspace.minX, Math.min(airspace.maxX, rawTargetX));
     drone.targetY = Math.max(airspace.minY, Math.min(airspace.maxY, rawTargetY));
 
-    // High-Agility Supersonic Lerp: ultra-fast attitude tracking (0.35)
-    drone.x += (drone.targetX - drone.x) * 0.25;
-    drone.y += (drone.targetY - drone.y) * 0.25;
-    drone.pitch += (drone.targetPitch - drone.pitch) * 0.35;
-    drone.yaw += (drone.targetYaw - drone.yaw) * 0.35;
+    // Smooth aerodynamic attitude tracking (0.16)
+    drone.x += (drone.targetX - drone.x) * 0.14;
+    drone.y += (drone.targetY - drone.y) * 0.14;
+    drone.pitch += (drone.targetPitch - drone.pitch) * 0.16;
+    drone.yaw += (drone.targetYaw - drone.yaw) * 0.16;
 
     if (drone.rollBoost > 0) {
-      // Supersonic aileron roll on click / tap: completes in ~3-4 frames with intense speed!
-      const step = Math.min(drone.rollBoost, Math.max(0.95, drone.rollBoost * 0.55));
+      // Smooth acrobatic aileron roll: completes in ~11-12 frames (~180ms) with natural ease-out
+      const step = Math.min(drone.rollBoost, Math.max(0.38, drone.rollBoost * 0.18));
       drone.roll += step;
       drone.rollBoost -= step;
     } else {
-      drone.roll += (drone.targetRoll - drone.roll) * 0.35;
+      drone.roll += (drone.targetRoll - drone.roll) * 0.16;
     }
 
     const curScale = drone.scale * (width < 600 ? 0.72 : (airspace.isMobile ? 0.82 : 1.0));
@@ -1662,8 +1673,8 @@ function initDroneAvionicsSimulation() {
       state.autoRotate = false;
       const dx = e.clientX - prevMouse.x;
       const dy = e.clientY - prevMouse.y;
-      state.targetYaw += dx * 0.022;
-      state.targetPitch += dy * 0.016;
+      state.targetYaw += dx * 0.012;
+      state.targetPitch += dy * 0.009;
       state.targetPitch = Math.max(-0.9, Math.min(0.9, state.targetPitch));
       prevMouse.x = e.clientX;
       prevMouse.y = e.clientY;
@@ -1676,8 +1687,8 @@ function initDroneAvionicsSimulation() {
       state.autoRotate = false;
       const dx = e.touches[0].clientX - prevMouse.x;
       const dy = e.touches[0].clientY - prevMouse.y;
-      state.targetYaw += dx * 0.024;
-      state.targetPitch += dy * 0.018;
+      state.targetYaw += dx * 0.014;
+      state.targetPitch += dy * 0.010;
       state.targetPitch = Math.max(-0.9, Math.min(0.9, state.targetPitch));
       prevMouse.x = e.touches[0].clientX;
       prevMouse.y = e.touches[0].clientY;
@@ -1844,19 +1855,19 @@ function initDroneAvionicsSimulation() {
   let animId = null;
 
   canvas.addEventListener('click', () => {
-    state.targetYaw += 1.4;
+    state.targetYaw += 0.65;
     renderCAD();
   });
 
   function loop() {
-    state.yaw += (state.targetYaw - state.yaw) * 0.25;
-    state.pitch += (state.targetPitch - state.pitch) * 0.25;
+    state.yaw += (state.targetYaw - state.yaw) * 0.12;
+    state.pitch += (state.targetPitch - state.pitch) * 0.12;
 
     if (state.autoRotate) {
-      state.targetYaw += 0.020;
+      state.targetYaw += 0.007;
     }
 
-    state.rotorAngle += 0.45;
+    state.rotorAngle += 0.32;
     renderCAD();
 
     if (state.isVisible) {
