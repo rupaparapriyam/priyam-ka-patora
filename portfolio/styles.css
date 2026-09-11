@@ -7656,4 +7656,220 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
   box-shadow: 0 0 10px rgba(0, 240, 255, 0.3);
 }
 
+/* ==========================================================================
+   PROMINENT PROJECT CARD LIVE PILLS & ACTION BUTTONS
+   ========================================================================== */
+
+.sc-live-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22C55E !important;
+  border: 1px solid rgba(34, 197, 94, 0.45);
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 2;
+  margin-left: auto;
+}
+
+.sc-live-pill:hover {
+  background: #22C55E;
+  color: #000000 !important;
+  box-shadow: 0 0 12px rgba(34, 197, 94, 0.5);
+  transform: translateY(-1px);
+}
+
+.sc-live-pill--surge {
+  background: rgba(0, 240, 255, 0.12);
+  color: #00F0FF !important;
+  border-color: rgba(0, 240, 255, 0.45);
+}
+
+.sc-live-pill--surge:hover {
+  background: #00F0FF;
+  color: #000000 !important;
+  box-shadow: 0 0 12px rgba(0, 240, 255, 0.5);
+}
+
+.sc-live-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.35rem 0.75rem;
+  border-radius: 6px;
+  background: rgba(34, 197, 94, 0.18);
+  color: #22C55E !important;
+  border: 1px solid rgba(34, 197, 94, 0.5);
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.sc-live-action-btn:hover {
+  background: #22C55E;
+  color: #000000 !important;
+  box-shadow: 0 0 14px rgba(34, 197, 94, 0.45);
+  transform: translateY(-1px);
+}
+
+.sc-live-action-btn--surge {
+  background: rgba(0, 240, 255, 0.14);
+  color: #00F0FF !important;
+  border-color: rgba(0, 240, 255, 0.45);
+}
+
+.sc-live-action-btn--surge:hover {
+  background: #00F0FF;
+  color: #000000 !important;
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.45);
+}
+
+/* ==========================================================================
+   PROMINENT PROJECT MODAL LIVE PLATFORM BANNER & FEATURE GRID
+   ========================================================================== */
+
+.pm-live-header-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+  padding: 1.1rem 1.35rem;
+  margin: 1.15rem 0 0.5rem;
+  border-radius: 10px;
+  background: rgba(34, 197, 94, 0.08);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  flex-wrap: wrap;
+}
+
+.pm-live-header-banner--surge {
+  background: rgba(0, 240, 255, 0.08);
+  border-color: rgba(0, 240, 255, 0.35);
+}
+
+.pm-lh-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 240px;
+}
+
+.pm-lh-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #22C55E;
+}
+
+.pm-live-header-banner--surge .pm-lh-badge {
+  color: #00F0FF;
+}
+
+.pm-lh-url {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.pm-lh-desc {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  line-height: 1.45;
+}
+
+.pm-lh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.25rem;
+  background: #22C55E;
+  color: #000000 !important;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border-radius: 6px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(34, 197, 94, 0.35);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  white-space: nowrap;
+}
+
+.pm-lh-btn:hover {
+  background: #16A34A;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.5);
+  color: #000000 !important;
+}
+
+.pm-live-header-banner--surge .pm-lh-btn {
+  background: #00F0FF;
+  box-shadow: 0 4px 14px rgba(0, 240, 255, 0.35);
+}
+
+.pm-live-header-banner--surge .pm-lh-btn:hover {
+  background: #38BDF8;
+  box-shadow: 0 6px 20px rgba(0, 240, 255, 0.5);
+}
+
+/* Feature Highlights Grid in Modal */
+.pm-feature-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.85rem;
+  margin-top: 0.65rem;
+}
+
+@media (min-width: 600px) {
+  .pm-feature-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.pm-feature-card {
+  padding: 1rem 1.15rem;
+  background: var(--paper-dark);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.pm-fc-title {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pm-fc-desc {
+  font-size: 0.8125rem;
+  color: var(--ink-muted);
+  line-height: 1.5;
+}
+
+
 
