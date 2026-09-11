@@ -416,16 +416,22 @@ function initHeroInteractiveCanvas() {
     mouse.targetY = curAirspace.baseY;
   }, { passive: true });
 
-  // Interactive Kinetic Pulse & Harmonic Audio Feedback on Click
+  // Interactive Kinetic Pulse & Harmonic Audio Feedback on Click / Tap
+  let lastPulseTime = 0;
   window.triggerHeroPulse = () => {
+    const now = Date.now();
+    if (now - lastPulseTime < 60) return; // Prevent micro-double taps
+    lastPulseTime = now;
+
+    // Supersonic barrel roll impulse: spins immediately and aggressively
     drone.rollBoost += Math.PI * 2;
 
     shockwaveRings.push({
       x: drone.x,
       y: drone.y,
       r: 16,
-      maxR: 420,
-      speed: 18,
+      maxR: 480,
+      speed: 26,
       alpha: 1.0,
       color: '#00F0FF',
     });
@@ -433,25 +439,25 @@ function initHeroInteractiveCanvas() {
     try {
       const actx = getSharedAudioContext();
       if (actx) {
-        const now = actx.currentTime;
+        const audioNow = actx.currentTime;
         [587.33, 739.99, 880].forEach((freq, idx) => {
           const osc = actx.createOscillator();
           const gain = actx.createGain();
           osc.connect(gain);
           gain.connect(actx.destination);
           osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, now + idx * 0.04);
-          gain.gain.setValueAtTime(0.05, now + idx * 0.04);
-          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.04 + 0.26);
-          osc.start(now + idx * 0.04);
-          osc.stop(now + idx * 0.04 + 0.26);
+          osc.frequency.setValueAtTime(freq, audioNow + idx * 0.03);
+          gain.gain.setValueAtTime(0.06, audioNow + idx * 0.03);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioNow + idx * 0.03 + 0.22);
+          osc.start(audioNow + idx * 0.03);
+          osc.stop(audioNow + idx * 0.03 + 0.22);
         });
       }
     } catch (e) {}
   };
 
-  heroSec?.addEventListener('click', (e) => {
-    if (e.target.closest('a, button, input, .zuck-simple-card, .cmd-item')) return;
+  heroSec?.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('a, button, input, .zuck-simple-card, .cmd-item, [role="button"]')) return;
     window.triggerHeroPulse();
   });
 
@@ -599,7 +605,7 @@ function initHeroInteractiveCanvas() {
   }
 
   function render() {
-    time += 0.024;
+    time += 0.034;
     ctx.clearRect(0, 0, width, height);
 
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -668,25 +674,28 @@ function initHeroInteractiveCanvas() {
     ctx.stroke();
     ctx.restore();
 
-    // Mouse Tracking Interpolation
-    mouse.x += (mouse.targetX - mouse.x) * 0.10;
-    mouse.y += (mouse.targetY - mouse.y) * 0.10;
+    // High-Bandwidth Snappy Mouse Tracking (Zero latency)
+    mouse.x += (mouse.targetX - mouse.x) * 0.40;
+    mouse.y += (mouse.targetY - mouse.y) * 0.40;
 
     const airspace = getSafeAirspace();
 
-    // 3. 3D Flight Physics: Orientation points towards cursor across full screen
-    const deltaX = (mouse.x - airspace.baseX) / width;
-    const deltaY = (mouse.y - airspace.baseY) / height;
+    // 3. 3D Flight Physics: Orientation points dynamically towards cursor relative to drone position
+    // Normalizing by width * 0.35 gives immediate, sensitive banking and heading changes
+    const relX = (mouse.x - drone.x) / (width * 0.35);
+    const relY = (mouse.y - drone.y) / (height * 0.35);
+    const clampedRelX = Math.max(-1.5, Math.min(1.5, relX));
+    const clampedRelY = Math.max(-1.2, Math.min(1.2, relY));
 
-    drone.targetYaw = deltaX * 0.85;
-    drone.targetPitch = deltaY * 0.65 + Math.sin(time * 1.3) * 0.04;
-    drone.targetRoll = -deltaX * 1.2 + Math.cos(time * 1.0) * 0.05;
+    drone.targetYaw = clampedRelX * 0.95;
+    drone.targetPitch = clampedRelY * 0.75 + Math.sin(time * 1.5) * 0.05;
+    drone.targetRoll = -clampedRelX * 1.55 + Math.cos(time * 1.2) * 0.07;
 
     // Physical position is strictly clamped to safe airspace corridor (Never collides with text)
-    const hoverPullX = (mouse.x - airspace.baseX) * (airspace.isMobile ? 0.08 : 0.18);
-    const hoverPullY = (mouse.y - airspace.baseY) * (airspace.isMobile ? 0.08 : 0.18);
-    const wanderX = Math.sin(time * 0.8) * (airspace.isMobile ? 8 : 18);
-    const wanderY = Math.cos(time * 1.1) * (airspace.isMobile ? 6 : 14);
+    const hoverPullX = (mouse.x - airspace.baseX) * (airspace.isMobile ? 0.10 : 0.22);
+    const hoverPullY = (mouse.y - airspace.baseY) * (airspace.isMobile ? 0.10 : 0.22);
+    const wanderX = Math.sin(time * 1.1) * (airspace.isMobile ? 8 : 18);
+    const wanderY = Math.cos(time * 1.4) * (airspace.isMobile ? 6 : 14);
 
     const rawTargetX = airspace.baseX + hoverPullX + wanderX;
     const rawTargetY = airspace.baseY + hoverPullY + wanderY;
@@ -694,18 +703,19 @@ function initHeroInteractiveCanvas() {
     drone.targetX = Math.max(airspace.minX, Math.min(airspace.maxX, rawTargetX));
     drone.targetY = Math.max(airspace.minY, Math.min(airspace.maxY, rawTargetY));
 
-    // Snappy, responsive lerp (0.14)
-    drone.x += (drone.targetX - drone.x) * 0.14;
-    drone.y += (drone.targetY - drone.y) * 0.14;
-    drone.pitch += (drone.targetPitch - drone.pitch) * 0.14;
-    drone.yaw += (drone.targetYaw - drone.yaw) * 0.14;
+    // High-Agility Supersonic Lerp: ultra-fast attitude tracking (0.35)
+    drone.x += (drone.targetX - drone.x) * 0.25;
+    drone.y += (drone.targetY - drone.y) * 0.25;
+    drone.pitch += (drone.targetPitch - drone.pitch) * 0.35;
+    drone.yaw += (drone.targetYaw - drone.yaw) * 0.35;
 
     if (drone.rollBoost > 0) {
-      const step = Math.min(drone.rollBoost, 0.25);
+      // Supersonic aileron roll on click / tap: completes in ~3-4 frames with intense speed!
+      const step = Math.min(drone.rollBoost, Math.max(0.95, drone.rollBoost * 0.55));
       drone.roll += step;
       drone.rollBoost -= step;
     } else {
-      drone.roll += (drone.targetRoll - drone.roll) * 0.14;
+      drone.roll += (drone.targetRoll - drone.roll) * 0.35;
     }
 
     const curScale = drone.scale * (width < 600 ? 0.72 : (airspace.isMobile ? 0.82 : 1.0));
@@ -1652,8 +1662,8 @@ function initDroneAvionicsSimulation() {
       state.autoRotate = false;
       const dx = e.clientX - prevMouse.x;
       const dy = e.clientY - prevMouse.y;
-      state.targetYaw += dx * 0.007;
-      state.targetPitch += dy * 0.005;
+      state.targetYaw += dx * 0.022;
+      state.targetPitch += dy * 0.016;
       state.targetPitch = Math.max(-0.9, Math.min(0.9, state.targetPitch));
       prevMouse.x = e.clientX;
       prevMouse.y = e.clientY;
@@ -1666,8 +1676,8 @@ function initDroneAvionicsSimulation() {
       state.autoRotate = false;
       const dx = e.touches[0].clientX - prevMouse.x;
       const dy = e.touches[0].clientY - prevMouse.y;
-      state.targetYaw += dx * 0.009;
-      state.targetPitch += dy * 0.006;
+      state.targetYaw += dx * 0.024;
+      state.targetPitch += dy * 0.018;
       state.targetPitch = Math.max(-0.9, Math.min(0.9, state.targetPitch));
       prevMouse.x = e.touches[0].clientX;
       prevMouse.y = e.touches[0].clientY;
@@ -1833,15 +1843,20 @@ function initDroneAvionicsSimulation() {
 
   let animId = null;
 
+  canvas.addEventListener('click', () => {
+    state.targetYaw += 1.4;
+    renderCAD();
+  });
+
   function loop() {
-    state.yaw += (state.targetYaw - state.yaw) * 0.08;
-    state.pitch += (state.targetPitch - state.pitch) * 0.08;
+    state.yaw += (state.targetYaw - state.yaw) * 0.25;
+    state.pitch += (state.targetPitch - state.pitch) * 0.25;
 
     if (state.autoRotate) {
-      state.targetYaw += 0.005;
+      state.targetYaw += 0.020;
     }
 
-    state.rotorAngle += 0.28;
+    state.rotorAngle += 0.45;
     renderCAD();
 
     if (state.isVisible) {
