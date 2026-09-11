@@ -2018,100 +2018,93 @@ function initSurgeScrollDrivenBottle() {
 
   const scrollBody = section.querySelector('.surge-scroll-body') || section;
   const stickyViewport = section.querySelector('.surge-sticky-viewport');
-  let cachedSurgeBodyTop = 0;
-  let cachedSurgeStickyTop = 110;
-  let cachedTotalScrollable = 1000;
-  let isSurgeActive = false;
   let lastActiveCardIdx = -1;
-
-  function updateSurgeMetrics() {
-    if (!scrollBody) return;
-    const rect = scrollBody.getBoundingClientRect();
-    const scrollY = window.scrollY || window.pageYOffset || 0;
-    cachedSurgeBodyTop = rect.top + scrollY;
-    cachedSurgeStickyTop = stickyViewport ? (parseFloat(getComputedStyle(stickyViewport).top) || 110) : 110;
-    const viewportH = stickyViewport ? stickyViewport.offsetHeight : window.innerHeight;
-    cachedTotalScrollable = Math.max(1, (scrollBody.offsetHeight || rect.height) - viewportH);
-  }
-
-  updateSurgeMetrics();
-  window.addEventListener('resize', updateSurgeMetrics, { passive: true });
-  window.addEventListener('load', updateSurgeMetrics, { passive: true });
-
-  if ('IntersectionObserver' in window && section) {
-    const surgeObserver = new IntersectionObserver((entries) => {
-      isSurgeActive = entries[0].isIntersecting;
-      if (isSurgeActive) onScroll();
-    }, { rootMargin: '200px 0px' });
-    surgeObserver.observe(section);
-  } else {
-    isSurgeActive = true;
-  }
 
   let ticking = false;
   function onScroll() {
-    if (!isSurgeActive) return;
     if (!ticking) {
       requestAnimationFrame(() => {
-        if (!isSurgeActive) {
-          ticking = false;
-          return;
-        }
-        const scrollY = window.scrollY || window.pageYOffset || 0;
-        const scrolled = (scrollY + cachedSurgeStickyTop) - cachedSurgeBodyTop;
-        const progress = Math.max(0, Math.min(1, scrolled / cachedTotalScrollable));
-        const frameIdx = Math.min(TOTAL_FRAMES - 1, Math.floor(progress * (TOTAL_FRAMES - 1)));
-        if (frameIdx !== currentFrame) {
-          currentFrame = frameIdx;
-          draw(currentFrame);
-        }
-
-        const cardIdx = Math.min(cards.length - 1, Math.floor(progress * cards.length));
-        if (cardIdx !== lastActiveCardIdx) {
-          cards.forEach((c, i) => c?.classList.toggle('active', i === cardIdx));
-          lastActiveCardIdx = cardIdx;
-        }
         ticking = false;
+        if (!scrollBody || !stickyViewport) return;
+
+        const bodyRect = scrollBody.getBoundingClientRect();
+        // Fast offscreen exit: skip calculations when the user is far above or below the SURGE section
+        if (bodyRect.bottom < -100 || bodyRect.top > window.innerHeight + 100) return;
+
+        const stickyRect = stickyViewport.getBoundingClientRect();
+        const scrolled = stickyRect.top - bodyRect.top;
+        const totalScrollable = scrollBody.offsetHeight - stickyViewport.offsetHeight;
+
+        if (totalScrollable > 0) {
+          const progress = Math.max(0, Math.min(1, scrolled / totalScrollable));
+          const frameIdx = Math.min(TOTAL_FRAMES - 1, Math.max(0, Math.floor(progress * (TOTAL_FRAMES - 1))));
+
+          if (frameIdx !== currentFrame) {
+            currentFrame = frameIdx;
+            draw(currentFrame);
+          }
+
+          const cardIdx = Math.min(cards.length - 1, Math.max(0, Math.floor(progress * cards.length)));
+          if (cardIdx !== lastActiveCardIdx) {
+            cards.forEach((c, i) => c?.classList.toggle('active', i === cardIdx));
+            lastActiveCardIdx = cardIdx;
+          }
+        }
       });
       ticking = true;
     }
   }
 
   window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
   setTimeout(onScroll, 60);
+  setTimeout(onScroll, 300);
 
   // Direct touch & pointer drag to spin bottle on phones, tablets, and desktop
   let isDragging = false;
   let startX = 0;
+  let startY = 0;
   let startFrame = 0;
+  let isHorizontalDrag = false;
 
   canvas.addEventListener('pointerdown', (e) => {
     isDragging = true;
+    isHorizontalDrag = false;
     startX = e.clientX;
+    startY = e.clientY;
     startFrame = currentFrame;
-    try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
   });
 
-  canvas.addEventListener('pointermove', (e) => {
+  window.addEventListener('pointermove', (e) => {
     if (!isDragging) return;
-    const deltaX = e.clientX - startX;
-    const frameOffset = Math.round(deltaX / 4);
-    let newFrame = (startFrame + frameOffset) % TOTAL_FRAMES;
-    if (newFrame < 0) newFrame += TOTAL_FRAMES;
-    if (newFrame !== currentFrame) {
-      currentFrame = newFrame;
-      draw(currentFrame);
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+
+    if (!isHorizontalDrag && Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 6) {
+      isHorizontalDrag = true;
+      try { canvas.setPointerCapture(e.pointerId); } catch (_) {}
+    }
+
+    if (isHorizontalDrag) {
+      const frameOffset = Math.round(dx / 4);
+      let newFrame = (startFrame + frameOffset) % TOTAL_FRAMES;
+      if (newFrame < 0) newFrame += TOTAL_FRAMES;
+      if (newFrame !== currentFrame) {
+        currentFrame = newFrame;
+        draw(currentFrame);
+      }
     }
   });
 
   const stopDrag = (e) => {
     if (isDragging) {
       isDragging = false;
+      isHorizontalDrag = false;
       try { canvas.releasePointerCapture(e.pointerId); } catch (_) {}
     }
   };
-  canvas.addEventListener('pointerup', stopDrag);
-  canvas.addEventListener('pointercancel', stopDrag);
+  window.addEventListener('pointerup', stopDrag);
+  window.addEventListener('pointercancel', stopDrag);
 
   if (frames[0] && frames[0].complete) draw(0);
   setTimeout(() => draw(0), 100);

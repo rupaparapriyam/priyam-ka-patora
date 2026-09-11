@@ -5034,8 +5034,19 @@ body.preloader-active {
 }
 
 /* Canvas Mobile & Web Ultra-Performance GPU Optimizations */
-#drone-game-canvas, #ecom-game-canvas, .hero-interactive-canvas, #hero-drone-canvas, #surge-scroll-bottle-canvas {
+#drone-game-canvas, #ecom-game-canvas, .hero-interactive-canvas, #hero-drone-canvas {
   touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: transform;
+  contain: layout paint;
+}
+
+#surge-scroll-bottle-canvas {
+  touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
   transform: translate3d(0, 0, 0);
