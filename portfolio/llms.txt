@@ -13,7 +13,7 @@ Priyam Rupapara builds software for messy, physical, real-world operations where
 
 ## Core Projects
 
-### 1. Kliniqo (Rebranded from PathLab Ops — Healthcare Operations)
+### 1. Kliniqo (Diagnostic Healthcare Operations & LIS)
 - Live Website: https://kliniqo.co.in
 - Working MVP deployed in active diagnostic pathology laboratories.
 - Real-time ASTM E1394 serial machine protocol bridging to ingest automated blood and serum analyzers (CBC, Biochemistry, Electrolytes) without manual data entry.

@@ -5042,6 +5042,7 @@ body.preloader-active {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   will-change: transform;
+  contain: layout paint;
 }
 
 /* ==========================================================================
