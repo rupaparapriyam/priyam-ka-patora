@@ -1092,8 +1092,8 @@ const PROJECT_REGISTRY = {
     tag: '[02 · INDIAN D2C SAAS]',
     headline: 'Ecommerce Hub (Is)\nThe D2C Margin\nTruth Layer.',
     statusPills: [
-      { label: 'Pre-Seed / MVP Stage · Actively Raising', style: 'amber' },
-      { label: 'Solving 60%+ COD & 28% RTO', style: '' },
+      { label: 'Prototype · No Live Brand Data Yet', style: 'amber' },
+      { label: 'Targets 60%+ COD & 28% RTO Leakage', style: '' },
       { label: 'Shopify · Razorpay · Shiprocket · Meta Ads', style: '' },
     ],
     featureHighlights: [
@@ -1124,7 +1124,7 @@ const PROJECT_REGISTRY = {
     ],
     stats: [
       { val: '18', label: 'Pitch Deck Slides Ready' },
-      { val: 'Pre-Seed', label: 'Active Round (Targeting Top Tier Valuation)' },
+      { val: 'Not Yet', label: 'Pointed At A Live Brand\u2019s Real Numbers' },
       { val: '0', label: 'Global Tools with India Connectors' },
       { val: '15', label: 'Founder Validation Calls Planned' },
     ],
@@ -2111,7 +2111,7 @@ const COMMAND_ITEMS = [
   { title: 'SURGE Grooming — Official Brand Site (surgemen.in)', tag: 'Live Site', action: () => window.open('https://surgemen.in', '_blank') },
   { title: 'A Bit About Priyam (Background & Skills)', tag: 'About', action: () => { window.location.href = '#about'; } },
   { title: 'Kliniqo (Working MVP · kliniqo.co.in)', tag: 'Project', action: () => window.openProjectDetail('pathlab') },
-  { title: 'Ecommerce Hub (Pre-Seed D2C Truth Layer)', tag: 'Project', action: () => window.openProjectDetail('ecom') },
+  { title: 'Ecommerce Hub (Prototype · D2C Truth Layer)', tag: 'Project', action: () => window.openProjectDetail('ecom') },
   { title: 'Autonomous Defence AI & Edge Telemetry', tag: 'Project', action: () => window.openProjectDetail('defence') },
   { title: 'AI Chatbot Assistant (Unstarted Idea / Vault Teardown)', tag: 'Concept', action: () => window.openProjectDetail('aichatbot') },
   { title: 'SURGE Grooming: Hair Texture & Styling Line (surgemen.in)', tag: 'Case Study', action: () => window.openProjectDetail('surge') },
@@ -4797,11 +4797,11 @@ Don't waste weeks arguing over syntax—understand how systems connect, orchestr
   },
   {
     id: 'funding_preseed_deck',
-    title: 'Pre-Seed / MVP Round & High-Signal Collabs',
+    title: 'Funding, Investment & High-Signal Collabs',
     category: 'finance',
     tags: ['funding', 'preseed', 'pre-seed', 'invest', 'investor', 'angel', 'raise', 'deck', 'valuation', 'round', 'check', 'capital', 'collab', 'rokda', 'paisa', 'cheque'],
     text: `Whether you want to write an angel cheque, discuss operational moats, or hop on for high-signal tech banter:
-• For Investors: Actively raising our Pre-Seed / MVP round for Kliniqo & Ecommerce Hub. Real working software with live deployments and zero vaporware.
+• For Investors: Kliniqo is the live one — working MVP deployed in a real diagnostic lab, with the storefront running at vaibhavlabs.com. Ecommerce Hub is still a prototype and has not been pointed at a live brand’s numbers yet. Happy to talk pre-seed on that basis; I will not oversell it.
 • For Builders: Always down to roast wrapper ideas, talk game theory, and brainstorm vertical automation.
 Direct Email: rupaparapriyam@gmail.com | Instagram: @priyamm_r | GitHub: @rupaparapriyam`,
     actions: [
@@ -7159,6 +7159,99 @@ function initRoamingPriyamAvatar() {
     return { dx: bestX - x, fade: 1 };
   }
 
+  const layoutCache = {
+    w: window.innerWidth,
+    h: window.innerHeight,
+    docHeight: 5000,
+    hero: { top: 0, height: 800 },
+    about: { top: 800, height: 600 },
+    projects: { top: 1400, height: 1200 },
+    surge: { top: 2600, height: 1800, stickyTop: 110, viewportH: 600, totalScrollable: 1200 },
+    funZone: { top: 4400, height: 800 },
+    contact: { top: 5200, height: 700 },
+    trigger: { top: 5600, centerX: window.innerWidth - 80, height: 48, valid: false },
+    keepOut: []
+  };
+
+  function updateGlobalLayoutMetrics() {
+    const scrollY = window.scrollY || window.pageYOffset || 0;
+    layoutCache.w = window.innerWidth;
+    layoutCache.h = window.innerHeight;
+    layoutCache.docHeight = Math.max(1, document.documentElement.scrollHeight, document.body.offsetHeight);
+
+    const getElBounds = (id) => {
+      const el = document.getElementById(id);
+      if (!el) return { top: 0, height: 0 };
+      const r = el.getBoundingClientRect();
+      return { top: r.top + scrollY, height: r.height || el.offsetHeight || 0 };
+    };
+
+    layoutCache.hero = getElBounds('hero');
+    layoutCache.about = getElBounds('about');
+    layoutCache.projects = getElBounds('projects');
+    layoutCache.funZone = getElBounds('fun-zone');
+    layoutCache.contact = getElBounds('contact');
+
+    const surgeEl = document.getElementById('surge');
+    if (surgeEl) {
+      const sb = surgeEl.querySelector('.surge-scroll-body') || surgeEl;
+      const r = sb.getBoundingClientRect();
+      const sv = surgeEl.querySelector('.surge-sticky-viewport');
+      const stickyTop = sv ? (parseFloat(getComputedStyle(sv).top) || 110) : 110;
+      const viewportH = sv ? sv.offsetHeight : window.innerHeight;
+      layoutCache.surge = {
+        top: r.top + scrollY,
+        height: r.height || sb.offsetHeight || 0,
+        stickyTop,
+        viewportH,
+        totalScrollable: Math.max(0, (r.height || sb.offsetHeight) - viewportH)
+      };
+    }
+
+    // ---- Content keep-out rects (document space). Measured ONLY here, never in the
+    // rAF loop; the loop converts to viewport space arithmetically via (top - scrollY). ----
+    const KEEP_OUT_SELECTOR = [
+      '.hero-headline', '.hero-actions-row', '.hero-intent-row', '.section-clean-heading',
+      '.section-display', '.section-lead', '.section-tag-header', '.sc-headline',
+      '.sc-top-meta', '.surge-story-title', '.glb-title', '.about-group-label'
+    ].join(',');
+    const ko = [];
+    document.querySelectorAll(KEEP_OUT_SELECTOR).forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.width > 4 && r.height > 4) {
+        ko.push({
+          top: r.top + scrollY,
+          bottom: r.top + scrollY + r.height,
+          left: r.left,
+          right: r.right
+        });
+      }
+    });
+    ko.sort((a, b) => a.top - b.top);
+    layoutCache.keepOut = ko;
+
+    const triggerEl = document.getElementById('priyam-ai-trigger');
+    if (triggerEl) {
+      const r = triggerEl.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) {
+        layoutCache.trigger = {
+          top: r.top + scrollY,
+          centerX: r.left + r.width * 0.5,
+          height: r.height,
+          valid: true
+        };
+      }
+    }
+  }
+
+  updateGlobalLayoutMetrics();
+  window.refreshLayoutMetrics = updateGlobalLayoutMetrics;
+  window.addEventListener('resize', updateGlobalLayoutMetrics, { passive: true });
+  window.addEventListener('load', updateGlobalLayoutMetrics, { passive: true });
+  if ('onscrollend' in window) {
+    window.addEventListener('scrollend', updateGlobalLayoutMetrics, { passive: true });
+  }
+
   function getScrollWaypoint() {
     const w = layoutCache.w;
     const h = layoutCache.h;
@@ -8023,3 +8116,48 @@ if (document.readyState === 'loading') {
 } else {
   initApp();
 }
+
+/* ===================== AUDIENCE SPLIT (hero intent router) =====================
+ * Routes a visitor to what they came for instead of making them scroll past the
+ * playground. Nothing is hidden or removed: professional intents only soften the
+ * fun-zone, and it snaps back to full on hover/focus. The choice is remembered so
+ * a returning investor is not re-asked.
+ * -------------------------------------------------------------------------- */
+(function initIntentRouter() {
+  const row = document.querySelector('.hero-intent-row');
+  if (!row) return;
+
+  const DEST = { work: '#projects', invest: '#projects', browse: '#fun-zone' };
+  const btns = Array.from(row.querySelectorAll('.hero-intent-btn'));
+
+  function paint(intent) {
+    btns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.intent === intent)));
+  }
+
+  function apply(intent, scroll) {
+    if (!DEST[intent]) return;
+    document.documentElement.setAttribute('data-intent', intent);
+    try { localStorage.setItem('pr-intent', intent); } catch (e) {}
+    paint(intent);
+
+    if (scroll) {
+      const target = document.querySelector(DEST[intent]);
+      if (target) {
+        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+      }
+    }
+    // Section offsets shift once the fun-zone restyles; refresh the cached metrics.
+    if (typeof window.refreshLayoutMetrics === 'function') {
+      setTimeout(window.refreshLayoutMetrics, 600);
+    }
+  }
+
+  btns.forEach(b => b.addEventListener('click', () => apply(b.dataset.intent, true)));
+
+  // Restore a previous choice WITHOUT scrolling - jumping someone down the page
+  // on load is hostile.
+  let saved = null;
+  try { saved = localStorage.getItem('pr-intent'); } catch (e) {}
+  if (saved && DEST[saved]) apply(saved, false);
+})();
