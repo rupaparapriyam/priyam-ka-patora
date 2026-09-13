@@ -8285,3 +8285,323 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
 }
 
 .stamp-card--dark .sc-updated { color: rgba(255, 255, 255, 0.6); }
+
+/* ===================== IN-GAME KEYBOARD LEGEND =====================
+   The SNES pad lives below the CRT, so on a laptop the game and the controls
+   never share a viewport. This mirrors the bindings onto the screen itself and
+   highlights in lockstep with the physical pad (same .gp-btn-active timing). */
+.kbd-legend {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 6;
+  width: 170px;
+  background: rgba(4, 8, 14, 0.78);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(0, 240, 255, 0.28);
+  border-radius: 10px;
+  padding: 0.45rem 0.5rem 0.5rem;
+  font-family: var(--font-mono, monospace);
+  pointer-events: auto;
+  user-select: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+/* Touch devices already have the tappable pad; the legend is desktop-only. */
+@media (hover: none), (max-width: 900px) {
+  .kbd-legend { display: none; }
+}
+
+.kbd-legend-head {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  color: rgba(0, 240, 255, 0.85);
+  padding-bottom: 0.35rem;
+  margin-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.kbd-legend-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #22C55E;
+  box-shadow: 0 0 6px #22C55E;
+}
+
+.kbd-legend-toggle {
+  margin-left: auto;
+  width: 16px;
+  height: 16px;
+  line-height: 1;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  font-size: 0.7rem;
+  padding: 0;
+}
+
+.kbd-legend-toggle:hover { border-color: rgba(0, 240, 255, 0.6); color: #00F0FF; }
+
+.kbd-legend-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kbd-legend.is-collapsed .kbd-legend-list { display: none; }
+.kbd-legend.is-collapsed { width: auto; }
+
+.kbd-legend-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.58rem;
+  color: rgba(255, 255, 255, 0.72);
+  padding: 1px 3px;
+  border-radius: 4px;
+  transition: background 0.12s ease, color 0.12s ease;
+}
+
+.kbd-legend-list kbd {
+  min-width: 34px;
+  text-align: center;
+  font-family: inherit;
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 1px 3px;
+  transition: transform 0.08s ease, background 0.08s ease,
+              border-color 0.08s ease, color 0.08s ease;
+}
+
+/* Lit state - mirrors .gp-btn-active on the physical pad */
+.kbd-legend-list li.is-pressed {
+  background: rgba(0, 240, 255, 0.14);
+  color: #FFFFFF;
+}
+
+.kbd-legend-list li.is-pressed kbd {
+  background: #00F0FF;
+  border-color: #00F0FF;
+  color: #04080E;
+  transform: translateY(2px);
+  border-bottom-width: 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kbd-legend, .kbd-legend-list li, .kbd-legend-list kbd { transition: none; }
+}
+
+/* ===================== 3D SCROLL CHOREOGRAPHY (Projects + Ambitions) =========
+   Cards arrive on a perspective rig: rotated back in Z, lifted, slightly
+   de-saturated, then settle as they enter. Driven by IntersectionObserver +
+   a scroll-linked tilt, all on compositor-only properties (transform/opacity)
+   so the zero-reflow budget is untouched. */
+.stamp-cards-grid {
+  perspective: 1400px;
+  perspective-origin: 50% 40%;
+}
+
+.stamp-card {
+  transform-style: preserve-3d;
+}
+
+/* Promote only while the entry animation is pending; a permanent will-change on
+   every card pins layers the compositor could otherwise reclaim. */
+.stamp-card.scroll-3d:not(.is-in) {
+  will-change: transform, opacity;
+}
+
+/* Pre-entry pose */
+.stamp-card.scroll-3d {
+  opacity: 0;
+  transform: translate3d(0, 46px, -110px) rotateX(9deg) scale(0.965);
+  filter: saturate(0.72);
+  transition:
+    opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.95s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.75s ease;
+}
+
+/* Settled */
+.stamp-card.scroll-3d.is-in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) rotateX(0deg) scale(1);
+  /* `filter: saturate(1)` would keep a compositing layer alive on every card
+     forever. `none` releases it once the entry animation has settled. */
+  filter: none;
+}
+
+/* Alternate the entry axis so a grid does not arrive as one flat wall */
+.stamp-card.scroll-3d:nth-child(odd)  { transform: translate3d(-26px, 46px, -110px) rotateX(9deg) rotateY(5deg) scale(0.965); }
+.stamp-card.scroll-3d:nth-child(even) { transform: translate3d( 26px, 46px, -110px) rotateX(9deg) rotateY(-5deg) scale(0.965); }
+.stamp-card.scroll-3d.is-in:nth-child(odd),
+.stamp-card.scroll-3d.is-in:nth-child(even) {
+  transform: translate3d(0, 0, 0) rotateX(0) rotateY(0) scale(1);
+}
+
+/* Live scroll tilt — --sx is written once per frame from a rAF batch */
+.stamp-card.scroll-3d.is-in {
+  transform:
+    translate3d(0, calc(var(--sx, 0) * -12px), calc(var(--sx, 0) * 18px))
+    rotateX(calc(var(--sx, 0) * -3.2deg))
+    scale(calc(1 + (var(--sx, 0) * 0.012)));
+}
+
+/* Tier heads sweep in with their group */
+.tier-head.scroll-3d {
+  opacity: 0;
+  transform: translate3d(0, 26px, -60px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tier-head.scroll-3d.is-in {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Headline masks: each line rises out of its own clip */
+.sc-headline.line-rise {
+  overflow: hidden;
+}
+
+.sc-headline .rise-line {
+  display: block;
+  transform: translateY(105%);
+  transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stamp-card.is-in .sc-headline .rise-line { transform: translateY(0); }
+
+.stamp-card.is-in .sc-headline .rise-line:nth-child(2) { transition-delay: 0.07s; }
+.stamp-card.is-in .sc-headline .rise-line:nth-child(3) { transition-delay: 0.14s; }
+
+/* Hover: lift toward the viewer, not a flat scale */
+@media (hover: hover) and (pointer: fine) {
+  .stamp-card.scroll-3d.is-in:hover {
+    transform: translate3d(0, -6px, 34px) rotateX(-1.2deg) scale(1.012);
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 2;
+  }
+}
+
+/* Respect reduced motion completely: no 3D, no transforms, just visible. */
+@media (prefers-reduced-motion: reduce) {
+  .stamp-cards-grid { perspective: none; }
+  .stamp-card.scroll-3d,
+  .stamp-card.scroll-3d.is-in,
+  .stamp-card.scroll-3d:nth-child(odd),
+  .stamp-card.scroll-3d:nth-child(even),
+  .tier-head.scroll-3d {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+  .sc-headline .rise-line { transform: none !important; transition: none !important; }
+}
+
+/* ===================== PRELOADER — APPLE BOOT SEQUENCE =====================
+   Solid wordmark, thin pill bar beneath, nothing else competing. Apple's boot
+   screen works because it is one mark and one bar on an empty field; the
+   percentage is demoted to a whisper rather than the centrepiece. */
+.preloader-center-editorial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.preloader-wordmark {
+  font-family: var(--font-display, 'Bebas Neue'), 'Oswald', 'Arial Narrow', sans-serif;
+  font-weight: 800;
+  font-size: clamp(2.6rem, 9vw, 5.6rem);
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-indent: 0.16em;           /* optical centring against the tracking */
+  text-transform: uppercase;
+  color: var(--ink, #0B0D10);
+  margin: 0 0 2.1rem;
+  user-select: none;
+  font-synthesis: none;
+  animation: pwFadeIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes pwFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+[data-theme="dark"] .preloader-wordmark { color: #F8FAFC; }
+
+/* The bar: Apple's proportions — narrow, short, fully rounded. */
+.preloader-applebar {
+  width: clamp(180px, 22vw, 260px);
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+[data-theme="dark"] .preloader-applebar { background: rgba(255, 255, 255, 0.16); }
+
+.preloader-applebar-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ink, #0B0D10);
+  transition: width 0.18s linear;
+  will-change: width;
+}
+
+[data-theme="dark"] .preloader-applebar-fill { background: #F8FAFC; }
+
+/* Percentage demoted to a quiet readout under the bar. */
+.preloader-num-row--muted {
+  margin-top: 1.1rem;
+  opacity: 0.38;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.15rem;
+}
+
+.preloader-num-row--muted .preloader-huge-num {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+}
+
+.preloader-num-row--muted .preloader-unit {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader-wordmark { animation: none; }
+  .preloader-applebar-fill { transition: none; }
+}
+
+/* Apple's boot screen is one mark and one bar. The status readout competes. */
+.preloader-detail-row { display: none; }

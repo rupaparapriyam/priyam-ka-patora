@@ -107,7 +107,7 @@
   <!-- High-Priority Asset Preloads for 0ms Instant Rendering (Hero Viewport Only) -->
   <link rel="preload" as="image" href="assets/avatar-priyam-casual.webp" type="image/webp" fetchpriority="high" />
 
-  <link rel="stylesheet" href="styles.css?v=20260914_15" />
+  <link rel="stylesheet" href="styles.css?v=20260914_24" />
 </head>
 <body class="preloader-active">
 
@@ -129,13 +129,17 @@
 
     <!-- Centerpiece: Clean Bold Editorial Counter & Hairline Progress -->
     <div class="preloader-center-editorial">
-      <div class="preloader-num-row">
-        <span class="preloader-huge-num" id="preloader-pct">000</span>
-        <span class="preloader-unit">%</span>
+      <!-- Apple boot sequence: solid wordmark, thin pill progress bar beneath.
+           Nothing else competes with it. -->
+      <div class="preloader-wordmark" id="preloader-wordmark" aria-hidden="true">PRIYAM</div>
+
+      <div class="preloader-applebar">
+        <div class="preloader-applebar-fill" id="preloader-bar"></div>
       </div>
 
-      <div class="preloader-rule-track">
-        <div class="preloader-rule-fill" id="preloader-bar" style="width: 0%;"></div>
+      <div class="preloader-num-row preloader-num-row--muted">
+        <span class="preloader-huge-num" id="preloader-pct">000</span>
+        <span class="preloader-unit">%</span>
       </div>
 
       <div class="preloader-detail-row">
@@ -851,12 +855,33 @@
 
                 <canvas id="drone-game-canvas" width="800" height="500"></canvas>
                 
+                <!-- Desktop keyboard legend. The gamepad sits below the screen, so on a
+                     laptop you cannot see both at once. This mirrors the same keys on the
+                     screen itself and lights up in sync with the physical pad. -->
+                <div class="kbd-legend" id="uav-kbd-legend" aria-hidden="true">
+                  <div class="kbd-legend-head">
+                    <span class="kbd-legend-dot"></span>
+                    <span>KEYBOARD</span>
+                    <button class="kbd-legend-toggle" id="uav-legend-toggle" type="button" aria-label="Hide keyboard legend">–</button>
+                  </div>
+                  <ul class="kbd-legend-list">
+                    <li data-legend-key="Space"><kbd>SPACE</kbd><span>Intercept</span></li>
+                    <li data-legend-key="KeyS"><kbd>S</kbd><span>Salvo &times;6</span></li>
+                    <li data-legend-key="KeyF"><kbd>F</kbd><span>Area flak</span></li>
+                    <li data-legend-key="KeyR"><kbd>R</kbd><span>Railgun</span></li>
+                    <li data-legend-key="KeyD"><kbd>D</kbd><span>Drone squad</span></li>
+                    <li data-legend-key="KeyE"><kbd>E</kbd><span>ECCM jammer</span></li>
+                    <li data-legend-key="Tab"><kbd>TAB</kbd><span>Switch target</span></li>
+                    <li data-legend-key="KeyP"><kbd>P</kbd><span>Pause</span></li>
+                  </ul>
+                </div>
+
                 <!-- Ready to Play / Start Mission Overlay (Compact Retro CRT OSD) -->
                 <div class="uav-overlay" id="uav-start-overlay">
                   <div class="uav-overlay-box">
                     <span class="mono-label uav-overlay-tag">[CH · 03 // AIR DEFENCE C2]</span>
                     <h4 class="uav-overlay-title">TACTICAL RADAR C2</h4>
-                    <p class="uav-overlay-desc">Eliminate incoming cruise missiles &amp; drone swarms. Tap gamepad controls below or the screen.</p>
+                    <p class="uav-overlay-desc">Eliminate incoming cruise missiles &amp; drone swarms. Use the keyboard (legend on screen), the gamepad below, or tap the screen.</p>
                     <button class="uav-btn-primary" onclick="window.startUavGame()">[ ENGAGE DEFENCE ▶ ]</button>
                   </div>
                 </div>
@@ -1371,7 +1396,7 @@
     </div>
   </div>
 
-  <script src="avatar-data.js?v=20260914_15"></script>
-  <script src="app.js?v=20260914_15"></script>
+  <script src="avatar-data.js?v=20260914_24"></script>
+  <script src="app.js?v=20260914_24"></script>
 </body>
 </html>
