@@ -5768,6 +5768,25 @@ function initPriyamAiClone() {
     sessionTimestamps: []
   };
 
+  /* Daily cap. The counters above live in memory, so a page refresh clears them -
+   * fine against accidental flooding, useless against someone who just hits F5.
+   * This one persists, so the day's budget survives reloads. Still a courtesy
+   * guard, not a security boundary: real enforcement belongs in the Worker. */
+  const AI_DAILY_CAP = 120;
+
+  function readDailyUsage() {
+    const today = new Date().toISOString().slice(0, 10);
+    let st;
+    try { st = JSON.parse(localStorage.getItem('priyam_ai_usage') || '{}'); } catch (e) { st = {}; }
+    if (st.day !== today) st = { day: today, count: 0 };
+    return st;
+  }
+
+  function bumpDailyUsage(st) {
+    st.count = (st.count || 0) + 1;
+    try { localStorage.setItem('priyam_ai_usage', JSON.stringify(st)); } catch (e) {}
+  }
+
   function evaluatePriyamAiGuardrails(rawText, mode) {
     const text = (rawText || '').trim();
     const isSerious = mode === 'serious';
@@ -5817,10 +5836,22 @@ function initPriyamAiClone() {
       };
     }
 
+    // 2d. Daily Cap (survives page reloads, unlike the counters above)
+    const usage = readDailyUsage();
+    if ((usage.count || 0) >= AI_DAILY_CAP) {
+      return {
+        blocked: true,
+        reply: isSerious
+          ? `\u26a1 Daily message limit reached (${AI_DAILY_CAP}/day). Email Priyam directly at rupaparapriyam@gmail.com \u2014 he replies faster than I do.`
+          : `Bhai aaj ka quota khatam! \ud83d\uded1 ${AI_DAILY_CAP} message ho gaye. Kal aana, ya seedha mail kar de: rupaparapriyam@gmail.com`
+      };
+    }
+
     // Record verified request timestamp
     aiRateLimiter.lastTime = now;
     aiRateLimiter.burstTimestamps.push(now);
     aiRateLimiter.sessionTimestamps.push(now);
+    bumpDailyUsage(usage);
 
     const norm = text.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -5876,46 +5907,9 @@ function initPriyamAiClone() {
     return { blocked: false };
   }
 
-  /* ---- Usage limits -------------------------------------------------------
-   * A courtesy guard, not a security boundary: anything client-side can be
-   * bypassed from devtools. Real enforcement has to live in the proxy
-   * (AI_PROXY_URL). This exists so ordinary use cannot accidentally burn a
-   * free-tier quota, and to keep a bored visitor from spamming the box.
-   * ------------------------------------------------------------------------ */
-  const RATE = { perMin: 12, perDay: 120, minGapMs: 1200 };
-
-  function rateCheck() {
-    const now = Date.now();
-    let st;
-    try { st = JSON.parse(localStorage.getItem('priyam_ai_usage') || '{}'); } catch (e) { st = {}; }
-
-    const today = new Date().toISOString().slice(0, 10);
-    if (st.day !== today) { st.day = today; st.dayCount = 0; }
-    st.recent = (st.recent || []).filter(t => now - t < 60000);
-
-    if (now - (st.last || 0) < RATE.minGapMs) {
-      return { ok: false, msg: 'Easy \u2014 give me a second to think. \ud83d\ude05' };
-    }
-    if (st.recent.length >= RATE.perMin) {
-      return { ok: false, msg: `Slow down! That\u2019s ${RATE.perMin} messages in a minute. Take a breath and try again shortly. \u23f3` };
-    }
-    if ((st.dayCount || 0) >= RATE.perDay) {
-      return { ok: false, msg: `You\u2019ve hit today\u2019s ${RATE.perDay}-message limit. Email me instead \u2014 rupaparapriyam@gmail.com \u2709\ufe0f` };
-    }
-
-    st.recent.push(now);
-    st.last = now;
-    st.dayCount = (st.dayCount || 0) + 1;
-    try { localStorage.setItem('priyam_ai_usage', JSON.stringify(st)); } catch (e) {}
-    return { ok: true };
-  }
-
   async function handleMessage(text) {
     if (isTyping) return;
     document.getElementById('priyam-ai-starters')?.remove();
-
-    const gate = rateCheck();
-    if (!gate.ok) { streamBotMsg({ text: gate.msg }); return; }
 
     const norm = (text || '').toLowerCase().replace(/[^a-z0-9+]/g, ' ').replace(/\s+/g, ' ').trim();
 
