@@ -2120,7 +2120,7 @@ const COMMAND_ITEMS = [
   { title: 'Algo Trading Bot (Zerodha Kite)', tag: 'Scaffold', action: () => window.openProjectDetail('algo') },
   { title: 'Tactical Air Defence & Missile Interceptor C2 (Defence AI)', tag: 'Defence C2', action: () => { window.location.href = '#fun-zone'; } },
   { title: 'Open Priyam\'s Instagram (@priyamm_r)', tag: 'Social', action: () => window.open('https://www.instagram.com/priyamm_r?igsi=aXUzcmptY204Nm5t&utm_source=qr', '_blank') },
-  { title: 'Talk to Priyam AI Clone', tag: 'AI Chat', action: () => window.togglePriyamChat(true) },
+  { title: 'Talk to Priyuum (AI Clone)', tag: 'AI Chat', action: () => window.togglePriyamChat(true) },
   { title: 'Copy Direct Email (rupaparapriyam@gmail.com)', tag: 'Action', action: () => document.getElementById('copy-email-btn')?.click() },
   { title: 'Toggle Light / Dark Theme', tag: 'Settings', action: () => document.getElementById('theme-toggle')?.click() },
 ];
@@ -7083,74 +7083,80 @@ function initRoamingPriyamAvatar() {
   // ==================== DYNAMIC SECTION-ANCHORED SCROLL ENGINE ====================
   let currentFlightTilt = 0;
 
-  // High-Performance Cached Section Metrics (Zero getBoundingClientRect in 60 FPS loop)
-  const layoutCache = {
-    w: window.innerWidth,
-    h: window.innerHeight,
-    docHeight: 5000,
-    hero: { top: 0, height: 800 },
-    about: { top: 800, height: 600 },
-    projects: { top: 1400, height: 1200 },
-    surge: { top: 2600, height: 1800, stickyTop: 110, viewportH: 600, totalScrollable: 1200 },
-    funZone: { top: 4400, height: 800 },
-    contact: { top: 5200, height: 700 },
-    trigger: { top: 5600, centerX: window.innerWidth - 80, height: 48, valid: false }
-  };
+  // ---- Content-aware avoidance state (eased so the dodge reads as intentional) ----
+  let avoidOffsetX = 0;
+  let avoidFadeCur = 1;
 
-  function updateGlobalLayoutMetrics() {
-    const scrollY = window.scrollY || window.pageYOffset || 0;
-    layoutCache.w = window.innerWidth;
-    layoutCache.h = window.innerHeight;
-    layoutCache.docHeight = Math.max(1, document.documentElement.scrollHeight, document.body.offsetHeight);
+  /**
+   * Resolve a horizontal dodge so the avatar never sits on top of real content.
+   *
+   * Gap-based (not push-based): collects every keep-out block in the avatar's
+   * vertical band, merges them into occupied spans, then picks the nearest free
+   * gap wide enough to hold the avatar. This is deterministic - a push-based
+   * solver can shove the avatar out of one block and straight into its neighbour,
+   * then oscillate between them forever.
+   *
+   * If no gap fits (full-width text, common on mobile) it fades out instead.
+   * Pure arithmetic over cached rects - no layout reads, safe inside the rAF loop.
+   */
+  function solveAvoidance(x, y, avW, avH, scrollY, bubbleH) {
+    const ko = layoutCache.keepOut;
+    if (!ko || ko.length === 0) return { dx: 0, fade: 1 };
 
-    const getElBounds = (id) => {
-      const el = document.getElementById(id);
-      if (!el) return { top: 0, height: 0 };
-      const r = el.getBoundingClientRect();
-      return { top: r.top + scrollY, height: r.height || el.offsetHeight || 0 };
-    };
+    const boxTop = y - bubbleH;
+    const boxBottom = y + avH;
+    const vw = layoutCache.w;
+    const EDGE = 8;
+    const PAD = 14;
+    const needed = avW + PAD * 2;
 
-    layoutCache.hero = getElBounds('hero');
-    layoutCache.about = getElBounds('about');
-    layoutCache.projects = getElBounds('projects');
-    layoutCache.funZone = getElBounds('fun-zone');
-    layoutCache.contact = getElBounds('contact');
+    // 1. Occupied spans within the avatar's vertical band
+    const spans = [];
+    for (let i = 0; i < ko.length; i++) {
+      const r = ko[i];
+      if (r.top - scrollY > boxBottom) break;      // sorted by top
+      if (r.bottom - scrollY < boxTop) continue;
+      spans.push([r.left - PAD, r.right + PAD]);
+    }
+    if (spans.length === 0) return { dx: 0, fade: 1 };
 
-    const surgeEl = document.getElementById('surge');
-    if (surgeEl) {
-      const sb = surgeEl.querySelector('.surge-scroll-body') || surgeEl;
-      const r = sb.getBoundingClientRect();
-      const sv = surgeEl.querySelector('.surge-sticky-viewport');
-      const stickyTop = sv ? (parseFloat(getComputedStyle(sv).top) || 110) : 110;
-      const viewportH = sv ? sv.offsetHeight : window.innerHeight;
-      layoutCache.surge = {
-        top: r.top + scrollY,
-        height: r.height || sb.offsetHeight || 0,
-        stickyTop,
-        viewportH,
-        totalScrollable: Math.max(0, (r.height || sb.offsetHeight) - viewportH)
-      };
+    // 2. Does the avatar actually overlap anything right now?
+    let overlaps = false;
+    for (let i = 0; i < spans.length; i++) {
+      if (x < spans[i][1] && x + avW > spans[i][0]) { overlaps = true; break; }
+    }
+    if (!overlaps) return { dx: 0, fade: 1 };
+
+    // 3. Merge spans
+    spans.sort((a, b) => a[0] - b[0]);
+    const merged = [spans[0].slice()];
+    for (let i = 1; i < spans.length; i++) {
+      const last = merged[merged.length - 1];
+      if (spans[i][0] <= last[1]) last[1] = Math.max(last[1], spans[i][1]);
+      else merged.push(spans[i].slice());
     }
 
-    const triggerEl = document.getElementById('priyam-ai-trigger');
-    if (triggerEl) {
-      const r = triggerEl.getBoundingClientRect();
-      if (r.width > 0 && r.height > 0) {
-        layoutCache.trigger = {
-          top: r.top + scrollY,
-          centerX: r.left + r.width * 0.5,
-          height: r.height,
-          valid: true
-        };
-      }
+    // 4. Free gaps between EDGE and vw-EDGE
+    const gaps = [];
+    let cursor = EDGE;
+    for (let i = 0; i < merged.length; i++) {
+      if (merged[i][0] - cursor >= needed) gaps.push([cursor, merged[i][0]]);
+      cursor = Math.max(cursor, merged[i][1]);
     }
-  }
+    if (vw - EDGE - cursor >= needed) gaps.push([cursor, vw - EDGE]);
 
-  updateGlobalLayoutMetrics();
-  window.addEventListener('resize', updateGlobalLayoutMetrics, { passive: true });
-  window.addEventListener('load', updateGlobalLayoutMetrics, { passive: true });
-  if ('onscrollend' in window) {
-    window.addEventListener('scrollend', updateGlobalLayoutMetrics, { passive: true });
+    if (gaps.length === 0) return { dx: 0, fade: 0.12 };   // nowhere to stand
+
+    // 5. Nearest gap wins (least movement reads as deliberate, not frantic)
+    let bestX = x, bestCost = Infinity;
+    for (let i = 0; i < gaps.length; i++) {
+      const lo = gaps[i][0] + PAD;
+      const hi = gaps[i][1] - PAD - avW;
+      const cand = Math.max(lo, Math.min(hi, x));
+      const cost = Math.abs(cand - x);
+      if (cost < bestCost) { bestCost = cost; bestX = cand; }
+    }
+    return { dx: bestX - x, fade: 1 };
   }
 
   function getScrollWaypoint() {
@@ -7550,10 +7556,22 @@ function initRoamingPriyamAvatar() {
     const totalTilt = (facingRight ? currentFlightTilt : -currentFlightTilt) + currentScrollTilt;
     const renderY = posY + bob;
 
-    container.style.transform = `translate3d(${posX.toFixed(1)}px, ${renderY.toFixed(1)}px, 0)`;
+    // ---- Content-aware avoidance (cached rects + arithmetic only) ----
+    const avDims = getAvatarDimensions();
+    const bubbleH = (bubble && bubble.classList.contains('active')) ? 62 : 0;
+    const sy = window.scrollY || window.pageYOffset || 0;
+    const av = solveAvoidance(posX, renderY, avDims.w, avDims.h, sy, bubbleH);
+    avoidOffsetX += (av.dx - avoidOffsetX) * 0.14;
+    avoidFadeCur += (av.fade - avoidFadeCur) * 0.14;
+    if (Math.abs(avoidOffsetX) < 0.3) avoidOffsetX = 0;
+
+    const drawX = Math.max(-avDims.w, Math.min(layoutCache.w, posX + avoidOffsetX));
+    container.style.opacity = avoidFadeCur.toFixed(3);
+
+    container.style.transform = `translate3d(${drawX.toFixed(1)}px, ${renderY.toFixed(1)}px, 0)`;
     charBody.style.transform = `scaleX(${facingRight ? 1 : -1}) rotate(${totalTilt.toFixed(1)}deg)`;
 
-    updateBubblePlacement(posX, renderY);
+    updateBubblePlacement(drawX, renderY);
     requestAnimationFrame(avatarPhysicsLoop);
   }
   requestAnimationFrame(avatarPhysicsLoop);
