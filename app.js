@@ -8426,6 +8426,11 @@ if (document.readyState === 'loading') {
     for (let i = 0; i < visible.length; i++) {
       const m = visible[i];
       const top = m.top - sy;                            // pure arithmetic
+
+      // When IO is unavailable, `visible` holds every card. Skip the off-screen
+      // ones so we are not forcing a style recalc per card per frame.
+      if (top > vh + 200 || top + m.h < -200) continue;
+
       const centre = top + m.h * 0.5;
       // -1 (below fold) → 0 (centred) → 1 (above fold)
       const sx = Math.max(-1, Math.min(1, (vh * 0.5 - centre) / (vh * 0.5)));
