@@ -34,6 +34,7 @@ Priyam Rupapara builds software for messy, physical, real-world operations where
 - Status: waitlist open in Delhi and Gurugram; hardware not yet shipped.
 
 ### 4. Ecommerce Hub (Indian D2C Truth Layer)
+- Status: PROTOTYPE. Not yet run against a live brand’s data, and not currently raising on it.
 - Financial analytics and real-time reconciliation engine tailored for Indian e-commerce.
 - Solves attribution gaps across Razorpay, Cash on Delivery (COD), Return to Origin (RTO) freight penalties, and multi-channel marketing CAC.
 - Real-time unit margin calculation factoring NDR (Non-Delivery Report) workflows and reverse logistics costs.

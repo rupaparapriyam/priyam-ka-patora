@@ -7909,3 +7909,99 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
 
 
 
+
+/* ===================== AUDIENCE SPLIT (hero intent router) ===================== */
+.hero-intent-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1.1rem;
+}
+
+.hero-intent-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin-right: 0.15rem;
+}
+
+.hero-intent-btn {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.5rem 0.85rem;
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper-warm, #FBF9F4);
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.18s ease, border-color 0.18s ease, color 0.18s ease;
+}
+
+.hero-intent-btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--ink);
+}
+
+.hero-intent-btn:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.hero-intent-btn[aria-pressed="true"] {
+  background: var(--ink);
+  color: var(--paper-warm, #FBF9F4);
+  border-color: var(--ink);
+}
+
+[data-theme="dark"] .hero-intent-btn {
+  background: rgba(255, 255, 255, 0.04);
+  color: #F8FAFC;
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+[data-theme="dark"] .hero-intent-btn:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="dark"] .hero-intent-btn[aria-pressed="true"] {
+  background: #F8FAFC;
+  color: #0B0D10;
+  border-color: #F8FAFC;
+}
+
+/* Professional intents de-emphasise the playground rather than removing it.
+   Everything stays in the DOM, keyboard-reachable, and one click from full size. */
+[data-intent="work"] #fun-zone,
+[data-intent="invest"] #fun-zone {
+  opacity: 0.48;
+  filter: saturate(0.65);
+  transition: opacity 0.5s ease, filter 0.5s ease;
+}
+
+[data-intent="work"] #fun-zone:hover,
+[data-intent="work"] #fun-zone:focus-within,
+[data-intent="invest"] #fun-zone:hover,
+[data-intent="invest"] #fun-zone:focus-within {
+  opacity: 1;
+  filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-intent-btn { transition: none; }
+  [data-intent="work"] #fun-zone,
+  [data-intent="invest"] #fun-zone { transition: none; }
+}
+
+@media (max-width: 640px) {
+  .hero-intent-row { gap: 0.4rem; }
+  .hero-intent-label { width: 100%; margin-bottom: 0.1rem; }
+  .hero-intent-btn { font-size: 0.66rem; padding: 0.5rem 0.7rem; min-height: 44px; }
+}
