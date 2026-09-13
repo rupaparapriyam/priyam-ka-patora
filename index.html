@@ -48,6 +48,8 @@
         "description": "Founder and Systems Builder building operational software including diagnostic lab automation (Kliniqo, https://kliniqo.co.in), Indian D2C attribution (Ecommerce Hub), SURGE Men (https://surgemen.in), and autonomous edge avionics.",
         "sameAs": [
           "https://kliniqo.co.in",
+          "https://vaibhavlabs.com",
+          "https://facecard.co.in",
           "https://surgemen.in",
           "https://www.instagram.com/priyamm_r",
           "https://github.com/rupaparapriyam"
@@ -106,7 +108,7 @@
   <link rel="preload" as="image" href="assets/avatar-priyam-casual.webp" type="image/webp" fetchpriority="high" />
   <link rel="preload" as="image" href="assets/surge/bottle_frames/bottle_000.webp" type="image/webp" />
 
-  <link rel="stylesheet" href="styles.css?v=20260914_01" />
+  <link rel="stylesheet" href="styles.css?v=20260914_05" />
 </head>
 <body class="preloader-active">
 
@@ -179,7 +181,7 @@
           <span class="cmd-text">Search</span>
         </button>
 
-        <button class="nav-chat-btn" onclick="window.togglePriyamChat(true)">[Talk to Priyam]</button>
+        <button class="nav-chat-btn" onclick="window.togglePriyamChat(true)">[Talk to Priyuum]</button>
         <button id="theme-toggle" class="nav-icon-btn" aria-label="Toggle theme">
           <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
           <svg class="moon-icon hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -236,6 +238,7 @@
 
           <div class="hero-actions-row">
             <a href="#projects" class="hero-cta">↓ Explore all projects</a>
+            <a href="https://www.linkedin.com/in/priyam-rupapara" target="_blank" rel="noopener" class="hero-link-pill">[LINKEDIN ↗]</a>
             <a href="https://www.instagram.com/priyamm_r?igsi=aXUzcmptY204Nm5t&utm_source=qr" target="_blank" rel="noopener" class="hero-link-pill">[INSTAGRAM · @priyamm_r ↗]</a>
             <button class="hero-cmd-hint" onclick="window.openCommandPalette()"><span class="desktop-hint">Press <kbd>⌘K</kbd> for quick menu</span><span class="mobile-hint">⚡ Search (⌘K)</span></button>
           </div>
@@ -375,7 +378,7 @@
             </div>
             <!-- Filter Pills -->
             <div class="project-filters" id="project-filters">
-              <button class="pf-btn active" data-filter="all">All (9)</button>
+              <button class="pf-btn active" data-filter="all">All (11)</button>
               <button class="pf-btn" data-filter="mvp">Active MVPs</button>
               <button class="pf-btn" data-filter="commerce">Commerce &amp; D2C</button>
               <button class="pf-btn" data-filter="hardware">Hardware &amp; AI</button>
@@ -411,10 +414,49 @@
             </div>
           </article>
 
-          <!-- 2. Ecommerce Hub -->
-          <article class="stamp-card stamp-card--secondary" data-category="commerce mvp" onclick="window.openProjectDetail('ecom')" tabindex="0" role="button" aria-label="Open Ecommerce Hub project detail">
+          <!-- 2. Vaibhav Laboratory (live commercial site, running on Kliniqo) -->
+          <article class="stamp-card stamp-card--primary" data-category="mvp">
             <div class="sc-top-meta">
               <span class="sc-index">[02]</span>
+              <span class="sc-status-tag sc-status--green">LIVE &middot; TAKING REAL BOOKINGS</span>
+              <a href="https://vaibhavlabs.com" target="_blank" rel="noopener noreferrer" class="sc-live-pill" onclick="event.stopPropagation()" title="Visit live website vaibhavlabs.com">
+                <span class="live-pulse-dot"></span>
+                <span>vaibhavlabs.com &#8599;</span>
+              </a>
+            </div>
+            <h3 class="sc-headline">Vaibhav Lab.<br>The Storefront<br>Kliniqo Runs.</h3>
+            <p class="sc-sub">The public booking site for an 18-year-old Rajkot pathology lab, built on Kliniqo and live to real patients. Searchable test catalogue, cart and checkout, home-collection booking, WhatsApp reports, and the full interface in English, &#2361;&#2367;&#2306;&#2342;&#2368; and &#2711;&#2753;&#2716;&#2736;&#2750;&#2724;&#2752;. This is the proof: go click it.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">Next.js &middot; i18n (EN/HI/GU) &middot; Cart &middot; WhatsApp API</span>
+              <div class="sc-card-actions">
+                <a href="https://vaibhavlabs.com" target="_blank" rel="noopener noreferrer" class="sc-live-action-btn" onclick="event.stopPropagation()">Visit vaibhavlabs.com &#8599;</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- 3. FaceCard -->
+          <article class="stamp-card stamp-card--dark" data-category="commerce">
+            <div class="sc-top-meta">
+              <span class="sc-index">[03]</span>
+              <span class="sc-status-tag sc-status--amber">PRE-LAUNCH &middot; WAITLIST OPEN</span>
+              <a href="https://facecard.co.in" target="_blank" rel="noopener noreferrer" class="sc-live-pill sc-live-pill--surge" onclick="event.stopPropagation()" title="Visit facecard.co.in">
+                <span>facecard.co.in &#8599;</span>
+              </a>
+            </div>
+            <h3 class="sc-headline">FaceCard.<br>An NFC Card<br>That Talks First.</h3>
+            <p class="sc-sub">A physical NFC card you tap on a phone to swap contact, profile and intent in one gesture &mdash; three variants (Devil, Angel, Witness) that say what you came for before you say anything. Brand, site and product design built end to end. Waitlist open in Delhi &amp; Gurugram; hardware has not shipped yet.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">NFC &middot; Brand Design &middot; Waitlist Funnel</span>
+              <div class="sc-card-actions">
+                <a href="https://facecard.co.in" target="_blank" rel="noopener noreferrer" class="sc-live-action-btn sc-live-action-btn--surge" onclick="event.stopPropagation()">Visit facecard.co.in &#8599;</a>
+              </div>
+            </div>
+          </article>
+
+          <!-- 4. Ecommerce Hub -->
+          <article class="stamp-card stamp-card--secondary" data-category="commerce mvp" onclick="window.openProjectDetail('ecom')" tabindex="0" role="button" aria-label="Open Ecommerce Hub project detail">
+            <div class="sc-top-meta">
+              <span class="sc-index">[04]</span>
               <span class="sc-status-tag sc-status--amber">PRE-SEED / MVP STAGE · ACTIVELY RAISING</span>
             </div>
             <h3 class="sc-headline">Ecommerce<br>Hub (Is) The<br>D2C Truth Layer.</h3>
@@ -425,10 +467,10 @@
             </div>
           </article>
 
-          <!-- 3. AI Chatbot Assistant (Idea Only / Unstarted) -->
+          <!-- 5. AI Chatbot Assistant (Idea Only / Unstarted) -->
           <article class="stamp-card stamp-card--paper" data-category="mvp" onclick="window.openProjectDetail('aichatbot')" tabindex="0" role="button" aria-label="Open AI Chatbot Assistant idea detail">
             <div class="sc-top-meta">
-              <span class="sc-index">[03]</span>
+              <span class="sc-index">[05]</span>
               <span class="sc-status-tag sc-status--amber">UNSTARTED CONCEPT · VAULT TEARDOWN</span>
             </div>
             <h3 class="sc-headline">AI Chatbot<br>(Was) Business<br>Agent OS Idea.</h3>
@@ -439,10 +481,10 @@
             </div>
           </article>
 
-          <!-- 4. SURGE Grooming -->
+          <!-- 6. SURGE Grooming -->
           <article class="stamp-card stamp-card--paper" data-category="commerce" onclick="window.openProjectDetail('surge')" tabindex="0" role="button" aria-label="Open SURGE project detail">
             <div class="sc-top-meta">
-              <span class="sc-index">[04]</span>
+              <span class="sc-index">[06]</span>
               <span class="sc-status-tag sc-status--blue">LIVE AT SURGEMEN.IN</span>
               <a href="https://surgemen.in" target="_blank" rel="noopener noreferrer" class="sc-live-pill sc-live-pill--surge" onclick="event.stopPropagation()" title="Visit live storefront surgemen.in">
                 <span class="live-pulse-dot"></span>
@@ -460,10 +502,10 @@
             </div>
           </article>
 
-          <!-- 5. n8n WhatsApp & Parents' Lab Automation -->
+          <!-- 7. n8n WhatsApp & Parents' Lab Automation -->
           <article class="stamp-card stamp-card--paper" data-category="mvp" onclick="window.openProjectDetail('chatbot')" tabindex="0" role="button" aria-label="Open n8n WhatsApp Automation project detail">
             <div class="sc-top-meta">
-              <span class="sc-index">[05]</span>
+              <span class="sc-index">[07]</span>
               <span class="sc-status-tag sc-status--green">LIVE AT FAMILY LAB</span>
             </div>
             <h3 class="sc-headline">n8n WhatsApp<br>&amp; Parents' Lab<br>Automation.</h3>
@@ -474,10 +516,10 @@
             </div>
           </article>
 
-          <!-- 6. Academic Knowledge Graph & Study Intelligence Engine -->
+          <!-- 8. Academic Knowledge Graph & Study Intelligence Engine -->
           <article class="stamp-card stamp-card--paper" data-category="fun" onclick="window.openProjectDetail('kg')" tabindex="0" role="button" aria-label="Open Academic Knowledge Graph detail">
             <div class="sc-top-meta">
-              <span class="sc-index">[06]</span>
+              <span class="sc-index">[08]</span>
               <span class="sc-status-tag sc-status--blue">BUILT FOR FUN / EXAM PREP</span>
             </div>
             <h3 class="sc-headline">Academic Knowledge<br>Graph (College<br>Study Engine).</h3>
@@ -488,10 +530,10 @@
             </div>
           </article>
 
-          <!-- 7. Algo Trading Bot -->
+          <!-- 9. Algo Trading Bot -->
           <article class="stamp-card stamp-card--paper" data-category="fun" onclick="window.openProjectDetail('algo')" tabindex="0" role="button" aria-label="Open Algo Trading Bot detail">
             <div class="sc-top-meta">
-              <span class="sc-index">[07]</span>
+              <span class="sc-index">[09]</span>
               <span class="sc-status-tag sc-status--gray">UNTESTED CODE SCAFFOLD</span>
             </div>
             <h3 class="sc-headline">Algo Trading<br>Bot (Didn't Test)<br>Never Made Cash.</h3>
@@ -502,10 +544,10 @@
             </div>
           </article>
 
-          <!-- 8. JEE Backlog Tracker -->
+          <!-- 10. JEE Backlog Tracker -->
           <article class="stamp-card stamp-card--paper" data-category="fun" onclick="window.openProjectDetail('jee')" tabindex="0" role="button" aria-label="Open JEE Tracker detail">
             <div class="sc-top-meta">
-              <span class="sc-index">[08]</span>
+              <span class="sc-index">[10]</span>
               <span class="sc-status-tag sc-status--amber">ORIGIN STORY / JOKE</span>
             </div>
             <h3 class="sc-headline">JEE Backlog<br>(Built Instead<br>Of Studying).</h3>
@@ -516,10 +558,10 @@
             </div>
           </article>
 
-          <!-- 9. Solana Stake Bot -->
+          <!-- 11. Solana Stake Bot -->
           <article class="stamp-card stamp-card--paper" data-category="fun" onclick="window.openProjectDetail('stake')" tabindex="0" role="button" aria-label="Open Solana Stake Bot detail">
             <div class="sc-top-meta">
-              <span class="sc-index">[09]</span>
+              <span class="sc-index">[11]</span>
               <span class="sc-status-tag sc-status--gray">FOR FUN</span>
             </div>
             <h3 class="sc-headline">Solana Stake<br>Auto-Compound<br>Bot.</h3>
@@ -1281,7 +1323,7 @@
     </div>
   </div>
 
-  <script src="avatar-data.js?v=20260914_01"></script>
-  <script src="app.js?v=20260914_01"></script>
+  <script src="avatar-data.js?v=20260914_05"></script>
+  <script src="app.js?v=20260914_05"></script>
 </body>
 </html>
