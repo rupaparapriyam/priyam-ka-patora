@@ -5516,6 +5516,30 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
     transform: rotate(0deg) translateY(-4px);
   }
 
+  /* Card footer: stop the separator dangling at the end of a wrapped line.
+     Row 1 = email + handle, Row 2 = location. */
+  .zsc-footer > a + .zsc-sep {
+    display: none;
+  }
+  .zsc-footer > span:last-child {
+    flex-basis: 100%;
+  }
+
+  /* Stamp: drop the redundant location (already printed on the card above)
+     so the line stops orphaning "DELHI]" onto a second row. */
+  .hero-stamp .stamp-loc {
+    display: none;
+  }
+
+  /* Comfortable touch targets on the hero links (was 18-25px tall). */
+  .hero-cta,
+  .hero-link-pill,
+  .zsc-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
   .zuck-simple-card {
     padding: 1.25rem 1.15rem;
     min-height: auto;
