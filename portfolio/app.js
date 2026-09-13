@@ -1597,12 +1597,21 @@ function initDroneAvionicsSimulation() {
   if (!ctx) return;
   const dpr = window.devicePixelRatio || 1;
 
+  // Was 1.0, which drew the airframe at roughly a sixth of its stage and read as
+  // a broken/empty panel. Derived from the stage height so it fills the box at
+  // any breakpoint instead of being a magic number tuned for one screen.
+  // Single source of truth so "Reset view" agrees with the initial view.
+  const cadDefaultZoom = () => {
+    const h = (canvas.height / dpr) || (container?.clientHeight || 480);
+    return Math.min(4.2, Math.max(2.0, h / 125));
+  };
+
   const state = {
     yaw: 0.65,
     pitch: 0.28,
     targetYaw: 0.65,
     targetPitch: 0.28,
-    zoom: 1.0,
+    zoom: 3.0,
     rotorAngle: 0,
     autoRotate: true,
     activePart: 'frame',
@@ -1652,7 +1661,7 @@ function initDroneAvionicsSimulation() {
   document.getElementById('btn-reset-drone')?.addEventListener('click', () => {
     state.targetYaw = 0.65;
     state.targetPitch = 0.28;
-    state.zoom = 1.0;
+    state.zoom = cadDefaultZoom();
     showToast('CAD view reset');
     renderCAD();
   });
@@ -2022,7 +2031,24 @@ function initSurgeScrollDrivenBottle() {
     }
     setTimeout(streamNextBatch, 25);
   }
-  preloadAllFrames();
+  /* The 80-frame sequence is ~1.3 MB. Preloading it on every page load bills
+   * that to everyone who never scrolls this far - on mobile data, most people.
+   * Frame 0 is already loaded above for the poster; the rest waits until SURGE
+   * is within ~1.5 viewports. Falls back to eager where IO is unavailable. */
+  if ('IntersectionObserver' in window) {
+    let framesStarted = false;
+    const frameIO = new IntersectionObserver((entries) => {
+      if (framesStarted) return;
+      if (entries.some(e => e.isIntersecting)) {
+        framesStarted = true;
+        frameIO.disconnect();
+        preloadAllFrames();
+      }
+    }, { rootMargin: '150% 0px' });
+    frameIO.observe(section);
+  } else {
+    preloadAllFrames();
+  }
 
   const scrollBody = section.querySelector('.surge-scroll-body') || section;
   const stickyViewport = section.querySelector('.surge-sticky-viewport');
@@ -7995,23 +8021,7 @@ function startBackgroundAssetStreamer() {
     }
     streamNextSprite();
 
-    // 2. Stream all 80 SURGE bottle frames progressively in idle batches of 8
-    let frameIdx = 0;
-    const TOTAL_BOTTLE_FRAMES = 80;
-    function streamNextBottleBatch() {
-      const batchEnd = Math.min(frameIdx + 8, TOTAL_BOTTLE_FRAMES);
-      for (let i = frameIdx; i < batchEnd; i++) {
-        const bImg = new Image();
-        bImg.decoding = 'async';
-        bImg.src = `assets/surge/bottle_frames/bottle_${String(i).padStart(3, '0')}.webp?v=20260902_45`;
-        if (bImg.decode) bImg.decode().catch(() => {});
-      }
-      frameIdx = batchEnd;
-      if (frameIdx < TOTAL_BOTTLE_FRAMES) {
-        idle(streamNextBottleBatch, { timeout: 1000 });
-      }
-    }
-    setTimeout(streamNextBottleBatch, 100);
+    // (SURGE bottle frames are owned by the SURGE module and load on proximity.)
   }, { timeout: 1200 });
 }
 
