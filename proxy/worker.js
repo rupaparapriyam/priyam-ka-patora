@@ -97,8 +97,21 @@ export default {
     });
 
     if (!upstream.ok) {
-      // Never surface the upstream body — it can echo key or account details.
-      return json({ error: `Upstream error (${upstream.status})` }, 502, origin);
+      // Surface only the provider's error MESSAGE, never the body (which can echo
+      // account details) and never the key. Enough to tell "bad key" apart from
+      // "bad model" without leaking anything.
+      let reason = '';
+      try {
+        const errBody = await upstream.json();
+        reason = String(errBody?.error?.message || errBody?.error?.code || '').slice(0, 160);
+      } catch (e) { /* non-JSON upstream error */ }
+
+      const keyShape = env.GROQ_API_KEY
+        ? `len=${env.GROQ_API_KEY.length},prefix=${env.GROQ_API_KEY.slice(0, 4)},trimmed=${env.GROQ_API_KEY === env.GROQ_API_KEY.trim()}`
+        : 'absent';
+      console.error(`upstream ${upstream.status}: ${reason} | key ${keyShape}`);
+
+      return json({ error: `Upstream error (${upstream.status})`, reason }, 502, origin);
     }
 
     const data = await upstream.json();

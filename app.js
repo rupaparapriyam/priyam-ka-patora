@@ -2833,6 +2833,11 @@ function initUavFlightGame() {
                       (e.code === 'Enter' ? document.querySelector(`.gp-3d-btn[data-key="Space"], .gp-action-btn[data-key="Space"]`) : null);
     if (activeBtn) activeBtn.classList.add('gp-btn-active');
 
+    // Mirror the press onto the on-screen legend (the pad is below the fold on laptops)
+    const legendKey = e.code === 'Enter' ? 'Space' : e.code;
+    document.querySelector(`.kbd-legend-list li[data-legend-key="${legendKey}"]`)
+      ?.classList.add('is-pressed');
+
     if (e.code === 'KeyP') {
       window.toggleUavPause();
       e.preventDefault();
@@ -2876,6 +2881,10 @@ function initUavFlightGame() {
   });
 
   window.addEventListener('keyup', (e) => {
+    const upLegendKey = e.code === 'Enter' ? 'Space' : e.code;
+    document.querySelector(`.kbd-legend-list li[data-legend-key="${upLegendKey}"]`)
+      ?.classList.remove('is-pressed');
+
     const activeBtn = document.querySelector(`.gp-3d-btn[data-key="${e.code}"], .gp-action-btn[data-key="${e.code}"]`) || 
                       (e.code === 'Enter' ? document.querySelector(`.gp-3d-btn[data-key="Space"], .gp-action-btn[data-key="Space"]`) : null);
     if (activeBtn) activeBtn.classList.remove('gp-btn-active');
@@ -8143,6 +8152,21 @@ function initSitePreloader() {
     }, 40);
   }
 
+  /* rAF is paused in background tabs, and the preloader locks body scroll while
+   * it is up. Without this, opening the site in a background tab leaves the page
+   * scroll-locked behind a loop that never runs. These timers do not depend on
+   * rAF, so dismissal is guaranteed either way. */
+  setTimeout(() => { if (!isDismissed) finishPreloader(); }, MAX_TIMEOUT_MS + 250);
+  setTimeout(() => {                       // last-resort unlock
+    if (document.body.classList.contains('preloader-active')) {
+      document.body.classList.remove('preloader-active');
+      try { preloader.remove(); } catch (e) {}
+    }
+  }, 4000);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && !isDismissed) finishPreloader();
+  }, { once: false });
+
   // High-speed frame animation ticker
   function tick(timestamp) {
     if (isDismissed) return;
@@ -8269,4 +8293,177 @@ if (document.readyState === 'loading') {
   let saved = null;
   try { saved = localStorage.getItem('pr-intent'); } catch (e) {}
   if (saved && DEST[saved]) apply(saved, false);
+})();
+
+
+/* ---- In-game keyboard legend: collapse toggle + stuck-key safety ---------- */
+(function initKbdLegend() {
+  const legend = document.getElementById('uav-kbd-legend');
+  if (!legend) return;
+
+  const toggle = document.getElementById('uav-legend-toggle');
+  toggle?.addEventListener('click', () => {
+    const collapsed = legend.classList.toggle('is-collapsed');
+    toggle.textContent = collapsed ? '+' : '\u2013';
+    toggle.setAttribute('aria-label', collapsed ? 'Show keyboard legend' : 'Hide keyboard legend');
+    try { localStorage.setItem('uav_legend_collapsed', collapsed ? '1' : '0'); } catch (e) {}
+  });
+
+  try {
+    if (localStorage.getItem('uav_legend_collapsed') === '1') {
+      legend.classList.add('is-collapsed');
+      if (toggle) toggle.textContent = '+';
+    }
+  } catch (e) {}
+
+  // Alt-tabbing mid-keypress never fires keyup, which would leave a row lit.
+  const clearAll = () => {
+    legend.querySelectorAll('li.is-pressed').forEach(li => li.classList.remove('is-pressed'));
+    document.querySelectorAll('.gp-btn-active').forEach(b => b.classList.remove('gp-btn-active'));
+  };
+  window.addEventListener('blur', clearAll);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) clearAll(); });
+})();
+
+/* ==========================================================================
+   3D SCROLL CHOREOGRAPHY — Projects + Ambitions
+   Cards fly in on a perspective rig and hold a live scroll-linked tilt.
+   Zero-reflow contract: every geometry read happens in one batched pass on
+   scrollend/resize (never inside the rAF loop), and the loop only writes a
+   CSS custom property. No getBoundingClientRect in the frame path.
+   ========================================================================== */
+(function initScroll3D() {
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const scopes = ['#projects-grid', '#ambitions'];
+
+  const cards = [];
+  scopes.forEach(sel => {
+    document.querySelectorAll(`${sel} .stamp-card`).forEach(el => cards.push(el));
+    document.querySelectorAll(`${sel} .tier-head`).forEach(el => el.classList.add('scroll-3d'));
+  });
+  if (!cards.length) return;
+
+  // Split headlines into per-line masks so each rises independently.
+  cards.forEach(card => {
+    const h = card.querySelector('.sc-headline');
+    if (!h || h.dataset.split === '1') return;
+    const parts = h.innerHTML.split(/<br\s*\/?>/i);
+    if (parts.length > 1) {
+      h.innerHTML = parts.map(p => `<span class="rise-line">${p}</span>`).join('');
+      h.classList.add('line-rise');
+    }
+    h.dataset.split = '1';
+  });
+
+  if (reduce) return;                       // honour the OS setting entirely
+  cards.forEach(c => c.classList.add('scroll-3d'));
+
+  // --- Entry reveal ---
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      const sibs = Array.from(el.parentElement?.children || []);
+      const delay = Math.min(sibs.indexOf(el), 5) * 70;   // cap the stagger
+      setTimeout(() => el.classList.add('is-in'), delay);
+      io.unobserve(el);
+    });
+  }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12 });
+
+  cards.forEach(c => io.observe(c));
+  document.querySelectorAll('.tier-head.scroll-3d').forEach(h => io.observe(h));
+
+  /* Failsafe. These elements start at opacity 0, so anything the observer never
+   * fires for would be invisible content - far worse than a missed animation.
+   * Filtering can also re-show a card after it was unobserved. Sweep on filter
+   * clicks and once on a timer. */
+  function revealAll() {
+    cards.forEach(c => c.classList.add('is-in'));
+    document.querySelectorAll('.tier-head.scroll-3d').forEach(h => h.classList.add('is-in'));
+  }
+  document.querySelectorAll('.pf-btn').forEach(b => {
+    b.addEventListener('click', () => setTimeout(revealAll, 60));
+  });
+  /* Tiered failsafe. A blanket reveal at 3s would also destroy the scroll
+   * animation for every below-fold card, so:
+   *   - 1.2s: reveal only what is already on screen (nothing to animate anyway)
+   *   - 12s : absolute last resort, reveal everything. By then any working
+   *           reveal path has long since fired, so this only ever rescues a
+   *           genuinely broken state. */
+  setTimeout(revealSweep, 1200);
+  setTimeout(revealAll, 12000);
+
+  // --- Live tilt, cached geometry ---
+  let metrics = [];
+  let visible = [];
+
+  function measure() {                       // reads: only here, never in rAF
+    const sy = window.scrollY || window.pageYOffset || 0;
+    metrics = cards.map(el => {
+      const r = el.getBoundingClientRect();
+      return { el, top: r.top + sy, h: r.height };
+    });
+  }
+
+  const vis = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const m = metrics.find(x => x.el === e.target);
+      if (!m) return;
+      if (e.isIntersecting) { if (!visible.includes(m)) visible.push(m); }
+      else {
+        visible = visible.filter(x => x !== m);
+        e.target.style.removeProperty('--sx');
+      }
+    });
+  }, { rootMargin: '15% 0px' });
+
+  let ticking = false;
+  function frame() {
+    ticking = false;
+    const sy = window.scrollY || window.pageYOffset || 0;
+    const vh = window.innerHeight;
+
+    for (let i = 0; i < visible.length; i++) {
+      const m = visible[i];
+      const top = m.top - sy;                            // pure arithmetic
+      const centre = top + m.h * 0.5;
+      // -1 (below fold) → 0 (centred) → 1 (above fold)
+      const sx = Math.max(-1, Math.min(1, (vh * 0.5 - centre) / (vh * 0.5)));
+      m.el.style.setProperty('--sx', sx.toFixed(3));
+    }
+  }
+
+  /* Reveal must NOT depend on requestAnimationFrame: rAF is paused in background
+   * tabs, and these elements start at opacity 0 — a paused loop means invisible
+   * content, not just a skipped animation. This runs synchronously on scroll
+   * (arithmetic over cached metrics, no layout reads). The rAF loop is reserved
+   * for the purely cosmetic tilt, which is fine to drop when hidden. */
+  function revealSweep() {
+    const sy = window.scrollY || window.pageYOffset || 0;
+    const vh = window.innerHeight;
+    for (let i = 0; i < metrics.length; i++) {
+      const m = metrics[i];
+      if (m.el.classList.contains('is-in')) continue;
+      const top = m.top - sy;
+      if (top < vh * 0.92 && top + m.h > 0) m.el.classList.add('is-in');
+    }
+  }
+
+  window.addEventListener('scroll', () => {
+    revealSweep();
+    if (!ticking) { ticking = true; requestAnimationFrame(frame); }
+  }, { passive: true });
+
+  function remeasure() {
+    measure();
+    if (!visible.length) visible = metrics.slice();   // IO unavailable/throttled
+    revealSweep();
+    frame();
+  }
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) remeasure(); });
+  measure();
+  cards.forEach(c => vis.observe(c));
+  window.addEventListener('resize', remeasure, { passive: true });
+  window.addEventListener('load', remeasure, { passive: true });
+  if ('onscrollend' in window) window.addEventListener('scrollend', remeasure, { passive: true });
 })();
