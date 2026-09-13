@@ -8514,7 +8514,7 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
   text-align: center;
 }
 
-.preloader-wordmark {
+.preloader-wordmark--unused {
   font-family: var(--font-display, 'Bebas Neue'), 'Oswald', 'Arial Narrow', sans-serif;
   font-weight: 800;
   font-size: clamp(2.6rem, 9vw, 5.6rem);
@@ -8589,3 +8589,188 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
 
 /* Apple's boot screen is one mark and one bar. The status readout competes. */
 .preloader-detail-row { display: none; }
+
+/* ===================== PER-CARD SCROLL CHOREOGRAPHY ========================
+   Every card's internals stagger in rather than the card arriving as one flat
+   slab. All of it hangs off the parent's .is-in class, which already carries
+   the IO + scroll-sweep + 12s blanket failsafes — so no inner element can get
+   stranded invisible by a new observer of its own. */
+.stamp-card.scroll-3d .sc-top-meta,
+.stamp-card.scroll-3d .sc-sub,
+.stamp-card.scroll-3d .sc-footer {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stamp-card.scroll-3d.is-in .sc-top-meta,
+.stamp-card.scroll-3d.is-in .sc-sub,
+.stamp-card.scroll-3d.is-in .sc-footer {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* Cascade: meta → headline (its own line masks) → body → footer */
+.stamp-card.scroll-3d.is-in .sc-top-meta { transition-delay: 0.04s; }
+.stamp-card.scroll-3d.is-in .sc-sub      { transition-delay: 0.20s; }
+.stamp-card.scroll-3d.is-in .sc-footer   { transition-delay: 0.30s; }
+
+/* Status tag snaps in slightly ahead of its row, like a stamp landing */
+.stamp-card.scroll-3d .sc-status-tag {
+  opacity: 0;
+  transform: scale(0.9) translateZ(0);
+  transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.stamp-card.scroll-3d.is-in .sc-status-tag {
+  opacity: 1;
+  transform: scale(1) translateZ(0);
+  transition-delay: 0.14s;
+}
+
+/* Internal depth parallax — headline and body ride the scroll at different
+   rates against the card plane, so the card reads as having volume. */
+.stamp-card.scroll-3d.is-in .sc-headline {
+  transform: translate3d(0, calc(var(--sx, 0) * -7px), calc(var(--sx, 0) * 26px));
+  will-change: transform;
+}
+
+.stamp-card.scroll-3d.is-in .sc-sub {
+  transform: translate3d(0, calc(var(--sx, 0) * -3px), 0);
+}
+
+.stamp-card.scroll-3d.is-in .sc-top-meta {
+  transform: translate3d(0, calc(var(--sx, 0) * -10px), calc(var(--sx, 0) * 34px));
+}
+
+/* A light sweep that crosses the card once as it lands.
+   Animated via background-position, NOT transform: a translating overlay would
+   need overflow:hidden to clip, and overflow:hidden forces preserve-3d to
+   flatten — which would kill the inner depth parallax above. */
+.stamp-card.scroll-3d::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0;
+  background-image: linear-gradient(105deg,
+    rgba(255,255,255,0) 42%,
+    rgba(255,255,255,0.11) 50%,
+    rgba(255,255,255,0) 58%);
+  background-size: 300% 100%;
+  background-position: 100% 0;
+}
+
+.stamp-card.scroll-3d.is-in::after {
+  animation: cardSweep 1.05s cubic-bezier(0.22, 1, 0.36, 1) 0.16s both;
+}
+
+@keyframes cardSweep {
+  0%   { opacity: 0; background-position: 100% 0; }
+  30%  { opacity: 1; }
+  100% { opacity: 0; background-position: 0% 0; }
+}
+
+.stamp-card--dark.scroll-3d::after,
+.stamp-card--primary.scroll-3d::after {
+  background-image: linear-gradient(105deg,
+    rgba(0,240,255,0) 42%,
+    rgba(0,240,255,0.16) 50%,
+    rgba(0,240,255,0) 58%);
+}
+
+/* Index badge counts up out of its own mask */
+.stamp-card.scroll-3d .sc-index {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.45s ease 0.06s, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.06s;
+}
+
+.stamp-card.scroll-3d.is-in .sc-index {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Ambitions cards get a longer, more deliberate arrival — they are the "what
+   I want to build" beat and should feel slower than the shipped work. */
+#ambitions .stamp-card.scroll-3d {
+  transition:
+    opacity 0.95s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 1.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#ambitions .stamp-card.scroll-3d.is-in .sc-sub    { transition-delay: 0.30s; }
+#ambitions .stamp-card.scroll-3d.is-in .sc-footer { transition-delay: 0.42s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .stamp-card.scroll-3d .sc-top-meta,
+  .stamp-card.scroll-3d .sc-sub,
+  .stamp-card.scroll-3d .sc-footer,
+  .stamp-card.scroll-3d .sc-status-tag,
+  .stamp-card.scroll-3d .sc-index {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .stamp-card.scroll-3d.is-in .sc-headline,
+  .stamp-card.scroll-3d.is-in .sc-sub,
+  .stamp-card.scroll-3d.is-in .sc-top-meta { transform: none !important; }
+  .stamp-card.scroll-3d::after,
+  .stamp-card.scroll-3d.is-in::after { display: none !important; animation: none !important; }
+}
+
+/* ===================== PRELOADER — APPLE "HELLO" HANDWRITING ===============
+   Each letter is one stroke path carrying pathLength="1", which normalises its
+   length so the draw-on is pure CSS: dashoffset 1 -> 0. No getTotalLength(),
+   no JS timing, nothing to fall out of sync. */
+.preloader-script {
+  display: block;
+  width: clamp(230px, 42vw, 430px);
+  height: auto;
+  margin: 0 auto 1.9rem;
+  color: var(--ink, #0B0D10);
+  overflow: visible;
+}
+
+[data-theme="dark"] .preloader-script { color: #F8FAFC; }
+
+.preloader-script .ps-l,
+.preloader-script .ps-dot {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: psDraw 0.62s cubic-bezier(0.55, 0, 0.35, 1) forwards;
+  /* Letters draw in sequence, the way a hand moves across the page. */
+  animation-delay: calc(var(--i, 0) * 0.17s);
+}
+
+.preloader-script .ps-dot {
+  stroke-width: 8;
+  animation-duration: 0.18s;
+}
+
+@keyframes psDraw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* A soft ink bloom once the word finishes, so it settles rather than stopping */
+.preloader-script {
+  animation: psSettle 0.7s ease 1.35s both;
+}
+
+@keyframes psSettle {
+  0%   { filter: drop-shadow(0 0 0 rgba(0,0,0,0)); }
+  40%  { filter: drop-shadow(0 2px 10px rgba(0,0,0,0.16)); }
+  100% { filter: drop-shadow(0 1px 3px rgba(0,0,0,0.08)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preloader-script .ps-l,
+  .preloader-script .ps-dot {
+    stroke-dashoffset: 0;
+    animation: none;
+  }
+  .preloader-script { animation: none; filter: none; }
+}
