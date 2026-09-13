@@ -27,11 +27,16 @@ Priyam Rupapara builds software for messy, physical, real-world operations where
 - Searchable test catalogue, cart and checkout, home-collection booking, same-day reporting, WhatsApp report delivery.
 - Fully trilingual interface: English, Hindi, Gujarati.
 
-### 3. FaceCard (NFC Social Card, pre-launch)
+### 3. Wearables + Reports Health App (BUILDING NOW - MVP in progress)
+- Connects to consumer wearables (Fitbit, smart rings, watches), ingests that continuous data,
+  merges it with the user's actual diagnostic reports, and reasons over both together to give
+  health suggestions.
+- Status: MVP actively being built. Not launched. No public URL yet.
+
+### 3b. FaceCard (a site Priyam built, not a venture he runs)
 - Website: https://facecard.co.in
-- Physical NFC card tapped on a phone to exchange contact, profile and intent in one gesture.
-- Three variants: Devil, Angel, Witness. Brand, product and site designed end to end.
-- Status: waitlist open in Delhi and Gurugram; hardware not yet shipped.
+- Brand identity, product storytelling and marketing site for an NFC social card.
+- Priyam built the brand and the site; the product itself is not his to run.
 
 ### 4. Ecommerce Hub (Indian D2C Truth Layer)
 - Status: PROTOTYPE. Not yet run against a live brand’s data, and not currently raising on it.
