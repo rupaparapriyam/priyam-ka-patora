@@ -107,7 +107,7 @@
   <!-- High-Priority Asset Preloads for 0ms Instant Rendering (Hero Viewport Only) -->
   <link rel="preload" as="image" href="assets/avatar-priyam-casual.webp" type="image/webp" fetchpriority="high" />
 
-  <link rel="stylesheet" href="styles.css?v=20260914_27" />
+  <link rel="stylesheet" href="styles.css?v=20260914_29" />
 </head>
 <body class="preloader-active">
 
@@ -131,7 +131,21 @@
     <div class="preloader-center-editorial">
       <!-- Apple boot sequence: solid wordmark, thin pill progress bar beneath.
            Nothing else competes with it. -->
-      <div class="preloader-wordmark" id="preloader-wordmark" aria-hidden="true">PRIYAM</div>
+      <!-- Apple "hello" style handwriting. Each letter is a single stroke path
+           with pathLength="1", so the draw-on is pure CSS (dashoffset 1 -> 0)
+           with no JS measuring getTotalLength(). -->
+      <svg class="preloader-script" id="preloader-script" viewBox="0 0 470 210"
+           fill="none" role="img" aria-label="Priyam">
+        <g stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+          <path class="ps-l" style="--i:0" pathLength="1" d="M72 150 C80 110 88 74 96 47 C100 33 112 26 122 34 C134 44 130 69 112 78 C102 83 90 85 82 84"/>
+          <path class="ps-l" style="--i:1" pathLength="1" d="M132 148 C136 127 140 110 143 97 C145 107 148 101 156 97 C164 93 173 95 179 101"/>
+          <path class="ps-l" style="--i:2" pathLength="1" d="M196 148 C198 130 200 113 202 98"/>
+          <path class="ps-dot" style="--i:3" pathLength="1" d="M203 77 l0.6 0"/>
+          <path class="ps-l" style="--i:4" pathLength="1" d="M224 98 C228 118 234 134 240 146 C246 132 252 113 256 98 C252 133 248 169 240 185 C234 197 221 199 215 190"/>
+          <path class="ps-l" style="--i:5" pathLength="1" d="M316 103 C304 94 289 100 287 116 C285 133 295 145 307 141 C315 138 319 126 319 114 C319 126 317 138 321 145 C324 150 329 150 334 147"/>
+          <path class="ps-l" style="--i:6" pathLength="1" d="M352 148 C354 128 356 112 358 98 C360 110 366 102 374 100 C382 98 388 105 388 115 C388 127 386 139 386 148 C388 128 394 102 404 100 C414 98 420 107 420 119 C420 131 418 141 418 148 C420 143 426 141 432 144"/>
+        </g>
+      </svg>
 
       <div class="preloader-applebar">
         <div class="preloader-applebar-fill" id="preloader-bar"></div>
@@ -1396,7 +1410,7 @@
     </div>
   </div>
 
-  <script src="avatar-data.js?v=20260914_27"></script>
-  <script src="app.js?v=20260914_27"></script>
+  <script src="avatar-data.js?v=20260914_29"></script>
+  <script src="app.js?v=20260914_29"></script>
 </body>
 </html>

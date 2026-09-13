@@ -6283,6 +6283,42 @@ function initPriyamAiClone() {
       };
     }
 
+    // 1b. INCOMING SMACK — must come before any retrieval. Someone swearing at
+    // the bot was falling through to RAG and getting served a funding document,
+    // which is the least funny possible reply. Bakchod mode swings back; serious
+    // mode stays composed.
+    const isSmack = /\b(fuck|fk|fuk|stfu|shut\s*up|bhenchod|bhosdi|madarchod|mc|bc\b|chutiya|chutiye|gandu|lodu|lund|randi|harami|kutta|kamina|idiot|stupid|trash|garbage|useless|mid\b|cringe|noob|loser|sucks?|scam|fake|fraud|overrated|nonsense|bakwas|faltu|ghatiya|nikamma)\b/i.test(lower);
+
+    if (isSmack) {
+      if (priyamAiMode === 'serious') {
+        return {
+          text: `Noted. \ud83d\ude42 If you actually want to argue about the work, I am up for it \u2014 ASTM serial taps, COD unit economics, whatever. Otherwise switch to \ud83d\udd25 Bakchod Mode and I will meet you where you are.`,
+          actions: [
+            { label: '\ud83d\udd25 Switch to Bakchod Mode', fn: 'setPriyamAiMode("bakchod")' },
+            { label: '\ud83d\udd2c View Kliniqo MVP', fn: 'openProjectDetail("pathlab")' }
+          ]
+        };
+      }
+      const comebacks = [
+        `bc itni energy apne startup me laga leta toh aaj tu bhi kuch ship kar raha hota. \ud83d\udc80`,
+        `Arre bhai gaali de raha hai ek clone ko. Main toh code hoon, tera kya excuse hai? \ud83d\ude02`,
+        `Skill issue detected. Tera CV mere git log se chhota hai bhai. \ud83d\uddff`,
+        `Bol le bol le. Mera ek lab live chal raha hai, tera localhost bhi nahi chalta. \ud83d\udd25`,
+        `Negative aura spotted. \u2212100,000 points. Ja ke thoda deploy kar, phir baat karna. \ud83e\udee1`,
+        `Tu gaali de raha hai, main reports auto-draft kar raha hoon. Dono apna kaam kar rahe hain. \ud83d\ude0e`,
+        `Kya hua, kisi aur AI ne reject kar diya? \ud83d\udc80 Aa ja, yahan bhi wahi milega.`,
+        `Delulu legend behaviour. Chal na, ship kuch kar ke dikha phir tameez sikhana. \ud83e\uddcb`
+      ];
+      return {
+        text: comebacks[Math.floor(Math.random() * comebacks.length)],
+        actions: [
+          { label: '\ud83d\udd25 Roast My Startup', fn: 'askPriyamAI("Roast my startup idea with zero mercy")' },
+          { label: '\u26a1 Calculate My Aura', fn: 'askPriyamAI("How much aura do I have right now?")' },
+          { label: '\ud83e\udd1d Dap Me Up', fn: 'triggerDabInteraction()' }
+        ]
+      };
+    }
+
     // 2. AURA SCANNER & CALCULATOR (GEN-Z AURA SYSTEM)
     if (/aura|how\s*much\s*aura|calculate\s*aura|aura\s*points|check\s*my\s*aura|my\s*aura/i.test(lower)) {
       const auraScores = [
