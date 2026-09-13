@@ -108,7 +108,7 @@
   <link rel="preload" as="image" href="assets/avatar-priyam-casual.webp" type="image/webp" fetchpriority="high" />
   <link rel="preload" as="image" href="assets/surge/bottle_frames/bottle_000.webp" type="image/webp" />
 
-  <link rel="stylesheet" href="styles.css?v=20260914_08" />
+  <link rel="stylesheet" href="styles.css?v=20260914_09" />
 </head>
 <body class="preloader-active">
 
@@ -400,10 +400,19 @@
         </header>
 
         <!-- Primary Featured Projects Grid -->
-        <div class="stamp-cards-grid" id="projects-grid">
+        <div id="projects-grid">
 
+          <!-- ===== TIER 1 : VENTURES ===== -->
+          <div class="tier-head">
+            <span class="tier-num">01</span>
+            <h3 class="tier-title">Ventures</h3>
+            <span class="tier-note">Shipped, running, and live on the internet right now.</span>
+          </div>
+
+          <!-- Kliniqo + Vaibhav Lab are one story: the platform, and the lab running on it. -->
+          <div class="stamp-cards-grid tier-1-grid platform-pair">
           <!-- 1. Kliniqo -->
-          <article class="stamp-card stamp-card--primary" data-category="mvp" onclick="window.openProjectDetail('pathlab')" tabindex="0" role="button" aria-label="Open Kliniqo project detail">
+          <article class="stamp-card stamp-card--primary tier-1-card pair-platform" data-category="mvp" onclick="window.openProjectDetail('pathlab')" tabindex="0" role="button" aria-label="Open Kliniqo project detail">
             <div class="sc-top-meta">
               <span class="sc-index">[01]</span>
               <span class="sc-status-tag sc-status--green">WORKING MVP · LIVE PLATFORM</span>
@@ -422,9 +431,9 @@
               </div>
             </div>
           </article>
-
+            <div class="pair-link" aria-hidden="true"><span>&darr; runs on Kliniqo</span></div>
           <!-- 2. Vaibhav Laboratory (live commercial site, running on Kliniqo) -->
-          <article class="stamp-card stamp-card--primary" data-category="mvp">
+          <article class="stamp-card stamp-card--primary tier-1-card pair-proof" data-category="mvp">
             <div class="sc-top-meta">
               <span class="sc-index">[02]</span>
               <span class="sc-status-tag sc-status--green">LIVE &middot; TAKING REAL BOOKINGS</span>
@@ -442,58 +451,13 @@
               </div>
             </div>
           </article>
+          </div>
 
-          <!-- 3. FaceCard -->
-          <article class="stamp-card stamp-card--dark" data-category="commerce">
+          <div class="stamp-cards-grid tier-1-grid">
+          <!-- 6. SURGE Grooming -->
+          <article class="stamp-card stamp-card--paper tier-1-card" data-category="commerce" onclick="window.openProjectDetail('surge')" tabindex="0" role="button" aria-label="Open SURGE project detail">
             <div class="sc-top-meta">
               <span class="sc-index">[03]</span>
-              <span class="sc-status-tag sc-status--amber">PRE-LAUNCH &middot; WAITLIST OPEN</span>
-              <a href="https://facecard.co.in" target="_blank" rel="noopener noreferrer" class="sc-live-pill sc-live-pill--surge" onclick="event.stopPropagation()" title="Visit facecard.co.in">
-                <span>facecard.co.in &#8599;</span>
-              </a>
-            </div>
-            <h3 class="sc-headline">FaceCard.<br>An NFC Card<br>That Talks First.</h3>
-            <p class="sc-sub">A physical NFC card you tap on a phone to swap contact, profile and intent in one gesture &mdash; three variants (Devil, Angel, Witness) that say what you came for before you say anything. Brand, site and product design built end to end. Waitlist open in Delhi &amp; Gurugram; hardware has not shipped yet.</p>
-            <div class="sc-footer">
-              <span class="sc-stack">NFC &middot; Brand Design &middot; Waitlist Funnel</span>
-              <div class="sc-card-actions">
-                <a href="https://facecard.co.in" target="_blank" rel="noopener noreferrer" class="sc-live-action-btn sc-live-action-btn--surge" onclick="event.stopPropagation()">Visit facecard.co.in &#8599;</a>
-              </div>
-            </div>
-          </article>
-
-          <!-- 4. Ecommerce Hub -->
-          <article class="stamp-card stamp-card--secondary" data-category="commerce mvp" onclick="window.openProjectDetail('ecom')" tabindex="0" role="button" aria-label="Open Ecommerce Hub project detail">
-            <div class="sc-top-meta">
-              <span class="sc-index">[04]</span>
-              <span class="sc-status-tag sc-status--amber">PROTOTYPE · NO LIVE BRAND DATA YET</span>
-            </div>
-            <h3 class="sc-headline">Ecommerce<br>Hub (Is) The<br>D2C Truth Layer.</h3>
-            <p class="sc-sub">A per-order contribution-margin dashboard for Indian D2C brands, designed to close the 60%+ COD and 25-28% RTO return leakage by joining Shopify orders, Razorpay settlement, Shiprocket tracking and Meta/Google ad spend. Prototype built out of the SURGE post-mortem &mdash; not yet pointed at a live brand&rsquo;s numbers.</p>
-            <div class="sc-footer">
-              <span class="sc-stack">Shopify API · Razorpay · Shiprocket · Meta Ads</span>
-              <span class="sc-arrow">↗ Full Story &amp; Math</span>
-            </div>
-          </article>
-
-          <!-- 5. AI Chatbot Assistant (Idea Only / Unstarted) -->
-          <article class="stamp-card stamp-card--paper" data-category="mvp" onclick="window.openProjectDetail('aichatbot')" tabindex="0" role="button" aria-label="Open AI Chatbot Assistant idea detail">
-            <div class="sc-top-meta">
-              <span class="sc-index">[05]</span>
-              <span class="sc-status-tag sc-status--amber">UNSTARTED CONCEPT · VAULT TEARDOWN</span>
-            </div>
-            <h3 class="sc-headline">AI Chatbot<br>(Was) Business<br>Agent OS Idea.</h3>
-            <p class="sc-sub">Native 24/7 action-oriented AI assistant idea for booking, lead triage, and Web/WhatsApp automation. Researched in vault, verified horizontal commoditization risks, and made the disciplined call not to write unvalidated code.</p>
-            <div class="sc-footer">
-              <span class="sc-stack">Strategy Teardown · Agent OS · RAG Architecture</span>
-              <span class="sc-arrow">↗ Read Vault Teardown</span>
-            </div>
-          </article>
-
-          <!-- 6. SURGE Grooming -->
-          <article class="stamp-card stamp-card--paper" data-category="commerce" onclick="window.openProjectDetail('surge')" tabindex="0" role="button" aria-label="Open SURGE project detail">
-            <div class="sc-top-meta">
-              <span class="sc-index">[06]</span>
               <span class="sc-status-tag sc-status--blue">LIVE AT SURGEMEN.IN</span>
               <a href="https://surgemen.in" target="_blank" rel="noopener noreferrer" class="sc-live-pill sc-live-pill--surge" onclick="event.stopPropagation()" title="Visit live storefront surgemen.in">
                 <span class="live-pulse-dot"></span>
@@ -510,11 +474,73 @@
               </div>
             </div>
           </article>
+          </div>
+
+          <!-- ===== TIER 2 : BUILDING ===== -->
+          <div class="tier-head">
+            <span class="tier-num">02</span>
+            <h3 class="tier-title">Building</h3>
+            <span class="tier-note">Real, designed end to end, not shipped yet. Labelled honestly.</span>
+          </div>
+
+          <div class="stamp-cards-grid tier-2-grid">
+          <!-- 3. FaceCard -->
+          <article class="stamp-card stamp-card--dark tier-2-card" data-category="commerce">
+            <div class="sc-top-meta">
+              <span class="sc-index">[04]</span>
+              <span class="sc-status-tag sc-status--amber">PRE-LAUNCH &middot; WAITLIST OPEN</span>
+              <a href="https://facecard.co.in" target="_blank" rel="noopener noreferrer" class="sc-live-pill sc-live-pill--surge" onclick="event.stopPropagation()" title="Visit facecard.co.in">
+                <span>facecard.co.in &#8599;</span>
+              </a>
+            </div>
+            <h3 class="sc-headline">FaceCard.<br>An NFC Card<br>That Talks First.</h3>
+            <p class="sc-sub">A physical NFC card you tap on a phone to swap contact, profile and intent in one gesture &mdash; three variants (Devil, Angel, Witness) that say what you came for before you say anything. Brand, site and product design built end to end. Waitlist open in Delhi &amp; Gurugram; hardware has not shipped yet.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">NFC &middot; Brand Design &middot; Waitlist Funnel</span>
+              <div class="sc-card-actions">
+                <a href="https://facecard.co.in" target="_blank" rel="noopener noreferrer" class="sc-live-action-btn sc-live-action-btn--surge" onclick="event.stopPropagation()">Visit facecard.co.in &#8599;</a>
+              </div>
+            </div>
+          </article>
+          </div>
+
+          <!-- ===== TIER 3 : EXPERIMENTS ===== -->
+          <div class="tier-head">
+            <span class="tier-num">03</span>
+            <h3 class="tier-title">Experiments &amp; Hacks</h3>
+            <span class="tier-note">Prototypes, teardowns, and things built for fun &mdash; including the ones that went nowhere.</span>
+          </div>
+
+          <div class="stamp-cards-grid tier-3-grid">
+          <!-- 4. Ecommerce Hub -->
+          <article class="stamp-card stamp-card--secondary tier-3-card" data-category="commerce mvp" onclick="window.openProjectDetail('ecom')" tabindex="0" role="button" aria-label="Open Ecommerce Hub project detail">
+            <div class="sc-top-meta">
+              <span class="sc-status-tag sc-status--amber">PROTOTYPE · NO LIVE BRAND DATA YET</span>
+            </div>
+            <h3 class="sc-headline">Ecommerce<br>Hub (Is) The<br>D2C Truth Layer.</h3>
+            <p class="sc-sub">A per-order contribution-margin dashboard for Indian D2C brands, designed to close the 60%+ COD and 25-28% RTO return leakage by joining Shopify orders, Razorpay settlement, Shiprocket tracking and Meta/Google ad spend. Prototype built out of the SURGE post-mortem &mdash; not yet pointed at a live brand&rsquo;s numbers.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">Shopify API · Razorpay · Shiprocket · Meta Ads</span>
+              <span class="sc-arrow">↗ Full Story &amp; Math</span>
+            </div>
+          </article>
+
+          <!-- 5. AI Chatbot Assistant (Idea Only / Unstarted) -->
+          <article class="stamp-card stamp-card--paper tier-3-card" data-category="mvp" onclick="window.openProjectDetail('aichatbot')" tabindex="0" role="button" aria-label="Open AI Chatbot Assistant idea detail">
+            <div class="sc-top-meta">
+              <span class="sc-status-tag sc-status--amber">UNSTARTED CONCEPT · VAULT TEARDOWN</span>
+            </div>
+            <h3 class="sc-headline">AI Chatbot<br>(Was) Business<br>Agent OS Idea.</h3>
+            <p class="sc-sub">Native 24/7 action-oriented AI assistant idea for booking, lead triage, and Web/WhatsApp automation. Researched in vault, verified horizontal commoditization risks, and made the disciplined call not to write unvalidated code.</p>
+            <div class="sc-footer">
+              <span class="sc-stack">Strategy Teardown · Agent OS · RAG Architecture</span>
+              <span class="sc-arrow">↗ Read Vault Teardown</span>
+            </div>
+          </article>
 
           <!-- 7. n8n WhatsApp & Parents' Lab Automation -->
-          <article class="stamp-card stamp-card--paper" data-category="mvp" onclick="window.openProjectDetail('chatbot')" tabindex="0" role="button" aria-label="Open n8n WhatsApp Automation project detail">
+          <article class="stamp-card stamp-card--paper tier-3-card" data-category="mvp" onclick="window.openProjectDetail('chatbot')" tabindex="0" role="button" aria-label="Open n8n WhatsApp Automation project detail">
             <div class="sc-top-meta">
-              <span class="sc-index">[07]</span>
               <span class="sc-status-tag sc-status--green">LIVE AT FAMILY LAB</span>
             </div>
             <h3 class="sc-headline">n8n WhatsApp<br>&amp; Parents' Lab<br>Automation.</h3>
@@ -526,9 +552,8 @@
           </article>
 
           <!-- 8. Academic Knowledge Graph & Study Intelligence Engine -->
-          <article class="stamp-card stamp-card--paper" data-category="fun" onclick="window.openProjectDetail('kg')" tabindex="0" role="button" aria-label="Open Academic Knowledge Graph detail">
+          <article class="stamp-card stamp-card--paper tier-3-card" data-category="fun" onclick="window.openProjectDetail('kg')" tabindex="0" role="button" aria-label="Open Academic Knowledge Graph detail">
             <div class="sc-top-meta">
-              <span class="sc-index">[08]</span>
               <span class="sc-status-tag sc-status--blue">BUILT FOR FUN / EXAM PREP</span>
             </div>
             <h3 class="sc-headline">Academic Knowledge<br>Graph (College<br>Study Engine).</h3>
@@ -540,9 +565,8 @@
           </article>
 
           <!-- 9. Algo Trading Bot -->
-          <article class="stamp-card stamp-card--paper" data-category="fun" onclick="window.openProjectDetail('algo')" tabindex="0" role="button" aria-label="Open Algo Trading Bot detail">
+          <article class="stamp-card stamp-card--paper tier-3-card" data-category="fun" onclick="window.openProjectDetail('algo')" tabindex="0" role="button" aria-label="Open Algo Trading Bot detail">
             <div class="sc-top-meta">
-              <span class="sc-index">[09]</span>
               <span class="sc-status-tag sc-status--gray">UNTESTED CODE SCAFFOLD</span>
             </div>
             <h3 class="sc-headline">Algo Trading<br>Bot (Didn't Test)<br>Never Made Cash.</h3>
@@ -554,9 +578,8 @@
           </article>
 
           <!-- 10. JEE Backlog Tracker -->
-          <article class="stamp-card stamp-card--paper" data-category="fun" onclick="window.openProjectDetail('jee')" tabindex="0" role="button" aria-label="Open JEE Tracker detail">
+          <article class="stamp-card stamp-card--paper tier-3-card" data-category="fun" onclick="window.openProjectDetail('jee')" tabindex="0" role="button" aria-label="Open JEE Tracker detail">
             <div class="sc-top-meta">
-              <span class="sc-index">[10]</span>
               <span class="sc-status-tag sc-status--amber">ORIGIN STORY / JOKE</span>
             </div>
             <h3 class="sc-headline">JEE Backlog<br>(Built Instead<br>Of Studying).</h3>
@@ -568,9 +591,8 @@
           </article>
 
           <!-- 11. Solana Stake Bot -->
-          <article class="stamp-card stamp-card--paper" data-category="fun" onclick="window.openProjectDetail('stake')" tabindex="0" role="button" aria-label="Open Solana Stake Bot detail">
+          <article class="stamp-card stamp-card--paper tier-3-card" data-category="fun" onclick="window.openProjectDetail('stake')" tabindex="0" role="button" aria-label="Open Solana Stake Bot detail">
             <div class="sc-top-meta">
-              <span class="sc-index">[11]</span>
               <span class="sc-status-tag sc-status--gray">FOR FUN</span>
             </div>
             <h3 class="sc-headline">Solana Stake<br>Auto-Compound<br>Bot.</h3>
@@ -581,8 +603,10 @@
             </div>
           </article>
 
-        </div>
-      </div>
+          </div><!-- /tier-3-grid -->
+
+        </div><!-- /projects-grid -->
+      </div><!-- /section-container -->
     </section>
 
     <!-- ===================== AMBITIONS / WHAT I WANT TO BUILD ===================== -->
@@ -1332,7 +1356,7 @@
     </div>
   </div>
 
-  <script src="avatar-data.js?v=20260914_08"></script>
-  <script src="app.js?v=20260914_08"></script>
+  <script src="avatar-data.js?v=20260914_09"></script>
+  <script src="app.js?v=20260914_09"></script>
 </body>
 </html>
