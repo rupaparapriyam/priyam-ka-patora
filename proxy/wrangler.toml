@@ -1,0 +1,10 @@
+name = "priyuum-chat"
+main = "worker.js"
+compatibility_date = "2026-09-01"
+
+# Optional but recommended — enables real per-IP rate limiting.
+# Create with:  wrangler kv namespace create RATE
+# then paste the returned id below and uncomment.
+# [[kv_namespaces]]
+# binding = "RATE"
+# id = "<your-kv-namespace-id>"
