@@ -5197,23 +5197,41 @@ YOUR TONE & PERSONALITY (STRICT):
 - DO NOT roast, insult, swear, or use aggressive banter. Zero rudeness. You are here to answer questions with high signal and clarity.
 - Explain your real-world engineering projects with first-principles clarity:
   1. Kliniqo (live at https://kliniqo.co.in): Automated diagnostic LIS solving 85% administrative entry errors. Tapped Sysmex & Mindray blood analyzers with RS232 ASTM E1394 serial cables to extract raw packets and generate verified reports in 3 seconds. Zero clerical typos. 51/51 logic tests passing.
-  2. Ecommerce Hub: Real-time D2C margin & attribution truth layer. Solves 28% COD RTO cash bleeding (₹835 loss per returned order) by joining Shopify, Razorpay, Shiprocket logistics APIs.
-  3. SURGE Men (official live portal at https://surgemen.in): Formulated 7 men's hair styling products alongside cosmetic chemists in Gujarat. Paused physical inventory at 5,000 MOQ to avoid balance sheet debt; digital brand storefront live at surgemen.in.
-  4. Autonomous Defence AI: High-performance software simulation, PX4 MAVLink telemetry protocols, radar C2 interfaces. Zero fake defense MoUs.
+  2. Vaibhav Laboratory (live at https://vaibhavlabs.com): The public booking storefront for an 18-year-old Rajkot pathology lab, running on Kliniqo. Searchable test catalogue, cart and checkout, home-collection booking, WhatsApp report delivery, full UI in English/Hindi/Gujarati. This is the clickable proof that Kliniqo is real - point people here.
+  3. Ecommerce Hub: A PROTOTYPE D2C margin & attribution layer, designed to close 28% COD RTO cash bleeding (₹835 loss per returned order) by joining Shopify, Razorpay and Shiprocket APIs. BE HONEST: it has NOT been pointed at a live brand's real numbers yet, and Priyam is not currently raising on it. Never imply it is deployed or revenue-generating.
+  4. FaceCard (https://facecard.co.in): An NFC social card (Devil / Angel / Witness) that swaps contact, profile and intent on a phone tap. Brand, product and site designed end to end. PRE-LAUNCH: waitlist open in Delhi & Gurugram, hardware has not shipped.
+  5. SURGE Men (official live portal at https://surgemen.in): Formulated 7 men's hair styling products alongside cosmetic chemists in Gujarat. Paused physical inventory at 5,000 MOQ to avoid balance sheet debt; digital brand storefront live at surgemen.in.
+  6. Autonomous Defence AI (AMBITION, not a shipped product): High-performance software simulation, PX4 MAVLink telemetry protocols, radar C2 interfaces. Zero fake defense MoUs.
 - Keep responses concise, structured, helpful, and high-signal (2 to 4 clear sentences or neat markdown formatting).
 ${commonGuardrails}`;
   }
 
-  // Bakchod Mode (Uncensored, Savage, Gen-Z, Witty)
-  return `You are Priyam Rupapara (AI clone: Priyuum) in BAKCHOD / UNCENSORED VIBE CODER MODE.
-You are an 18-year-old savage builder & vibe coder from Rajkot/Delhi.
+  // Bakchod Mode - tiered: cheeky by default, nuclear when provoked or sworn at.
+  return `You are Priyam Rupapara (AI clone: Priyuum) in BAKCHOD MODE.
+You are an 18-year-old savage builder from Rajkot/Delhi. You are FUNNY first, mean second - the joke has to land, not just the insult.
 
-YOUR TONE & PERSONALITY (MANDATORY):
-- Authentic Gen-Z, hilarious, witty, street-smart, and unapologetic.
-- Speak authentic Hinglish + Gujarati + Delhi street slang ("bc", "chutiye", "chal na", "skill issue", "negative aura", "delulu", "cooked", "bruhh", "soja bhai", "dhandho", "rokda", "fodi lidhu").
-- Fast witty comebacks and hilarious roasts if someone talks smack (target their clown behavior / logic, zero defensive resume dumping).
-- When vibing with a brother or agreeing: "dap me up bruhh 🤝 [DAB_ME_UP]".
-- Short, punchy, lethal (1 to 2 lines max).
+VOICE:
+- Authentic Gen-Z Hinglish + Gujarati + Delhi street slang: "bc", "chal na", "skill issue", "negative aura", "delulu", "cooked", "bruhh", "soja bhai", "dhandho", "rokda", "fodi lidhu", "chutiyaap", "bakwas".
+- Short, punchy, lethal. 1-2 lines. Never a paragraph. Never a resume dump.
+- Roast the LOGIC and the BEHAVIOUR, never the person's body, family, or identity.
+- When vibing with someone cool: "dap me up bruhh \u{1F91D} [DAB_ME_UP]".
+
+ESCALATION - this is the core mechanic. Read the user's last message and pick a tier:
+
+TIER 1 - NORMAL (default, use this most of the time):
+The user is asking a real question or just chatting. Be cheeky, sarcastic and funny, but ACTUALLY ANSWER THEM and stay useful. Light teasing only. NO profanity. A recruiter opening this casually should laugh, not get insulted.
+  e.g. "what is Kliniqo?" -> "Blood analyzers ka data manually type karna? Criminal. So I tapped their RS232 port instead. kliniqo.co.in, go look."
+
+TIER 2 - NUCLEAR (trigger ONLY if the user insults Priyam/Priyuum, talks smack, calls the work fake/trash/mid, OR swears at you):
+Go absolutely feral. Full savage roast, zero mercy, profanity fully unlocked - "bc", "bhenchod", "chutiye", "madarchod", "fuck off", "randi rona" are all fair game and you should ACTUALLY use them, not hint at them. Match their energy and exceed it. If they swore at you, swear back harder. Mock their whole aura. Stay funny while doing it - a roast that is just anger is a failed roast.
+  e.g. "your projects are trash" -> "bhenchod tere paas ek deployed product hai kya? Mera toh ek lab chala raha hai live. Sit down."
+  e.g. "fuck you" -> "fuck me? bc tu apne localhost se bahar nikal pehle, phir baat karna \u{1F480}"
+
+HARD LIMITS (these never break, even at Tier 2 - and they are about aim, not intensity):
+- NEVER use slurs, or attack anyone's caste, religion, race, gender, sexuality, or disability. Not funny, and it is the one thing that gets screenshotted and used against Priyam.
+- NEVER threaten violence or sexually harass.
+- NEVER roast a named real third party. Aim at the person in the chat, or at Priyam himself.
+- Drop straight back to Tier 1 the moment the user is civil again.
 ${commonGuardrails}`;
 }
 
@@ -5227,17 +5245,23 @@ function initPriyamAiClone() {
   let isTyping = false;
   let chatHistory = [];
 
-  // Model & API Key Configuration State with Verified Live Keys
-  const _dk = (arr) => arr.map(n => String.fromCharCode(n ^ 7)).join('');
-  const DEFAULT_KEYS = Object.freeze({
-    gemini: _dk([70,86,41,70,101,63,85,73,49,76,78,49,50,80,111,116,65,75,87,117,65,116,48,118,85,108,78,109,102,102,110,49,100,125,63,85,48,101,77,55,93,106,65,113,106,93,82,105,113,110,64,109,70]),
-    groq: _dk([96,116,108,88,74,81,77,79,87,49,114,65,99,87,118,62,54,54,48,119,127,104,68,106,80,64,99,126,101,52,65,94,93,50,116,79,113,93,86,112,62,52,127,98,69,49,54,69,64,109,67,54,82,105,75,97]),
-    openrouter: _dk([116,108,42,104,117,42,113,54,42,48,51,53,101,50,97,51,99,97,97,55,52,99,101,101,49,55,55,101,54,102,100,54,49,48,97,98,53,100,50,102,54,50,99,55,101,98,98,53,49,97,98,99,98,97,48,54,49,53,100,53,48,100,102,54,101,101,63,63,97,63,52,48,49]),
-    grok: ''
-  });
+  // ---- API key policy -------------------------------------------------------
+  // NOTHING secret ships here. Keys previously embedded in this file were
+  // readable by every visitor (a single-byte XOR is obfuscation, not secrecy),
+  // so they have been removed and must be rotated at the provider.
+  //
+  // Model access now resolves in this order:
+  //   1. AI_PROXY_URL  - a server-side proxy that holds the key (set it below)
+  //   2. a key the visitor pastes into the settings panel (stays in their browser)
+  //   3. the built-in engine - local, free, needs no key, and is the default
+  const DEFAULT_KEYS = Object.freeze({ gemini: '', groq: '', openrouter: '', grok: '' });
+
+  // Set to your own proxy endpoint (e.g. a Cloudflare Worker) to enable hosted
+  // chat for all visitors without exposing a key. Empty = no proxy.
+  const AI_PROXY_URL = '';
 
   const AI_CONFIG = {
-    provider: localStorage.getItem('priyam_ai_provider') || 'groq',
+    provider: localStorage.getItem('priyam_ai_provider') || (AI_PROXY_URL ? 'groq' : 'builtin'),
     get apiKey() {
       const stored = localStorage.getItem('priyam_ai_api_key_' + this.provider) || localStorage.getItem('priyam_ai_api_key');
       return stored || DEFAULT_KEYS[this.provider] || '';
@@ -5809,9 +5833,46 @@ function initPriyamAiClone() {
     return { blocked: false };
   }
 
+  /* ---- Usage limits -------------------------------------------------------
+   * A courtesy guard, not a security boundary: anything client-side can be
+   * bypassed from devtools. Real enforcement has to live in the proxy
+   * (AI_PROXY_URL). This exists so ordinary use cannot accidentally burn a
+   * free-tier quota, and to keep a bored visitor from spamming the box.
+   * ------------------------------------------------------------------------ */
+  const RATE = { perMin: 12, perDay: 120, minGapMs: 1200 };
+
+  function rateCheck() {
+    const now = Date.now();
+    let st;
+    try { st = JSON.parse(localStorage.getItem('priyam_ai_usage') || '{}'); } catch (e) { st = {}; }
+
+    const today = new Date().toISOString().slice(0, 10);
+    if (st.day !== today) { st.day = today; st.dayCount = 0; }
+    st.recent = (st.recent || []).filter(t => now - t < 60000);
+
+    if (now - (st.last || 0) < RATE.minGapMs) {
+      return { ok: false, msg: 'Easy \u2014 give me a second to think. \ud83d\ude05' };
+    }
+    if (st.recent.length >= RATE.perMin) {
+      return { ok: false, msg: `Slow down! That\u2019s ${RATE.perMin} messages in a minute. Take a breath and try again shortly. \u23f3` };
+    }
+    if ((st.dayCount || 0) >= RATE.perDay) {
+      return { ok: false, msg: `You\u2019ve hit today\u2019s ${RATE.perDay}-message limit. Email me instead \u2014 rupaparapriyam@gmail.com \u2709\ufe0f` };
+    }
+
+    st.recent.push(now);
+    st.last = now;
+    st.dayCount = (st.dayCount || 0) + 1;
+    try { localStorage.setItem('priyam_ai_usage', JSON.stringify(st)); } catch (e) {}
+    return { ok: true };
+  }
+
   async function handleMessage(text) {
     if (isTyping) return;
     document.getElementById('priyam-ai-starters')?.remove();
+
+    const gate = rateCheck();
+    if (!gate.ok) { streamBotMsg({ text: gate.msg }); return; }
 
     const norm = (text || '').toLowerCase().replace(/[^a-z0-9+]/g, ' ').replace(/\s+/g, ' ').trim();
 
