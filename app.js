@@ -1031,6 +1031,22 @@ function initProjectFilters() {
           card.classList.add('filtered-out');
         }
       });
+
+      // A tier heading with nothing left under it is noise - collapse the
+      // whole group (heading + its grid) when the filter empties it.
+      document.querySelectorAll('#projects-grid .stamp-cards-grid').forEach(grid => {
+        const visible = grid.querySelectorAll('.stamp-card:not(.filtered-out)').length;
+        grid.classList.toggle('tier-empty', visible === 0);
+      });
+      document.querySelectorAll('#projects-grid .tier-head').forEach(head => {
+        let n = head.nextElementSibling, any = false;
+        while (n && !n.classList.contains('tier-head')) {
+          if (n.classList.contains('stamp-cards-grid') &&
+              n.querySelectorAll('.stamp-card:not(.filtered-out)').length) { any = true; break; }
+          n = n.nextElementSibling;
+        }
+        head.classList.toggle('tier-empty', !any);
+      });
     });
   });
 }

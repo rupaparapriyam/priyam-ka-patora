@@ -8107,3 +8107,121 @@ button, .touch-ctrl-btn, .pl-btn, .ai-chip, .ai-action-chip, .stamp-card, .conta
   .cmd-box { border-radius: 16px; }
   .cmd-item { border-radius: 9px; }
 }
+
+/* ===================== PROJECT TIERS =====================
+   Ventures read large, experiments read small. The point is that a stranger
+   can tell at a glance which two things are businesses and which are hacks. */
+.tier-head {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 2.75rem 0 0.9rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.tier-head:first-of-type { margin-top: 1.5rem; }
+
+.tier-num {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: var(--ink-dim);
+}
+
+.tier-title {
+  font-family: var(--font-display, var(--font-body));
+  font-size: clamp(1.35rem, 3vw, 1.9rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--ink);
+}
+
+.tier-note {
+  font-size: 0.8rem;
+  color: var(--ink-dim);
+  flex: 1 1 260px;
+}
+
+/* --- Tier 1: full-bleed, one venture per row on desktop --- */
+.tier-1-grid { grid-template-columns: 1fr; }
+
+.tier-1-card .sc-headline {
+  font-size: clamp(1.9rem, 4.4vw, 3.1rem);
+  line-height: 0.98;
+}
+
+.tier-1-card .sc-sub {
+  font-size: 0.97rem;
+  max-width: 62ch;
+}
+
+.tier-1-card { padding: clamp(1.5rem, 3vw, 2.5rem); }
+
+/* Kliniqo -> Vaibhav Lab: one story, two cards. */
+.platform-pair { position: relative; }
+
+.pair-link {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--paper);
+  padding: 0.55rem 0;
+}
+
+.pair-link span {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  border: 1px dashed var(--line);
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+}
+
+/* --- Tier 2 --- */
+.tier-2-grid { grid-template-columns: 1fr; }
+.tier-2-card .sc-headline { font-size: clamp(1.6rem, 3.4vw, 2.3rem); }
+
+/* --- Tier 3: compact, deliberately secondary --- */
+.tier-3-card { padding: 1.05rem 1.15rem; }
+
+.tier-3-card .sc-headline {
+  font-size: clamp(1rem, 2vw, 1.18rem);
+  line-height: 1.14;
+}
+
+.tier-3-card .sc-sub {
+  font-size: 0.79rem;
+  line-height: 1.5;
+  opacity: 0.86;
+}
+
+.tier-3-card .sc-stack { font-size: 0.58rem; }
+
+/* Hide a tier heading when the active filter empties its grid. */
+.tier-head.tier-empty,
+.stamp-cards-grid.tier-empty { display: none; }
+
+@media (min-width: 768px) {
+  .tier-2-grid { grid-template-columns: repeat(2, 1fr); }
+  .tier-3-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (min-width: 1100px) {
+  .platform-pair { grid-template-columns: 1fr auto 1fr; align-items: stretch; }
+  .pair-link {
+    grid-column: auto;
+    padding: 0 0.4rem;
+  }
+  .pair-link span {
+    writing-mode: vertical-rl;
+    letter-spacing: 0.22em;
+  }
+}
