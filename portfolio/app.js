@@ -5300,10 +5300,10 @@ function initPriyamAiClone() {
 
   // Set to your own proxy endpoint (e.g. a Cloudflare Worker) to enable hosted
   // chat for all visitors without exposing a key. Empty = no proxy.
-  const AI_PROXY_URL = '';
+  const AI_PROXY_URL = 'https://priyuum-chat.rupaparapriyam.workers.dev';
 
   const AI_CONFIG = {
-    provider: localStorage.getItem('priyam_ai_provider') || (AI_PROXY_URL ? 'groq' : 'builtin'),
+    provider: localStorage.getItem('priyam_ai_provider') || (AI_PROXY_URL ? 'proxy' : 'builtin'),
     get apiKey() {
       const stored = localStorage.getItem('priyam_ai_api_key_' + this.provider) || localStorage.getItem('priyam_ai_api_key');
       return stored || DEFAULT_KEYS[this.provider] || '';
@@ -5992,9 +5992,36 @@ function initPriyamAiClone() {
 
     const systemPrompt = buildPriyamSystemPrompt();
 
-    // 2. Multi-Provider Cloud LLM Engine (Gemini / Groq / Grok / OpenRouter / Fallback)
+    // 2. Multi-Provider Cloud LLM Engine (Proxy / Gemini / Groq / Grok / OpenRouter / Fallback)
     try {
-      if (AI_CONFIG.provider === 'gemini' && AI_CONFIG.apiKey) {
+      if (AI_PROXY_URL && (AI_CONFIG.provider === 'proxy' || !AI_CONFIG.apiKey)) {
+        // Hosted path: the Worker holds the key, the browser never sees one.
+        // Real LLM reasoning over the retrieved RAG context - not canned replies.
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 12000);
+
+        const res = await fetch(AI_PROXY_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            messages: [
+              { role: 'system', content: `${systemPrompt}\n\n[RETRIEVED KNOWLEDGE CONTEXT]\n${ragContextStr}` },
+              ...chatHistory.slice(-6).map(m => ({
+                role: m.role === 'bot' ? 'assistant' : 'user',
+                content: m.content
+              }))
+            ],
+            temperature: 0.95
+          }),
+          signal: controller.signal
+        }).catch(() => null);
+
+        clearTimeout(timeoutId);
+        if (res && res.ok) {
+          const data = await res.json();
+          responseText = cleanResponseText(data?.text);
+        }
+      } else if (AI_CONFIG.provider === 'gemini' && AI_CONFIG.apiKey) {
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
 

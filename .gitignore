@@ -10,3 +10,8 @@
 .claude-flow/data/
 .claude-flow/logs/
 .claude-flow/sessions/
+
+# Wrangler local state (never deploy to gh-pages)
+portfolio/.wrangler/
+portfolio/wrangler.jsonc
+portfolio/proxy/.wrangler/
