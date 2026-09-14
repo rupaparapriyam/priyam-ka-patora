@@ -1015,7 +1015,10 @@ function initHeroInteractiveCanvas() {
    ========================================================================== */
 function initProjectFilters() {
   const filterBtns = document.querySelectorAll('.pf-btn');
-  const cards = document.querySelectorAll('.stamp-card');
+  // Scoped to the projects grid. This was document-wide, so clicking any
+  // non-"all" pill also hid both #ambitions cards — they carry no
+  // data-category, so nothing ever matched them.
+  const cards = document.querySelectorAll('#projects-grid .stamp-card');
 
   filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -5269,7 +5272,7 @@ YOUR TONE & PERSONALITY (MANDATORY):
 - Authentic Gen-Z, hilarious, witty, street-smart, and unapologetic.
 - Speak authentic Hinglish + Gujarati + Delhi street slang ("bc", "chutiye", "chal na", "skill issue", "negative aura", "delulu", "cooked", "bruhh", "soja bhai", "dhandho", "rokda", "fodi lidhu").
 - Fast witty comebacks and hilarious roasts if someone talks smack (target their clown behavior / logic, zero defensive resume dumping).
-- When vibing with a brother or agreeing: "dap me up bruhh \u{1F91D} [DAB_ME_UP]".
+- RARE move, not a catchphrase: ONLY if the user actually daps you up, hypes you, or says something genuinely based, you may end with "dap me up bruhh \u{1F91D} [DAB_ME_UP]". Never more than once in a conversation, and never on a normal question or a roast. Default is to NOT use it.
 - Short, punchy, lethal (1 to 2 lines max).
 - NEVER sound like a helpful assistant. No "Sure!", no "Great question!", no bullet-point explainers.
 
@@ -8507,4 +8510,219 @@ if (document.readyState === 'loading') {
   window.addEventListener('resize', remeasure, { passive: true });
   window.addEventListener('load', remeasure, { passive: true });
   if ('onscrollend' in window) window.addEventListener('scrollend', remeasure, { passive: true });
+})();
+
+/* ==========================================================================
+   PINNED HORIZONTAL 3D RAIL — sections 2 (#projects) + 3 (#ambitions)
+   --------------------------------------------------------------------------
+   Progressive enhancement. The markup on disk stays a normal vertical grid;
+   this builds the rail at runtime only when it is safe to. If this file never
+   executes, the grid renders exactly as before — which is why no rail styles
+   set opacity:0 on content.
+
+   Zero-reflow contract: every geometry read happens in measure(), which runs
+   on load / resize / scrollend / filter-click. The scroll path does arithmetic
+   over cached numbers and writes transforms. No getBoundingClientRect,
+   offsetWidth or getComputedStyle in the frame path.
+
+   Pin height is expressed in CSS-computed pixels and written ONCE per measure,
+   before updateGlobalLayoutMetrics runs, so layoutCache.surge.top (an absolute
+   document coordinate) and initNavSpy's offsetTop reads stay correct.
+   ========================================================================== */
+(function initPinnedRails() {
+  const MIN_WIDTH = 1024;
+
+  function eligible() {
+    return window.innerWidth >= MIN_WIDTH &&
+           window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+           !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  const rails = [];
+
+  function buildRail(sectionId, track) {
+    const section = document.getElementById(sectionId);
+    if (!section || !track || track.dataset.railBuilt === '1') return null;
+
+    // Wrap the track, never its children: the filter engine walks
+    // .tier-head -> nextElementSibling inside the track, so that stays intact.
+    const body = document.createElement('div');
+    body.className = 'rail-body';
+    const stage = document.createElement('div');
+    stage.className = 'rail-stage';
+
+    track.parentNode.insertBefore(body, track);
+    body.appendChild(stage);
+    stage.appendChild(track);
+
+    const prog = document.createElement('div');
+    prog.className = 'rail-progress';
+    const fill = document.createElement('span');
+    fill.className = 'rail-progress-fill';
+    prog.appendChild(fill);
+
+    const hint = document.createElement('div');
+    hint.className = 'rail-hint';
+    hint.textContent = 'Scroll ↓  ·  drag the rail  ·  click a card for the full story';
+
+    stage.appendChild(hint);
+    stage.appendChild(prog);
+
+    track.dataset.railBuilt = '1';
+    section.classList.add('rail-host');
+
+    const rail = {
+      section, track, body, stage, fill,
+      bodyTop: 0, bodyH: 0, stageH: 0, travel: 0, stickyTop: 0,
+      cards: [], centres: [], trackW: 0, drag: 0, on: false,
+    };
+    rails.push(rail);
+    return rail;
+  }
+
+  // ---- measure: the ONLY place geometry is read -------------------------
+  function measure(r) {
+    r.on = eligible();
+    r.track.classList.toggle('rail-on', r.on);
+
+    if (!r.on) {
+      r.body.style.height = '';
+      r.stage.style.top = '';
+      r.track.style.transform = '';
+      r.cards.forEach(c => c.el.style.removeProperty('--d'));
+      return;
+    }
+
+    const navH = parseFloat(getComputedStyle(document.documentElement)
+      .getPropertyValue('--nav-h')) || 64;
+    r.stickyTop = navH;
+    r.stage.style.top = navH + 'px';
+
+    // Natural width of the track content, then the pin length it needs.
+    r.track.style.transform = 'translate3d(0,0,0)';   // measure untransformed
+    r.body.style.height = 'auto';
+    const trackW = r.track.scrollWidth;
+    const stageW = r.stage.clientWidth;
+    r.travel = Math.max(0, trackW - stageW);
+
+    r.stageH = window.innerHeight - navH;
+    // 1px of vertical scroll ~ 1px of horizontal travel feels right, plus a
+    // little dwell at each end so the first and last card are readable.
+    const pin = r.travel > 0 ? r.travel + r.stageH * 0.5 : 0;
+    r.bodyH = r.stageH + pin;
+    r.body.style.height = r.bodyH + 'px';
+
+    const rect = r.body.getBoundingClientRect();
+    r.bodyTop = rect.top + (window.scrollY || window.pageYOffset || 0);
+
+    /* Centres must be relative to the TRACK. offsetLeft is relative to the
+     * nearest positioned ancestor, and every card sits inside a nested
+     * .stamp-cards-grid — using it produced non-monotonic distances and made
+     * cards further right read as closer to centre. Measure against the
+     * track's own rect instead (safe: this is measure(), not the frame path)
+     * and undo any transform already applied. */
+    const tRect = r.track.getBoundingClientRect();
+    const applied = r.lastX || 0;
+    const live = r.track.querySelectorAll('.stamp-card:not(.filtered-out)');
+    r.cards = [];
+    for (let i = 0; i < live.length; i++) {
+      const el = live[i];
+      const cr = el.getBoundingClientRect();
+      r.cards.push({ el, centre: (cr.left - tRect.left) + cr.width * 0.5 + 0 * applied });
+    }
+    r.stageW = stageW;
+  }
+
+  // ---- frame: arithmetic only -------------------------------------------
+  function render(r) {
+    if (!r.on) return;
+    const sy = window.scrollY || window.pageYOffset || 0;
+    const span = Math.max(1, r.bodyH - r.stageH);
+    let p = (sy - r.bodyTop + r.stickyTop) / span;
+    p = p < 0 ? 0 : p > 1 ? 1 : p;
+
+    const x = -(p * r.travel) + r.drag;
+    r.lastX = x;
+    r.track.style.transform = `translate3d(${x.toFixed(1)}px, 0, 0)`;
+    r.fill.style.width = (p * 100).toFixed(1) + '%';
+
+    const mid = r.stageW * 0.5;
+    for (let i = 0; i < r.cards.length; i++) {
+      const c = r.cards[i];
+      // signed distance from stage centre, normalised to roughly -1..1
+      const d = (c.centre + x - mid) / (r.stageW * 0.62);
+      c.el.style.setProperty('--d', (d < -1.6 ? -1.6 : d > 1.6 ? 1.6 : d).toFixed(3));
+    }
+  }
+
+  let ticking = false;
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => { ticking = false; rails.forEach(render); });
+  }
+
+  function remeasureAll() {
+    rails.forEach(measure);
+    rails.forEach(render);
+    // Our pin height changes document geometry; let the shared cache re-read.
+    if (typeof window.refreshLayoutMetrics === 'function') window.refreshLayoutMetrics();
+  }
+
+  // ---- drag-to-scrub, with click suppression ----------------------------
+  function attachDrag(r) {
+    let down = false, startX = 0, base = 0, moved = 0;
+
+    r.stage.addEventListener('pointerdown', e => {
+      if (!r.on || e.button !== 0) return;
+      down = true; moved = 0; startX = e.clientX; base = r.drag;
+    });
+
+    window.addEventListener('pointermove', e => {
+      if (!down) return;
+      const dx = e.clientX - startX;
+      moved = Math.max(moved, Math.abs(dx));
+      r.drag = Math.max(-r.travel, Math.min(r.travel, base + dx));
+      onScroll();
+    }, { passive: true });
+
+    window.addEventListener('pointerup', () => {
+      if (!down) return;
+      down = false;
+      // A drag ends in a real click on the card underneath, which would open
+      // the project modal on every swipe. Swallow exactly that one click.
+      if (moved > 6) {
+        const swallow = ev => { ev.stopPropagation(); ev.preventDefault(); };
+        window.addEventListener('click', swallow, { capture: true, once: true });
+        // If no click follows (drag ended off a card), drop the guard so it
+        // cannot swallow an unrelated click later.
+        setTimeout(() => window.removeEventListener('click', swallow, { capture: true }), 350);
+      }
+      r.drag = 0;
+      onScroll();
+    });
+  }
+
+  function boot() {
+    const projects = document.getElementById('projects-grid');
+    const ambitions = document.querySelector('#ambitions .stamp-cards-grid');
+    const a = buildRail('projects', projects);
+    const b = buildRail('ambitions', ambitions);
+    [a, b].filter(Boolean).forEach(attachDrag);
+    remeasureAll();
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', remeasureAll, { passive: true });
+    window.addEventListener('load', remeasureAll, { passive: true });
+    if ('onscrollend' in window) window.addEventListener('scrollend', remeasureAll, { passive: true });
+    document.querySelectorAll('.pf-btn').forEach(btn =>
+      btn.addEventListener('click', () => setTimeout(remeasureAll, 60)));
+    window.refreshRails = remeasureAll;
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, { once: true });
+  } else {
+    boot();
+  }
 })();

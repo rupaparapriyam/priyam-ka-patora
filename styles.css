@@ -8800,3 +8800,191 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
 @media (prefers-reduced-motion: reduce) {
   .tv-crt-viewport:has(#uav-start-overlay.hidden) .kbd-legend { animation: none; }
 }
+
+/* ===================== PINNED HORIZONTAL 3D RAIL ===========================
+   Sections 2 + 3 travel sideways through 3D space while pinned.
+
+   Built as progressive enhancement: JS wraps the existing #projects-grid /
+   #ambitions grid at runtime and adds .rail-on. If JS never runs, or the
+   viewport is narrow, or the user prefers reduced motion, NONE of this applies
+   and the original vertical grid stands untouched. Nothing here sets
+   opacity:0 on content — the reveal choreography is deliberately not reused
+   inside the rail, because a pinned rail freezes vertical position and would
+   strand every card invisible.                                             */
+
+.rail-body { position: relative; }
+
+.rail-stage {
+  position: sticky;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  /* Perspective lives HERE, not on the track: a perspective on the moving
+     element projects its own translateX and warps the travel. */
+  perspective: 1600px;
+  perspective-origin: 50% 50%;
+}
+
+/* Rail mode cancels the containment that would otherwise fight a pinned child */
+.rail-host {
+  content-visibility: visible !important;
+  contain: none !important;
+}
+
+/* The existing grid becomes the track. Children stay flat siblings, so the
+   filter engine's .tier-head -> nextElementSibling walk is untouched. */
+#projects-grid.rail-on,
+#ambitions .stamp-cards-grid.rail-on {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 1.5rem;
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding: 0 12vw;
+  will-change: transform;
+  transform-style: preserve-3d;
+  /* perspective deliberately NOT set here — see .rail-stage */
+  perspective: none;
+}
+
+.rail-on .stamp-cards-grid {
+  display: flex;
+  flex-direction: row;
+  gap: 1.5rem;
+  background: transparent;
+  border: none;
+  flex: 0 0 auto;
+  grid-template-columns: none !important;
+}
+
+/* Tier headings become vertical spine markers between groups */
+.rail-on .tier-head {
+  flex: 0 0 auto;
+  width: 72px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+.rail-on .tier-head .tier-title {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: clamp(1rem, 1.6vw, 1.4rem);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.rail-on .tier-head .tier-note { display: none; }
+
+.rail-on .tier-num {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+/* Cards on the rail: fixed width, always visible, 3D driven by --d
+   (signed distance from rail centre, -1 .. 0 .. 1) written once per frame. */
+.rail-on .stamp-card {
+  flex: 0 0 clamp(300px, 27vw, 420px);
+  min-height: clamp(340px, 46vh, 460px);
+  opacity: 1 !important;
+  filter: none !important;
+  will-change: transform;
+  transform:
+    translate3d(0, calc(var(--d, 0) * var(--d, 0) * 26px), calc(var(--d, 0) * var(--d, 0) * -190px))
+    rotateY(calc(var(--d, 0) * -21deg))
+    scale(calc(1 - (var(--d, 0) * var(--d, 0) * 0.1)));
+  transition: none;
+}
+
+/* Cards fade toward the edges rather than popping out of existence */
+.rail-on .stamp-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: var(--paper);
+  opacity: calc(var(--d, 0) * var(--d, 0) * 0.55);
+  transition: opacity 0.15s linear;
+}
+
+/* Inner elements stay put — the cascade belongs to the vertical layout */
+.rail-on .stamp-card .sc-top-meta,
+.rail-on .stamp-card .sc-sub,
+.rail-on .stamp-card .sc-footer,
+.rail-on .stamp-card .sc-status-tag,
+.rail-on .stamp-card .sc-index {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+.rail-on .stamp-card .sc-headline .rise-line {
+  transform: none !important;
+  transition: none !important;
+}
+
+.rail-on .stamp-card:hover {
+  transform:
+    translate3d(0, calc(var(--d, 0) * var(--d, 0) * 26px), calc(60px + var(--d, 0) * var(--d, 0) * -190px))
+    rotateY(calc(var(--d, 0) * -21deg))
+    scale(calc(1.02 - (var(--d, 0) * var(--d, 0) * 0.1)));
+  z-index: 4;
+}
+
+.rail-on .pair-link { display: none; }
+
+/* Progress hairline under the stage */
+.rail-progress {
+  position: absolute;
+  left: 12vw;
+  right: 12vw;
+  bottom: 7vh;
+  height: 2px;
+  background: var(--line);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.rail-progress-fill {
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: var(--ink);
+  border-radius: 2px;
+}
+
+.rail-hint {
+  position: absolute;
+  left: 12vw;
+  bottom: calc(7vh + 14px);
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+}
+
+/* The rail is desktop + fine-pointer + motion-allowed only. Everything else
+   keeps the original vertical grid, which is why none of the above is
+   destructive. */
+@media (max-width: 1023px), (hover: none), (prefers-reduced-motion: reduce) {
+  .rail-stage { position: static; height: auto; overflow: visible; perspective: none; }
+  #projects-grid.rail-on,
+  #ambitions .stamp-cards-grid.rail-on { display: grid; transform: none !important; padding: 0; }
+  .rail-on .stamp-card { transform: none !important; }
+  .rail-on .stamp-card::before { display: none; }
+  .rail-progress, .rail-hint { display: none; }
+}
