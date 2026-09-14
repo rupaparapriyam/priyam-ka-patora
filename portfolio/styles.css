@@ -8820,7 +8820,11 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
 
 .rail-stage {
   position: sticky;
-  height: 100vh;
+  /* MUST match the JS `stageH = innerHeight - navH`. It was 100vh (900px) while
+     JS assumed 842px, so the rail body was sized ~58px taller than the sticky
+     could cover: sticky ended before progress reached 1 and left a blank gap
+     between Ambitions and SURGE. */
+  height: calc(100vh - var(--nav-h));
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -8932,8 +8936,8 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
   transform:
     perspective(1400px)
     translate3d(var(--tx, 0px), calc(var(--a, 0) * var(--a, 0) * 22px), calc(var(--a, 0) * var(--a, 0) * -560px))
-    rotateY(calc(var(--sgn, 1) * var(--a, 0) * -74deg))
-    rotateZ(calc(var(--sgn, 1) * var(--a, 0) * 3deg))
+    rotateY(calc(var(--sgn, 1) * var(--a, 0) * -88deg))
+    rotateZ(calc(var(--sgn, 1) * var(--a, 0) * 4.5deg))
     scale(calc(1 - (var(--a, 0) * 0.34)));
 
   box-shadow:
