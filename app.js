@@ -8655,8 +8655,11 @@ if (document.readyState === 'loading') {
     for (let i = 0; i < r.cards.length; i++) {
       const c = r.cards[i];
       // signed distance from stage centre, normalised to roughly -1..1
-      const d = (c.centre + x - mid) / (r.stageW * 0.62);
-      c.el.style.setProperty('--d', (d < -1.6 ? -1.6 : d > 1.6 ? 1.6 : d).toFixed(3));
+      // Tighter divisor => the immediate neighbours already sit deep in the
+      // carousel instead of being almost flat. Clamped so far-off cards stop
+      // receding rather than collapsing to nothing.
+      const d = (c.centre + x - mid) / (r.stageW * 0.40);
+      c.el.style.setProperty('--d', (d < -1.35 ? -1.35 : d > 1.35 ? 1.35 : d).toFixed(3));
     }
   }
 
