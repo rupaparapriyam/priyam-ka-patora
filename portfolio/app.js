@@ -2477,7 +2477,8 @@ function initUavFlightGame() {
     const angleToBase = Math.atan2(targetY - startY, targetX - startX);
 
     // Dynamic speed scaling (+1.5% per kill, capped at +60% max)
-    const speedMultiplier = 1.0 + Math.min(0.60, state.intercepted * 0.015);
+    // Harder: ceiling 1.60x -> 2.05x, reached roughly twice as fast.
+    const speedMultiplier = 1.0 + Math.min(0.85, state.intercepted * 0.020);
     const finalSpeed = template.speed * speedMultiplier;
 
     threats.push({
@@ -2502,13 +2503,14 @@ function initUavFlightGame() {
 
   // Hostile Coordinated Drone Swarm (5 to 7 Micro-Drones in Formation)
   function spawnDroneSwarm() {
-    const swarmSize = 5 + Math.floor(Math.random() * 3);
+    const swarmSize = 6 + Math.floor(Math.random() * 3);   // Harder: 5-7 -> 6-8
     const startAngle = Math.PI + (Math.random() * Math.PI * 0.7 + 0.15 * Math.PI);
     const startDist = 450;
     const leaderX = BASE.x + Math.cos(startAngle) * startDist;
     const leaderY = BASE.y + Math.sin(startAngle) * startDist;
     const angleToBase = Math.atan2(BASE.y - leaderY, BASE.x - leaderX);
-    const speedMultiplier = 1.0 + Math.min(0.50, state.intercepted * 0.012);
+    // Harder: swarms accelerate further and sooner too.
+    const speedMultiplier = 1.0 + Math.min(0.70, state.intercepted * 0.017);
     const swarmSpeed = (1.85 + Math.random() * 0.40) * speedMultiplier;
 
     state.swarmAlertText = `⚠️ HOSTILE DRONE SWARM DETECTED [${swarmSize}x UNITS]`;
@@ -3012,7 +3014,7 @@ function initUavFlightGame() {
     // Fast automatic missile reload
     if (state.missileCount < state.maxMissiles) {
       state.reloadTimer++;
-      if (state.reloadTimer >= 40) { // 0.66s fast reload for intense combat
+      if (state.reloadTimer >= 50) { // Harder: 0.66s -> 0.83s. Magazine discipline now matters.
         state.missileCount++;
         state.reloadTimer = 0;
         updateTelemetryUI();
@@ -3022,7 +3024,9 @@ function initUavFlightGame() {
     if (state.eccmActiveTimer > 0) state.eccmActiveTimer--;
 
     // High-tempo threat spawn progression (starts at ~1.25s, scales down to a blazing 0.46s floor)
-    const spawnRate = Math.max(28, 75 - Math.floor(state.intercepted * 1.6));
+    // Harder: floor 28 -> 16 frames and a steeper ramp, so the sky fills up
+    // sooner and never lets you idle.
+    const spawnRate = Math.max(23, 72 - Math.floor(state.intercepted * 1.95));
     if (state.frameCount % spawnRate === 0) {
       spawnThreat();
     }
@@ -3104,7 +3108,8 @@ function initUavFlightGame() {
       // Check base perimeter breach
       const distToBase = Math.hypot(t.x - BASE.x, t.y - BASE.y);
       if (distToBase < 35) {
-        state.baseHealth -= t.isSwarm ? 12 : 30;
+        // Harder: a leak is closer to fatal. 3 clean hits end the run.
+        state.baseHealth -= t.isSwarm ? 15 : 36;
         playSound('breach');
         for (let k = 0; k < 18; k++) {
           particles.push({
