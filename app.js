@@ -8652,14 +8652,36 @@ if (document.readyState === 'loading') {
     r.fill.style.width = (p * 100).toFixed(1) + '%';
 
     const mid = r.stageW * 0.5;
+    const SPREAD = Math.min(360, r.stageW * 0.30);  // where the deck piles up
+    const K_STACK = 300;   // how fast lateral travel saturates
+    const K_FLIP  = 520;   // slower, so the first neighbour is mid-flip not edge-on
+
     for (let i = 0; i < r.cards.length; i++) {
       const c = r.cards[i];
-      // signed distance from stage centre, normalised to roughly -1..1
-      // Tighter divisor => the immediate neighbours already sit deep in the
-      // carousel instead of being almost flat. Clamped so far-off cards stop
-      // receding rather than collapsing to nothing.
-      const d = (c.centre + x - mid) / (r.stageW * 0.40);
-      c.el.style.setProperty('--d', (d < -1.35 ? -1.35 : d > 1.35 ? 1.35 : d).toFixed(3));
+
+      const dist = c.centre + x - mid;             // px from stage centre
+      const ad = dist < 0 ? -dist : dist;
+      const sign = dist < 0 ? -1 : 1;
+
+      /* STACK. Flex marches cards linearly off-screen; remap that through an
+       * asymptotic curve so lateral distance saturates near ±SPREAD. Cards
+       * past the first neighbour pile into a fanned deck at each edge instead
+       * of travelling away. --tx is the corrective delta, because the card is
+       * already sitting at `dist` from layout. */
+      const target = sign * (1 - Math.exp(-ad / K_STACK)) * SPREAD;
+
+      /* FLIP. Separate, slower constant so there is real gradation: the
+       * immediate neighbour is mid-flip rather than snapping straight to
+       * edge-on like every card behind it. */
+      const f = ad / K_FLIP;
+      const fn = f > 1 ? 1 : f;
+
+      const st = c.el.style;
+      st.setProperty('--tx', (target - dist).toFixed(1) + 'px');
+      st.setProperty('--a', fn.toFixed(3));
+      st.setProperty('--sgn', String(sign));
+      // Centre on top, each layer of the deck one step behind.
+      st.zIndex = String(200 - Math.round(fn * 90) - Math.min(40, Math.round(ad / 110)));
     }
   }
 
