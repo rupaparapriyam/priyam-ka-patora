@@ -20,9 +20,17 @@ const ALLOWED_ORIGINS = [
   'http://127.0.0.1:4321',
 ];
 
-const MODEL = 'llama-3.3-70b-versatile';
+/* Ordered fallback chain, verified against this account's /v1/models.
+ * A single hardcoded model is exactly how this broke: llama-3.3-70b-versatile
+ * was decommissioned and every request 404'd. If the first is gone, try the
+ * next rather than failing the whole chat. */
+const MODELS = ['openai/gpt-oss-120b', 'qwen/qwen3.8-27b', 'openai/gpt-oss-20b'];
 const MAX_MESSAGES = 12;
-const MAX_CHARS = 4000;
+/* The system prompt alone is ~4k chars, and the RAG context adds several more.
+ * The original 4000 cap rejected every real request with 413, so the page
+ * silently fell back to canned replies. Sized for prompt + context + history
+ * while still refusing anything that looks like prompt-stuffing. */
+const MAX_CHARS = 24000;
 const RATE_PER_MIN = 10;
 const RATE_PER_DAY = 200;
 
@@ -67,6 +75,17 @@ export default {
     if (!ALLOWED_ORIGINS.includes(origin)) return json({ error: 'Origin not allowed' }, 403, origin);
     if (!env.GROQ_API_KEY) return json({ error: 'Proxy not configured' }, 500, origin);
 
+    // Diagnostic: list the models this key can actually use. Returns model ids
+    // only - never the key, never account details.
+    if (new URL(request.url).searchParams.has('models')) {
+      const res = await fetch('https://api.groq.com/openai/v1/models', {
+        headers: { 'Authorization': `Bearer ${env.GROQ_API_KEY}` },
+      });
+      if (!res.ok) return json({ error: `models lookup failed (${res.status})` }, 502, origin);
+      const data = await res.json();
+      return json({ models: (data.data || []).map(m => m.id).sort() }, 200, origin);
+    }
+
     const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
     if (await limited(env, ip)) {
       return json({ error: 'Rate limit reached. Try again shortly.' }, 429, origin);
@@ -82,19 +101,28 @@ export default {
     const total = messages.reduce((n, m) => n + String(m.content || '').length, 0);
     if (total > MAX_CHARS) return json({ error: 'Payload too large' }, 413, origin);
 
-    const upstream = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${env.GROQ_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: body.model || MODEL,
-        messages,
-        temperature: body.temperature ?? 0.9,
-        max_tokens: 500,
-      }),
-    });
+    const chain = body.model ? [body.model, ...MODELS] : MODELS;
+    let upstream = null;
+
+    for (const model of chain) {
+      upstream = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.GROQ_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model,
+          messages,
+          temperature: body.temperature ?? 0.9,
+          max_tokens: 500,
+        }),
+      });
+      if (upstream.ok) break;
+      // Only a missing/unavailable model is worth retrying; auth or rate-limit
+      // failures will repeat identically on every model in the chain.
+      if (upstream.status !== 404 && upstream.status !== 400) break;
+    }
 
     if (!upstream.ok) {
       // Surface only the provider's error MESSAGE, never the body (which can echo
