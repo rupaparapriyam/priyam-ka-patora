@@ -8,3 +8,11 @@ __vt.html
 # scratch probes from debugging sessions
 __*.html
 _cssprobe*.html
+
+# never commit credentials
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+secrets.json
