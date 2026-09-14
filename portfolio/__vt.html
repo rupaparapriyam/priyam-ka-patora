@@ -1,0 +1,20 @@
+<style>
+#a { width:50px;height:50px;background:red;
+  transition: transform 0.95s cubic-bezier(0.16,1,0.3,1);
+  transform: translate3d(var(--tx,0px),0,0); }
+</style>
+<div id="a"></div>
+<pre id="out"></pre>
+<script>
+const a=document.getElementById('a'), out=document.getElementById('out');
+a.style.setProperty('--tx','0px');
+getComputedStyle(a).transform;
+requestAnimationFrame(()=>{
+  a.style.setProperty('--tx','500px');
+  requestAnimationFrame(()=>{
+    setTimeout(()=>{
+      out.textContent = 'after ~100ms: ' + getComputedStyle(a).transform;
+    },100);
+  });
+});
+</script>

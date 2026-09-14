@@ -2277,7 +2277,10 @@ function initFunZone() {
 
     if (!isFunVisible || isModalOpen || isTabHidden) {
       window.pauseUavGame?.(true);
-    } else {
+    } else if (!state.isUserPaused) {
+      // Never auto-resume over a deliberate [P] pause: alt-tabbing, opening
+      // the palette, a modal or the chat all routed through here and silently
+      // un-paused a game the player had paused on purpose.
       window.resumeUavGame?.(true);
     }
   };
@@ -2855,7 +2858,9 @@ function initUavFlightGame() {
       }
       return;
     }
-    if (['Space', 'Enter'].includes(e.code)) {
+    // Only capture Space/Enter once the game has actually started, otherwise a
+    // keyboard user merely scrolling past the Fun Zone loses both keys.
+    if (['Space', 'Enter'].includes(e.code) && state.hasStarted) {
       window.triggerInterceptorLaunch();
       e.preventDefault();
     }
@@ -2879,7 +2884,9 @@ function initUavFlightGame() {
       window.triggerEccmBurst();
       e.preventDefault();
     }
-    if (['Tab', 'Digit1', 'Digit2'].includes(e.code)) {
+    // Tab must never be swallowed - that is a hard keyboard trap: focus can
+    // never leave the Fun Zone. Digits still cycle the radar lock.
+    if (['Digit1', 'Digit2'].includes(e.code)) {
       window.cycleRadarLock();
       e.preventDefault();
     }
@@ -5297,6 +5304,12 @@ function initPriyamAiClone() {
   const input   = document.getElementById('priyam-ai-input');
   const send    = document.getElementById('priyam-ai-send');
   const msgs    = document.getElementById('priyam-ai-messages');
+  // Replies were appended silently: a screen-reader user heard nothing back.
+  if (msgs && !msgs.getAttribute('aria-live')) {
+    msgs.setAttribute('role', 'log');
+    msgs.setAttribute('aria-live', 'polite');
+    msgs.setAttribute('aria-relevant', 'additions text');
+  }
 
   let isTyping = false;
   let chatHistory = [];
@@ -8572,6 +8585,7 @@ if (document.readyState === 'loading') {
 
     const hint = document.createElement('div');
     hint.className = 'rail-hint';
+    hint.setAttribute('aria-hidden', 'true');   // pointer-only guidance
     hint.textContent = 'Scroll ↓  ·  drag the rail  ·  click a card for the full story';
 
     stage.appendChild(hint);
@@ -8593,6 +8607,20 @@ if (document.readyState === 'loading') {
   function measure(r) {
     r.on = eligible();
     r.track.classList.toggle('rail-on', r.on);
+
+    /* CRITICAL. The vertical choreography and the rail both write `transform`
+     * on .stamp-card, and the vertical rules win outright:
+     *   .stamp-card.scroll-3d.is-in:nth-child(odd)  = (0,4,0)
+     *   .rail-on .stamp-card                        = (0,2,0)
+     * Specificity ignores source order, so the rail's flip/stack transform
+     * NEVER rendered - --tx/--a were written to the DOM every frame and
+     * silently discarded. Escalating specificity would be fragile (every future
+     * rail rule would need it), so instead remove the competing class while the
+     * rail owns the card, and restore it when the rail stands down. */
+    r.track.querySelectorAll('.stamp-card').forEach(el => {
+      el.classList.toggle('scroll-3d', !r.on);
+      if (r.on) el.classList.add('is-in');
+    });
 
     if (!r.on) {
       r.body.style.height = '';
@@ -8741,6 +8769,10 @@ if (document.readyState === 'loading') {
     r.stage.addEventListener('pointerdown', e => {
       if (!r.on || e.button !== 0) return;
       down = true; moved = 0; startX = e.clientX; base = r.drag;
+      // Capture keeps move/up bound to this element even if the pointer leaves
+      // the window, which previously left `down` true forever - the rail then
+      // followed the bare mouse with no button held.
+      try { r.stage.setPointerCapture(e.pointerId); } catch (err) {}
     });
 
     window.addEventListener('pointermove', e => {
@@ -8751,20 +8783,52 @@ if (document.readyState === 'loading') {
       onScroll();
     }, { passive: true });
 
-    window.addEventListener('pointerup', () => {
+    function endDrag() {
       if (!down) return;
       down = false;
       // A drag ends in a real click on the card underneath, which would open
       // the project modal on every swipe. Swallow exactly that one click.
       if (moved > 6) {
+        /* Scoped to the rail. This used to listen on `window`, so the first
+         * click ANYWHERE within 350ms of a drag was swallowed - including the
+         * nav, the theme toggle or the chat button. */
         const swallow = ev => { ev.stopPropagation(); ev.preventDefault(); };
-        window.addEventListener('click', swallow, { capture: true, once: true });
-        // If no click follows (drag ended off a card), drop the guard so it
-        // cannot swallow an unrelated click later.
-        setTimeout(() => window.removeEventListener('click', swallow, { capture: true }), 350);
+        r.stage.addEventListener('click', swallow, { capture: true, once: true });
+        setTimeout(() => r.stage.removeEventListener('click', swallow, { capture: true }), 350);
       }
       r.drag = 0;
       onScroll();
+    }
+
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);   // browser stole the gesture
+    window.addEventListener('blur', endDrag);            // alt-tab mid-drag
+  }
+
+  /* Focusing a card the browser cannot reach by scrolling the window (its X is
+   * a transform) makes the browser scroll the sticky .rail-stage's hidden
+   * overflow instead - which permanently blanks the section, since nothing ever
+   * scrolls it back. Snap it to 0 and drive the rail to that card instead. */
+  function guardStageScroll(r) {
+    r.stage.addEventListener('scroll', () => {
+      if (r.stage.scrollLeft !== 0 || r.stage.scrollTop !== 0) {
+        r.stage.scrollLeft = 0;
+        r.stage.scrollTop = 0;
+      }
+    }, { passive: true });
+
+    r.stage.addEventListener('focusin', (e) => {
+      if (!r.on) return;
+      r.stage.scrollLeft = 0;
+      r.stage.scrollTop = 0;
+      const card = e.target.closest?.('.stamp-card');
+      if (!card) return;
+      const m = r.cards.find(c => c.el === card);
+      if (!m || !r.travel) return;
+      // Scroll the PAGE so the pin brings this card to centre.
+      const wanted = Math.max(0, Math.min(1, (m.centre - r.stageW * 0.5) / r.travel));
+      window.scrollTo({ top: r.bodyTop - r.stickyTop + wanted * (r.bodyH - r.stageH), behavior: 'auto' });
+      remeasureAll();
     });
   }
 
@@ -8773,7 +8837,7 @@ if (document.readyState === 'loading') {
     const ambitions = document.querySelector('#ambitions .stamp-cards-grid');
     const a = buildRail('projects', projects);
     const b = buildRail('ambitions', ambitions);
-    [a, b].filter(Boolean).forEach(attachDrag);
+    [a, b].filter(Boolean).forEach(r => { attachDrag(r); guardStageScroll(r); });
     remeasureAll();
 
     window.addEventListener('scroll', onScroll, { passive: true });
@@ -8783,6 +8847,16 @@ if (document.readyState === 'loading') {
     document.querySelectorAll('.pf-btn').forEach(btn =>
       btn.addEventListener('click', () => setTimeout(remeasureAll, 60)));
     window.refreshRails = remeasureAll;
+
+    /* Nothing previously listened for media-feature changes, so toggling
+     * Reduce Motion or attaching a mouse left .rail-on and a stale inline
+     * body height in place - roughly 1100px of blank page. */
+    ['(prefers-reduced-motion: reduce)', '(hover: hover)', '(pointer: fine)'].forEach(q => {
+      const mq = window.matchMedia(q);
+      const onChange = () => remeasureAll();
+      if (mq.addEventListener) mq.addEventListener('change', onChange);
+      else if (mq.addListener) mq.addListener(onChange);
+    });
   }
 
   if (document.readyState === 'loading') {

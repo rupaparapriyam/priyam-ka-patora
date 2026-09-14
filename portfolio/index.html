@@ -107,7 +107,7 @@
   <!-- High-Priority Asset Preloads for 0ms Instant Rendering (Hero Viewport Only) -->
   <link rel="preload" as="image" href="assets/avatar-priyam-casual.webp" type="image/webp" fetchpriority="high" />
 
-  <link rel="stylesheet" href="styles.css?v=20260914_46" />
+  <link rel="stylesheet" href="styles.css?v=20260914_48" />
 </head>
 <body class="preloader-active">
 
@@ -871,7 +871,7 @@
                 <!-- Desktop keyboard legend. The gamepad sits below the screen, so on a
                      laptop you cannot see both at once. This mirrors the same keys on the
                      screen itself and lights up in sync with the physical pad. -->
-                <div class="kbd-legend" id="uav-kbd-legend" aria-hidden="true">
+                <div class="kbd-legend" id="uav-kbd-legend" role="group" aria-label="Keyboard controls">
                   <div class="kbd-legend-head">
                     <span class="kbd-legend-dot"></span>
                     <span>KEYBOARD</span>
@@ -996,11 +996,11 @@
             <div class="snes-chassis">
               <!-- Top Edge: [L] and [R] Shoulder Buttons -->
               <div class="snes-shoulder-row">
-                <button class="snes-shoulder-btn snes-shoulder--left gp-3d-btn" data-key="KeyD" onpointerdown="window.deployPatrolUav()">
+                <button class="snes-shoulder-btn snes-shoulder--left gp-3d-btn" data-key="KeyD" onpointerdown="window.deployPatrolUav()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.deployPatrolUav();}">
                   <span class="snes-sh-key">[D] KEY</span>
                   <span class="snes-sh-title">L · DRONE SQUAD</span>
                 </button>
-                <button class="snes-shoulder-btn snes-shoulder--right gp-3d-btn" data-key="KeyE" onpointerdown="window.triggerEccmBurst()">
+                <button class="snes-shoulder-btn snes-shoulder--right gp-3d-btn" data-key="KeyE" onpointerdown="window.triggerEccmBurst()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.triggerEccmBurst();}">
                   <span class="snes-sh-key">[E] KEY</span>
                   <span class="snes-sh-title">R · ECCM JAMMER</span>
                 </button>
@@ -1012,13 +1012,13 @@
                 <div class="snes-dpad-section">
                   <div class="snes-dpad-well">
                     <div class="snes-cross-dpad">
-                      <button class="snes-dpad-arm snes-dpad--up" onpointerdown="window.cycleRadarLock()" aria-label="Target Up">▲</button>
+                      <button class="snes-dpad-arm snes-dpad--up" onpointerdown="window.cycleRadarLock()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.cycleRadarLock();}" aria-label="Target Up">▲</button>
                       <div class="snes-dpad-mid">
-                        <button class="snes-dpad-arm snes-dpad--left" onpointerdown="window.cycleRadarLock()" aria-label="Target Left">◀</button>
+                        <button class="snes-dpad-arm snes-dpad--left" onpointerdown="window.cycleRadarLock()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.cycleRadarLock();}" aria-label="Target Left">◀</button>
                         <div class="snes-dpad-center"></div>
-                        <button class="snes-dpad-arm snes-dpad--right" onpointerdown="window.cycleRadarLock()" aria-label="Target Right">▶</button>
+                        <button class="snes-dpad-arm snes-dpad--right" onpointerdown="window.cycleRadarLock()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.cycleRadarLock();}" aria-label="Target Right">▶</button>
                       </div>
-                      <button class="snes-dpad-arm snes-dpad--down" onpointerdown="window.cycleRadarLock()" aria-label="Target Down">▼</button>
+                      <button class="snes-dpad-arm snes-dpad--down" onpointerdown="window.cycleRadarLock()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.cycleRadarLock();}" aria-label="Target Down">▼</button>
                     </div>
                   </div>
                   <span class="snes-ctrl-hint mono-label">[TAB / ARROWS] TARGET</span>
@@ -1046,7 +1046,7 @@
                   <div class="snes-buttons-bezel">
                     <!-- Top Blue Button (X) = RAILGUN [R] -->
                     <div class="snes-btn-slot slot-x">
-                      <button class="snes-round-btn btn-blue gp-3d-btn" data-key="KeyR" onpointerdown="window.triggerOrbitalRailgun()" title="X: Railgun">
+                      <button class="snes-round-btn btn-blue gp-3d-btn" data-key="KeyR" onpointerdown="window.triggerOrbitalRailgun()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.triggerOrbitalRailgun();}" title="X: Railgun">
                         <span class="snes-btn-cap">X</span>
                       </button>
                       <div class="snes-btn-info">
@@ -1057,7 +1057,7 @@
 
                     <!-- Left Green Button (Y) = AREA FLAK [F] -->
                     <div class="snes-btn-slot slot-y">
-                      <button class="snes-round-btn btn-green gp-3d-btn" data-key="KeyF" onpointerdown="window.triggerAreaFlak()" title="Y: Area Flak">
+                      <button class="snes-round-btn btn-green gp-3d-btn" data-key="KeyF" onpointerdown="window.triggerAreaFlak()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.triggerAreaFlak();}" title="Y: Area Flak">
                         <span class="snes-btn-cap">Y</span>
                       </button>
                       <div class="snes-btn-info">
@@ -1068,7 +1068,7 @@
 
                     <!-- Right Red Button (A) = INTERCEPT [SPACE] -->
                     <div class="snes-btn-slot slot-a">
-                      <button class="snes-round-btn btn-red gp-3d-btn" data-key="Space" onpointerdown="window.triggerInterceptorLaunch()" title="A: Intercept">
+                      <button class="snes-round-btn btn-red gp-3d-btn" data-key="Space" onpointerdown="window.triggerInterceptorLaunch()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.triggerInterceptorLaunch();}" title="A: Intercept">
                         <span class="snes-btn-cap">A</span>
                       </button>
                       <div class="snes-btn-info">
@@ -1079,7 +1079,7 @@
 
                     <!-- Bottom Yellow Button (B) = SALVO x6 [S] -->
                     <div class="snes-btn-slot slot-b">
-                      <button class="snes-round-btn btn-yellow gp-3d-btn" data-key="KeyS" onpointerdown="window.triggerMultiSalvo()" title="B: Salvo x6">
+                      <button class="snes-round-btn btn-yellow gp-3d-btn" data-key="KeyS" onpointerdown="window.triggerMultiSalvo()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();window.triggerMultiSalvo();}" title="B: Salvo x6">
                         <span class="snes-btn-cap">B</span>
                       </button>
                       <div class="snes-btn-info">
@@ -1409,7 +1409,7 @@
     </div>
   </div>
 
-  <script src="avatar-data.js?v=20260914_46"></script>
-  <script src="app.js?v=20260914_46"></script>
+  <script src="avatar-data.js?v=20260914_48"></script>
+  <script src="app.js?v=20260914_48"></script>
 </body>
 </html>
