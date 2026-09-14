@@ -8816,7 +8816,32 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
    inside the rail, because a pinned rail freezes vertical position and would
    strand every card invisible.                                             */
 
+/* CRITICAL: these wrappers must only take their pinned form when JS has
+   actually enabled the rail. Previously .rail-stage was pinned purely by a
+   media query while JS gated on a DIFFERENT predicate (innerWidth >= 860 AND
+   hover:hover AND pointer:fine AND !reduce). On a touchscreen laptop - wide,
+   but coarse pointer - JS disabled the rail while the media query did not, so
+   a 842px sticky overflow:hidden box stayed wrapped around a plain vertical
+   grid and clipped most of Projects out of existence. Keying off .rail-on,
+   which only JS sets, makes one predicate the single source of truth. */
 .rail-body { position: relative; }
+
+.rail-body:not(:has(.rail-on)) {
+  height: auto !important;
+}
+
+.rail-body:not(:has(.rail-on)) .rail-stage {
+  position: static;
+  height: auto;
+  overflow: visible;
+  perspective: none;
+  display: block;
+}
+
+.rail-body:not(:has(.rail-on)) .rail-progress,
+.rail-body:not(:has(.rail-on)) .rail-hint {
+  display: none;
+}
 
 .rail-stage {
   position: sticky;
@@ -9034,14 +9059,10 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
   transition: none !important;
 }
 
-.rail-on .stamp-card:hover {
-  transform:
-    perspective(1200px)
-    translate3d(calc(var(--d, 0) * 36px), calc(-10px + var(--d, 0) * var(--d, 0) * 34px), calc(60px + (var(--d, 0) * var(--d, 0) * -420px)))
-    rotateY(calc(var(--d, 0) * -38deg))
-    scale(calc(1.11 - (var(--d, 0) * var(--d, 0) * 0.26)));
-  z-index: 5;
-}
+/* Removed a duplicate .rail-on .stamp-card:hover that still keyed off --d,
+   a property renamed to --tx/--a/--sgn. Being later in the file with equal
+   specificity it was winning, reverting the composed-hover fix and
+   collapsing every hovered card to its untransformed pose. */
 
 .rail-on .pair-link { display: none; }
 
