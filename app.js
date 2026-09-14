@@ -8556,6 +8556,24 @@ if (document.readyState === 'loading') {
    document coordinate) and initNavSpy's offsetTop reads stay correct.
    ========================================================================== */
 (function initPinnedRails() {
+  /* DISABLED - Projects and Ambitions render as the plain vertical grid.
+   *
+   * The pinned horizontal deck shipped and was tried at 88deg and then 22deg;
+   * the flip read as too much at every strength, so the grid is the deliberate
+   * choice, not a fallback we ended up on by accident.
+   *
+   * The engine below is left intact but dormant - flip RAIL_ENABLED to true to
+   * bring it back, nothing else needs changing. It is safe to leave here:
+   *   - it builds all of its own DOM (.rail-body/.rail-stage), so with boot()
+   *     skipped the markup stays exactly as authored,
+   *   - every horizontal rule is scoped under .rail-on, which is never added,
+   *     so the base `display: grid` applies untouched,
+   *   - initScroll3D() above owns the grid's per-card 3D choreography and is
+   *     completely independent of this.
+   * window.refreshRails is only ever assigned here, never called elsewhere. */
+  const RAIL_ENABLED = false;
+  if (!RAIL_ENABLED) return;
+
   /* Was 1024, which silently disabled the rail in any window narrower than a
    * full-screen desktop — including a browser beside a chat panel, which is
    * where it was actually being looked at. 860 still comfortably fits two cards
