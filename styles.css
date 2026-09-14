@@ -8947,8 +8947,8 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
      +2     74deg   scale 0.66   depth -560px   stacked 332px
      +3..   74deg   scale 0.66   depth -560px   stacked ~355px  (the pile)   */
 .rail-on .stamp-card {
-  flex: 0 0 clamp(280px, 23vw, 360px);
-  height: clamp(440px, 62vh, 580px);
+  flex: 0 0 clamp(300px, 26vw, 360px);   /* wider floor: narrow windows wrapped the copy into far more lines */
+  height: clamp(480px, 82vh, 720px);
   min-height: 0;
   overflow: hidden;
   border-radius: 14px;
@@ -8958,16 +8958,35 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
   transform-origin: 50% 50%;
   backface-visibility: hidden;
 
+  /* .stamp-card carries `transition: transform 0.18s var(--ease-spring)`, which
+     is right for a static grid and wrong for a deck the scroll handler redraws
+     every frame: each write restarted a 0.18s spring, so the cards sprang after
+     the scroll instead of tracking it — rubbery, always a beat behind, and it
+     also meant measure() could read a card mid-flight. The rail owns transform
+     directly; keep the transition for the paint-only properties. */
+  transition: box-shadow 0.18s ease, background 0.15s ease;
+
+  /* Softened. At 660px tall the card is a big surface, so perspective(1400px)
+     amplifies every degree — 26deg read as a hard turn with the near edge
+     visibly taller than the far one. 11deg keeps the depth cue and drops the
+     distortion; the depth push and scale carry most of the recession now. */
   transform:
-    perspective(1400px)
-    translate3d(var(--tx, 0px), calc(var(--a, 0) * var(--a, 0) * 22px), calc(var(--a, 0) * var(--a, 0) * -560px))
-    rotateY(calc(var(--sgn, 1) * var(--a, 0) * -88deg))
-    rotateZ(calc(var(--sgn, 1) * var(--a, 0) * 4.5deg))
-    scale(calc(1 - (var(--a, 0) * 0.34)));
+    perspective(1800px)
+    translate3d(var(--tx, 0px), calc(var(--a, 0) * var(--a, 0) * 6px), calc(var(--a, 0) * var(--a, 0) * -110px))
+    rotateY(calc(var(--sgn, 1) * var(--a, 0) * -22deg))
+    rotateZ(calc(var(--sgn, 1) * var(--a, 0) * 0.9deg))
+    scale(calc(1 - (var(--a, 0) * 0.11)));
 
   box-shadow:
-    0 calc(20px + (var(--a, 0) * 44px)) calc(44px + (var(--a, 0) * 66px)) -16px rgba(0, 0, 0, calc(0.28 + (var(--a, 0) * 0.30))),
+    0 calc(18px + (var(--a, 0) * 26px)) calc(40px + (var(--a, 0) * 38px)) -16px rgba(0, 0, 0, calc(0.26 + (var(--a, 0) * 0.16))),
     0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+/* Geometry probe. measure() adds .rail-measuring for exactly as long as it
+   takes to read the card rects, so it sees the untransformed layout box. */
+.rail-on.rail-measuring .stamp-card {
+  transform: none !important;
+  transition: none !important;
 }
 
 /* Fixed-height cards need their content composed, not overflowing.
@@ -8975,12 +8994,29 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
    display blockified — `-webkit-box` became `flow-root`, and line-clamp without
    that display collapses the element to 1px. The body text vanished entirely.
    A masked max-height clips gracefully with no display trickery. */
+/* The fade mask was slicing sentences in half ("auto-drafts reports in 3s and",
+   "reads them as one person. MVP is"). The cause was a magic `max-height: 17em`
+   — 238px of text box inside a 660px card, so five cards clipped while the card
+   still had room going spare. Let flexbox hand this the ACTUAL leftover space
+   instead: `flex: 1 1 auto` + `min-height: 0` (without which a flex item refuses
+   to shrink below its content and the card overflows instead). The box now
+   tracks card height and viewport with no number to keep in sync, and the mask
+   is a safety valve that should never fire on the current copy. */
 .rail-on .stamp-card .sc-sub {
-  flex: 0 1 auto;
-  max-height: 11.5em;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: none;
+  line-height: 1.46;
+  /* Short windows are the hard case: the card is pinned to its 280px minimum
+     width there, so the same copy wraps into far more lines with far less card
+     to put them in. Scale the copy with available height — 14px on a tall
+     window, ~12.5px on a short one. Text height goes roughly as the square of
+     font-size (fewer chars per line AND taller lines), so this small range
+     buys back about a fifth of the block. */
+  font-size: clamp(0.78rem, 0.62rem + 0.42vh, 0.875rem);
   overflow: hidden;
-  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 92%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 92%, transparent 100%);
 }
 
 .rail-on .stamp-card .sc-footer { margin-top: auto; }
@@ -9016,8 +9052,8 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
   pointer-events: none;
   z-index: 2;
   box-shadow:
-    inset 0 0 0 1px rgba(0, 240, 255, calc(0.6 - (var(--a, 0) * 0.6))),
-    inset 0 0 0 1px rgba(0, 0, 0, calc(var(--a, 0) * 0.18));
+    inset 0 0 0 1px rgba(0, 240, 255, calc(0.45 - (var(--a, 0) * 0.45))),
+    inset 0 0 0 1px rgba(0, 0, 0, calc(var(--a, 0) * 0.12));
 }
 
 /* Cards recede into the page rather than merely shrinking. Capped so the
@@ -9030,16 +9066,16 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
   pointer-events: none;
   border-radius: 14px;
   background: var(--paper);
-  opacity: calc(var(--a, 0) * var(--a, 0) * 0.42);
+  opacity: calc(var(--a, 0) * var(--a, 0) * 0.12);
 }
 
 /* Hover composes with the deck transform — replacing it snapped the card flat */
 .rail-on .stamp-card:hover {
   transform:
-    perspective(1400px)
-    translate3d(var(--tx, 0px), calc(-12px + (var(--a, 0) * var(--a, 0) * 22px)), calc(70px + (var(--a, 0) * var(--a, 0) * -560px)))
-    rotateY(calc(var(--sgn, 1) * var(--a, 0) * -60deg))
-    scale(calc(1.05 - (var(--a, 0) * 0.34)));
+    perspective(1800px)
+    translate3d(var(--tx, 0px), calc(-10px + (var(--a, 0) * var(--a, 0) * 6px)), calc(60px + (var(--a, 0) * var(--a, 0) * -110px)))
+    rotateY(calc(var(--sgn, 1) * var(--a, 0) * -17deg))
+    scale(calc(1.04 - (var(--a, 0) * 0.06)));
   z-index: 300 !important;
 }
 
