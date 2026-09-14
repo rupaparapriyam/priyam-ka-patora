@@ -8606,8 +8606,22 @@ if (document.readyState === 'loading') {
     // Natural width of the track content, then the pin length it needs.
     r.track.style.transform = 'translate3d(0,0,0)';   // measure untransformed
     r.body.style.height = 'auto';
-    const trackW = r.track.scrollWidth;
     const stageW = r.stage.clientWidth;
+
+    /* Travel from the real content extent, NOT scrollWidth: on a flex container
+     * scrollWidth omits trailing padding, so the Ambitions rail (which relies on
+     * deep gutters to have anything to travel) reported 47px and never flipped.
+     * Measure to the last card's right edge and add the track's own end padding. */
+    const tRectM = r.track.getBoundingClientRect();
+    const all = r.track.querySelectorAll('.stamp-card:not(.filtered-out)');
+    let contentRight = 0;
+    for (let i = 0; i < all.length; i++) {
+      const rr = all[i].getBoundingClientRect();
+      const right = (rr.left - tRectM.left) + rr.width;
+      if (right > contentRight) contentRight = right;
+    }
+    const padRight = parseFloat(getComputedStyle(r.track).paddingRight) || 0;
+    const trackW = contentRight + padRight;
     r.travel = Math.max(0, trackW - stageW);
 
     r.stageH = window.innerHeight - navH;

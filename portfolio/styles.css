@@ -8835,6 +8835,13 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
 
 /* The existing grid becomes the track. Children stay flat siblings, so the
    filter engine's .tier-head -> nextElementSibling walk is untouched. */
+#ambitions .stamp-cards-grid.rail-on {
+  /* Only two cards here: without deep gutters the track is barely wider than
+     the stage, travel is ~0 and the deck never flips. */
+  padding-left: 32vw !important;
+  padding-right: 32vw !important;
+}
+
 #projects-grid.rail-on,
 #ambitions .stamp-cards-grid.rail-on {
   display: flex;
@@ -8908,7 +8915,7 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
      +3..   74deg   scale 0.66   depth -560px   stacked ~355px  (the pile)   */
 .rail-on .stamp-card {
   flex: 0 0 clamp(280px, 23vw, 360px);
-  height: clamp(400px, 54vh, 520px);
+  height: clamp(440px, 62vh, 580px);
   min-height: 0;
   overflow: hidden;
   border-radius: 14px;
@@ -8930,15 +8937,41 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
     0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
-/* Fixed-height cards need their content composed, not overflowing */
+/* Fixed-height cards need their content composed, not overflowing.
+   NOT -webkit-line-clamp: .sc-sub carries `flex: 1`, and a flex item gets its
+   display blockified — `-webkit-box` became `flow-root`, and line-clamp without
+   that display collapses the element to 1px. The body text vanished entirely.
+   A masked max-height clips gracefully with no display trickery. */
 .rail-on .stamp-card .sc-sub {
-  display: -webkit-box;
-  -webkit-line-clamp: 6;
-  -webkit-box-orient: vertical;
+  flex: 0 1 auto;
+  max-height: 11.5em;
   overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
 }
 
 .rail-on .stamp-card .sc-footer { margin-top: auto; }
+
+/* Headlines are set for a wide grid cell. In a fixed 360px card the long ones
+   ("Autonomous Defence AI For Zero-Tolerance Edge") overflowed and were sliced
+   by the card's overflow:hidden. Scale them to the narrower box and let long
+   words break rather than run past the edge. */
+.rail-on .stamp-card .sc-headline {
+  font-size: clamp(1.45rem, 2vw, 1.95rem);
+  line-height: 1.04;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
+}
+
+.rail-on .stamp-card.tier-1-card .sc-headline {
+  font-size: clamp(1.6rem, 2.2vw, 2.15rem);
+}
+
+.rail-on .stamp-card .sc-headline .rise-line {
+  display: block;
+  overflow-wrap: break-word;
+}
 
 /* Rim: only fully lit at dead centre, so focus is unambiguous. Doubles as the
    edge that separates overlapping cards once they pile into the deck. */
