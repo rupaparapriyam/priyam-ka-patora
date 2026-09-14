@@ -8631,7 +8631,9 @@ if (document.readyState === 'loading') {
     r.stageH = window.innerHeight - navH;
     // 1px of vertical scroll ~ 1px of horizontal travel feels right, plus a
     // little dwell at each end so the first and last card are readable.
-    const pin = r.travel > 0 ? r.travel + r.stageH * 0.5 : 0;
+    // Dwell trimmed 0.5 -> 0.18 of a stage: half a viewport of scrolling after
+    // the rail had finished travelling read as dead space.
+    const pin = r.travel > 0 ? r.travel + r.stageH * 0.18 : 0;
     r.bodyH = r.stageH + pin;
     r.body.style.height = r.bodyH + 'px';
 
@@ -8675,8 +8677,8 @@ if (document.readyState === 'loading') {
      * Previously K_FLIP 520 meant every card past the second sat at a flat 74deg.
      * At ~384px pitch the flip now spreads over roughly four cards. */
     const SPREAD  = Math.min(460, r.stageW * 0.38);  // where the deck piles up
-    const K_STACK = 420;   // how fast lateral travel saturates
-    const K_FLIP  = 980;   // much slower => a real gradient of half-turned cards
+    const K_STACK = 360;   // how fast lateral travel saturates
+    const K_FLIP  = 620;   // harder + faster turn while still spanning ~3 cards
 
     for (let i = 0; i < r.cards.length; i++) {
       const c = r.cards[i];
