@@ -8598,7 +8598,18 @@ if (document.readyState === 'loading') {
       r.body.style.height = '';
       r.stage.style.top = '';
       r.track.style.transform = '';
-      r.cards.forEach(c => c.el.style.removeProperty('--d'));
+      /* Clear EVERY property the rail writes. This cleared only the long-since
+       * renamed --d, so --tx/--a/--sgn and an inline z-index of ~175 survived
+       * into the vertical grid, where that z-index outranks the grid's own
+       * hover rule (z-index: 2) and breaks card stacking on hover. */
+      r.cards.forEach(c => {
+        const st = c.el.style;
+        st.removeProperty('--d');
+        st.removeProperty('--tx');
+        st.removeProperty('--a');
+        st.removeProperty('--sgn');
+        st.removeProperty('z-index');
+      });
       return;
     }
 
@@ -8780,3 +8791,29 @@ if (document.readyState === 'loading') {
     boot();
   }
 })();
+
+/* ==========================================================================
+   KEYBOARD ACTIVATION FOR role="button" ELEMENTS
+   --------------------------------------------------------------------------
+   The project cards are <article role="button" tabindex="0" onclick=...>. A
+   native <button> activates on Enter and Space for free; an element merely
+   *labelled* as a button does not. Keyboard users could tab to all 9 cards and
+   open none of them — the aria-label and role advertised an affordance that
+   was not actually wired up.
+
+   Delegated so it also covers the rail (cards are never re-parented, but this
+   survives any future re-render) and anything else marked role="button".
+   ========================================================================== */
+document.addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+
+  const el = e.target;
+  if (!el || el.getAttribute?.('role') !== 'button') return;
+
+  // Real buttons and form controls already handle this themselves.
+  const tag = el.tagName;
+  if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+  e.preventDefault();          // Space would otherwise scroll the page
+  el.click();
+});
