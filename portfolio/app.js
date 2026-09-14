@@ -2277,7 +2277,7 @@ function initFunZone() {
 
     if (!isFunVisible || isModalOpen || isTabHidden) {
       window.pauseUavGame?.(true);
-    } else if (!state.isUserPaused) {
+    } else if (!window.isUavUserPaused?.()) {
       // Never auto-resume over a deliberate [P] pause: alt-tabbing, opening
       // the palette, a modal or the chat all routed through here and silently
       // un-paused a game the player had paused on purpose.
@@ -3761,6 +3761,14 @@ function initUavFlightGame() {
       window.showToast?.('Tactical Radar C2: Resumed [P]');
     }
   };
+
+  /* `state` lives in this closure, but updateGameAutoLifecycle() lives in
+   * initFunZone() - a sibling scope. Reading `state.isUserPaused` from there
+   * threw a ReferenceError every time the Fun Zone was on screen and nothing
+   * was blocking, which killed the auto-resume path and the
+   * IntersectionObserver callback with it. Expose it like the pause/resume
+   * handles above so the lifecycle can ask without reaching into the scope. */
+  window.isUavUserPaused = () => state.isUserPaused;
 
   window.pauseUavGame = (isAuto = false) => {
     if (!isAuto) state.isUserPaused = true;
