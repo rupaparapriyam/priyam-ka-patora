@@ -1,3 +1,10 @@
 .wrangler/
 wrangler.jsonc
 proxy/.wrangler/
+
+# stray CSS/JS scratch probes
+__vt.html
+
+# scratch probes from debugging sessions
+__*.html
+_cssprobe*.html

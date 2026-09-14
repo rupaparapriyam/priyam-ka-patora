@@ -8646,6 +8646,17 @@ if (document.readyState === 'loading') {
     r.stickyTop = navH;
     r.stage.style.top = navH + 'px';
 
+    /* Read LAYOUT geometry, not the live deck. Every rect below belongs to a
+     * card that render() has already flipped, stacked and scaled, and
+     * getBoundingClientRect reports the TRANSFORMED box — up to 88deg of
+     * rotateY (a much narrower box), scale 0.66, plus the --tx shift. So
+     * `travel` was derived from the very stack state that `travel` produces:
+     * the pin height swung between 2475px and 4655px on identical content,
+     * the scroll->rail mapping moved under the pointer, and the deck lurched
+     * backwards every time a remeasure landed. The class zeroes the card
+     * transform (and its transition) for the duration of the read. */
+    r.track.classList.add('rail-measuring');
+
     // Natural width of the track content, then the pin length it needs.
     r.track.style.transform = 'translate3d(0,0,0)';   // measure untransformed
     r.body.style.height = 'auto';
@@ -8694,6 +8705,7 @@ if (document.readyState === 'loading') {
       const cr = el.getBoundingClientRect();
       r.cards.push({ el, centre: (cr.left - tRect.left) + cr.width * 0.5 + 0 * applied });
     }
+    r.track.classList.remove('rail-measuring');   // hand the deck back to render()
     r.stageW = stageW;
   }
 
@@ -8715,9 +8727,9 @@ if (document.readyState === 'loading') {
      * several cards rather than "two readable cards plus a uniform pile".
      * Previously K_FLIP 520 meant every card past the second sat at a flat 74deg.
      * At ~384px pitch the flip now spreads over roughly four cards. */
-    const SPREAD  = Math.min(460, r.stageW * 0.38);  // where the deck piles up
-    const K_STACK = 360;   // how fast lateral travel saturates
-    const K_FLIP  = 620;   // harder + faster turn while still spanning ~3 cards
+    const SPREAD  = Math.min(700, r.stageW * 0.55);  // where the deck piles up
+    const K_STACK = 700;   // how fast lateral travel saturates
+    const K_FLIP  = 950;   // softer than the 88deg slam, still visibly a deck
 
     for (let i = 0; i < r.cards.length; i++) {
       const c = r.cards[i];
