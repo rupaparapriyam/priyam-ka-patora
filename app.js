@@ -8535,7 +8535,11 @@ if (document.readyState === 'loading') {
    document coordinate) and initNavSpy's offsetTop reads stay correct.
    ========================================================================== */
 (function initPinnedRails() {
-  const MIN_WIDTH = 1024;
+  /* Was 1024, which silently disabled the rail in any window narrower than a
+   * full-screen desktop — including a browser beside a chat panel, which is
+   * where it was actually being looked at. 860 still comfortably fits two cards
+   * plus gutters, and touch/reduced-motion remain excluded below. */
+  const MIN_WIDTH = 860;
 
   function eligible() {
     return window.innerWidth >= MIN_WIDTH &&
@@ -8666,9 +8670,13 @@ if (document.readyState === 'loading') {
     r.fill.style.width = (p * 100).toFixed(1) + '%';
 
     const mid = r.stageW * 0.5;
-    const SPREAD = Math.min(360, r.stageW * 0.30);  // where the deck piles up
-    const K_STACK = 300;   // how fast lateral travel saturates
-    const K_FLIP  = 520;   // slower, so the first neighbour is mid-flip not edge-on
+    /* SPREAD widened and K_FLIP roughly doubled so the flip is a GRADIENT across
+     * several cards rather than "two readable cards plus a uniform pile".
+     * Previously K_FLIP 520 meant every card past the second sat at a flat 74deg.
+     * At ~384px pitch the flip now spreads over roughly four cards. */
+    const SPREAD  = Math.min(460, r.stageW * 0.38);  // where the deck piles up
+    const K_STACK = 420;   // how fast lateral travel saturates
+    const K_FLIP  = 980;   // much slower => a real gradient of half-turned cards
 
     for (let i = 0; i < r.cards.length; i++) {
       const c = r.cards[i];
