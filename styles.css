@@ -8774,3 +8774,29 @@ body:has(#cmd-palette-modal:not(.hidden)) .ai-widget-wrapper {
   }
   .preloader-script { animation: none; filter: none; }
 }
+
+/* The start overlay sits at z-index 10 and covered the legend entirely, so it
+   was never visible before the game began — which is also the only time it is
+   useless. Show it only while the game is actually running, above the CRT
+   effect layers but below the game-over overlay. */
+.kbd-legend { display: none; }
+
+.tv-crt-viewport:has(#uav-start-overlay.hidden) .kbd-legend {
+  display: block;
+  z-index: 9;
+  animation: legendIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes legendIn {
+  from { opacity: 0; transform: translateX(8px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Touch devices have the tappable pad; the legend stays desktop-only. */
+@media (hover: none), (max-width: 900px) {
+  .tv-crt-viewport:has(#uav-start-overlay.hidden) .kbd-legend { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tv-crt-viewport:has(#uav-start-overlay.hidden) .kbd-legend { animation: none; }
+}
